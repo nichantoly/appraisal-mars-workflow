@@ -171,6 +171,7 @@ PROCESS:
   folds); log package + version, full config (degree, penalty, nk, pmethod,
   nfold), and a config hash in Model Detail. Note which methods are deterministic
   vs seed-dependent.
+- Always write and execute code for all calculations (or run the included R script); never estimate results by reading the data directly.
 
 DELIVERABLES:
 - PDF addendum (Spark-style): Adjustment Support page(s) with headline/low/high/
