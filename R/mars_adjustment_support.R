@@ -31,20 +31,68 @@ sales_path <- args[1]; subject_path <- args[2]; comps_path <- args[3]; out_dir <
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
 ## ---- Config & reproducibility --------------------------------------------
+msg <- function(...) message(sprintf("[%s] %s", format(Sys.time(), "%H:%M:%S"), sprintf(...)))
 cfg <- list(master_seed = 20260709L, degree = 1L, penalty = 2, nk = 21L,
-            pmethod = "backward", nfold = 5L, theilsen_max_pairs = 50000L,
-            min_n_feature = 20L, gla_band_default = 500)
+            pmethod = "backward", theilsen_max_pairs = 50000L,
+            min_n_feature = 20L, max_missing_frac = 0.30, gla_band_default = 500)
 if (length(args) >= 5) { user_cfg <- fromJSON(args[5]); cfg[names(user_cfg)] <- user_cfg }
 seeds <- list(lms = cfg$master_seed + 1L, boot = cfg$master_seed + 10000L,
-              cv = cfg$master_seed + 20000L, theilsen = cfg$master_seed + 30000L)
-cfg_string <- toJSON(cfg, auto_unbox = TRUE)
-tf <- tempfile(); writeLines(as.character(cfg_string), tf)
-cfg_hash <- strsplit(system(paste("sha256sum", tf), intern = TRUE), " ")[[1]][1]
+              theilsen = cfg$master_seed + 30000L)
+cfg_string <- as.character(toJSON(cfg, auto_unbox = TRUE))
+cfg_hash <- if (requireNamespace("digest", quietly = TRUE)) {
+  digest::digest(cfg_string, algo = "sha256")
+} else {
+  tf <- tempfile(); writeLines(cfg_string, tf)
+  h <- tryCatch(strsplit(system(paste("sha256sum", tf), intern = TRUE), " ")[[1]][1],
+                error = function(e) NA_character_)
+  if (is.na(h)) msg("WARNING: no sha256 available; config hash omitted (install R package 'digest')")
+  h
+}
+msg("Config hash: %s", cfg_hash)
 
 ## ---- Load inputs -----------------------------------------------------------
-sales   <- read.csv(sales_path, stringsAsFactors = FALSE)
-subject <- read.csv(subject_path, stringsAsFactors = FALSE)[1, ]
+num_cols  <- c("sale_price","concessions","gla","lot_sf","garage","full_baths",
+               "half_baths","bsmt_fin_sf","bsmt_unf_sf","year_built","levels")
+flag_cols <- c("arms_length","new_construction","to_be_built")
+to_num <- function(x) suppressWarnings(as.numeric(gsub("[$, ]", "", as.character(x))))
+to_date <- function(x) {
+  x <- as.character(x)
+  for (f in c("%Y-%m-%d","%m/%d/%Y","%m/%d/%y","%m-%d-%Y","%d-%b-%Y","%B %d, %Y")) {
+    d <- as.Date(x, format = f); if (mean(!is.na(d)) > 0.9) return(d) }
+  as.Date(x)  # last resort; NAs surface in validation below
+}
+validate_inputs <- function(sales, subject, comps_ids) {
+  need <- c("mls_id","address","sale_price","sale_date","subdivision")
+  missing_cols <- setdiff(need, names(sales))
+  if (length(missing_cols)) stop("sales.csv missing required columns: ", paste(missing_cols, collapse = ", "))
+  for (cn in intersect(num_cols, names(sales))) sales[[cn]] <- to_num(sales[[cn]])
+  for (cn in flag_cols) {
+    if (!cn %in% names(sales)) { sales[[cn]] <- if (cn == "arms_length") 1L else 0L
+      msg("NOTE: column '%s' absent; defaulting to %d for all rows", cn, sales[[cn]][1]) }
+    v <- suppressWarnings(as.integer(as.character(sales[[cn]])))
+    n_na <- sum(is.na(v))
+    if (n_na) msg("NOTE: %d non-numeric values in flag '%s' treated as %d", n_na,
+                  cn, ifelse(cn == "arms_length", 1L, 0L))
+    v[is.na(v)] <- if (cn == "arms_length") 1L else 0L
+    sales[[cn]] <- v
+  }
+  sales$sale_date_parsed <- to_date(sales$sale_date)
+  bad_dates <- sum(is.na(sales$sale_date_parsed))
+  if (bad_dates) msg("WARNING: %d unparseable sale_date values; those rows will be excluded", bad_dates)
+  if (nrow(subject) != 1) stop("subject.csv must contain exactly one row (found ", nrow(subject), ")")
+  for (cn in intersect(num_cols, names(subject))) subject[[cn]] <- to_num(subject[[cn]])
+  missing_comps <- setdiff(comps_ids, sales$mls_id)
+  if (length(missing_comps)) msg("WARNING: %d comp id(s) not found in sales.csv: %s",
+    length(missing_comps), paste(missing_comps, collapse = ", "))
+  list(sales = sales, subject = subject, missing_comps = missing_comps)
+}
+sales   <- read.csv(sales_path, stringsAsFactors = FALSE, colClasses = "character")
+subject <- read.csv(subject_path, stringsAsFactors = FALSE)
 comps_ids <- trimws(readLines(comps_path)); comps_ids <- comps_ids[comps_ids != ""]
+vi <- validate_inputs(sales, subject, comps_ids)
+sales <- vi$sales; subject <- vi$subject[1, ]
+msg("Loaded %d sales, %d comps requested, %d comp id(s) unmatched",
+    nrow(sales), length(comps_ids), length(vi$missing_comps))
 subject_is_new <- isTRUE(as.integer(subject$subject_is_new) == 1L)
 gla_band <- if (!is.null(subject$gla_band) && !is.na(subject$gla_band)) as.numeric(subject$gla_band) else cfg$gla_band_default
 
@@ -59,6 +107,7 @@ if (!subject_is_new) mark(as.integer(sales$new_construction) == 1L,
                           "new construction (subject is not new/newer)")
 mark(as.integer(sales$arms_length) == 0L, "non-arm's-length")
 sales$concessions[is.na(sales$concessions)] <- 0
+mark(is.na(sales$sale_date_parsed), "unparseable sale date")
 mark(is.na(sales$sale_price) | (sales$sale_price - sales$concessions) <= 0, "impossible: sale/net price")
 mark(is.na(sales$gla) | sales$gla <= 0, "impossible: GLA")
 mark(!is.na(sales$year_built) & (sales$year_built < 1700 | sales$year_built > 2100), "impossible: year built")
@@ -67,7 +116,7 @@ write.csv(excl, file.path(out_dir, "exclusions.csv"), row.names = FALSE)
 d <- sales[sales$exclude_reason == "", ]
 d$concessions[is.na(d$concessions)] <- 0
 d$net_price <- d$sale_price - d$concessions
-d$sale_date <- as.Date(d$sale_date)
+d$sale_date <- d$sale_date_parsed
 d$t <- as.numeric(difftime(d$sale_date, min(d$sale_date), units = "days")) / 30.4375  # months
 eff_month <- max(d$t)
 d$subdivision <- factor(d$subdivision)
@@ -75,10 +124,18 @@ n_clean <- nrow(d)
 if (n_clean < 100) warning(sprintf("Only %d usable sales; results may be weak.", n_clean))
 
 ## ---- Stage 1: time index (earth on ln price) -------------------------------
-num_ok <- features[sapply(features, function(f) f %in% names(d) && sum(!is.na(d[[f]])) > cfg$min_n_feature)]
+present <- features[features %in% names(d)]
+miss_frac <- sapply(present, function(f) mean(is.na(d[[f]])))
+dropped_missing <- present[miss_frac > cfg$max_missing_frac]
+if (length(dropped_missing)) msg("Dropped for >%d%% missing: %s",
+  round(100*cfg$max_missing_frac), paste(dropped_missing, collapse=", "))
+num_ok <- setdiff(present[sapply(present, function(f) sum(!is.na(d[[f]])) > cfg$min_n_feature)], dropped_missing)
+imputed_counts <- sapply(num_ok, function(f) sum(is.na(d[[f]])))
 for (f in num_ok) d[[f]][is.na(d[[f]])] <- median(d[[f]], na.rm = TRUE)
+if (sum(imputed_counts)) msg("Median-imputed cells: %s",
+  paste(sprintf("%s=%d", names(imputed_counts)[imputed_counts>0], imputed_counts[imputed_counts>0]), collapse=", "))
 f1 <- as.formula(paste("log(net_price) ~ t +", paste(num_ok, collapse = " + "), "+ subdivision"))
-m1 <- earth(f1, data = d, degree = 1, penalty = cfg$penalty, pmethod = cfg$pmethod)
+m1 <- earth(f1, data = d, degree = 1, nk = cfg$nk, penalty = cfg$penalty, pmethod = cfg$pmethod)
 # Partial dependence of time: vary t, hold others at subject-like reference
 ref <- d[1, ]; for (f in num_ok) ref[[f]] <- median(d[[f]]); ref$subdivision <- d$subdivision[1]
 tgrid <- seq(0, ceiling(eff_month))
@@ -93,14 +150,14 @@ d$half <- factor(floor(d$t / 6))
 mh <- lm(as.formula(paste("log(net_price) ~ half +", paste(num_ok, collapse = " + "))), data = d)
 half_coefs <- coef(mh)[grep("^half", names(coef(mh)))]
 halves <- sort(unique(as.integer(as.character(d$half))))
-mars_half <- sapply(halves, function(h) {
+mars_half <- setNames(sapply(halves, function(h) {
   sel <- tgrid >= h * 6 & tgrid < (h + 1) * 6
   if (!any(sel)) sel <- which.min(abs(tgrid - (h * 6 + 3)))
-  mean(pd[sel]) - mean(pd[tgrid < 6]) })
-k <- min(length(half_coefs), length(mars_half) - 1)
-time_check <- data.frame(half_year = seq_len(k),
-                         dummy_reg = round(as.numeric(half_coefs[seq_len(k)]), 4),
-                         mars_index = round(mars_half[-1][seq_len(k)], 4))
+  mean(pd[sel]) - mean(pd[tgrid < 6]) }), paste0("half", halves))
+common <- intersect(names(half_coefs), names(mars_half))
+time_check <- data.frame(half_year = sub("half", "", common),
+                         dummy_reg = round(as.numeric(half_coefs[common]), 4),
+                         mars_index = round(as.numeric(mars_half[common]), 4))
 time_check$divergence_pct <- round(100 * abs(time_check$dummy_reg - time_check$mars_index), 2)
 # Repeat sales check
 rep_addr <- names(which(table(d$address) > 1))
@@ -112,16 +169,19 @@ d$ta_price <- d$net_price * d$mult
 
 ## ---- Stage 2: adjustment model ---------------------------------------------
 f2 <- as.formula(paste("ta_price ~", paste(num_ok, collapse = " + "), "+ subdivision"))
-m2 <- earth(f2, data = d, degree = 1, penalty = cfg$penalty, pmethod = cfg$pmethod)
+m2 <- earth(f2, data = d, degree = cfg$degree, nk = cfg$nk, penalty = cfg$penalty, pmethod = cfg$pmethod)
 bx <- m2$bx                                        # basis matrix incl intercept
+if (n_clean <= ncol(bx) + 5) stop(sprintf(
+  "Too few sales (%d) for %d model terms; cannot compute credible SEs.", n_clean, ncol(bx)))
 lmfit <- lm.fit(bx, d$ta_price)
 sigma2 <- sum(lmfit$residuals^2) / (n_clean - ncol(bx))
-XtXinv <- chol2inv(chol(crossprod(bx)))
+XtXinv <- tryCatch(chol2inv(chol(crossprod(bx))), error = function(e) {
+  msg("NOTE: basis near-singular; using pseudo-inverse for covariance"); MASS::ginv(crossprod(bx)) })
 Vb <- sigma2 * XtXinv                              # coefficient covariance
 beta <- lmfit$coefficients
 
 # Interaction diagnostic (degree = 2)
-m2i <- earth(f2, data = d, degree = 2, penalty = cfg$penalty, pmethod = cfg$pmethod)
+m2i <- earth(f2, data = d, degree = 2, nk = cfg$nk, penalty = cfg$penalty, pmethod = cfg$pmethod)
 dirs <- m2i$dirs[m2i$selected.terms, , drop = FALSE]
 int_terms <- rownames(dirs)[rowSums(dirs != 0) >= 2]
 gla_int <- int_terms[grepl("gla", int_terms) & (grepl("levels", int_terms) | grepl("year_built", int_terms))]
@@ -150,7 +210,15 @@ basis_row <- function(row) {
 stopifnot(max(abs(basis_row(d[1, ]) - as.numeric(bx[1, ]))) < 1e-8)
 subj_row <- d[1, ]; for (f in num_ok) subj_row[[f]] <- as.numeric(subject[[f]])
 subj_row$subdivision <- factor(as.character(subject$subdivision), levels = levels(d$subdivision))
-if (is.na(subj_row$subdivision)) subj_row$subdivision <- d$subdivision[which.max(table(d$subdivision))]
+subj_subdiv_note <- "subject subdivision present in sales data"
+if (is.na(subj_row$subdivision)) {
+  fb <- names(which.max(table(d$subdivision)))
+  subj_subdiv_note <- sprintf(
+    "WARNING: subject subdivision '%s' not in sales data; location effects computed relative to fallback '%s' - APPRAISER MUST REVIEW",
+    as.character(subject$subdivision), fb)
+  msg(subj_subdiv_note)
+  subj_row$subdivision <- factor(fb, levels = levels(d$subdivision))
+}
 b_subj <- basis_row(subj_row)
 
 # Knot-safe adjustment for a feature value change: c = b(comp_x) - b(subject)
@@ -231,7 +299,8 @@ write.csv(comp_adj, file.path(out_dir, "comp_adjustments.csv"), row.names = FALS
 ## ---- Multi-method battery ---------------------------------------------------
 theil_sen <- function(x, y) { set.seed(seeds$theilsen)
   n <- length(x); ij <- if (n * (n - 1) / 2 > cfg$theilsen_max_pairs) {
-    cbind(sample(n, cfg$theilsen_max_pairs, TRUE), sample(n, cfg$theilsen_max_pairs, TRUE)) } else t(combn(n, 2))
+    a <- sample(n, cfg$theilsen_max_pairs, TRUE); b <- sample(n - 1, cfg$theilsen_max_pairs, TRUE)
+    b <- b + (b >= a); cbind(a, b) } else t(combn(n, 2))
   s <- (y[ij[, 2]] - y[ij[, 1]]) / (x[ij[, 2]] - x[ij[, 1]]); median(s[is.finite(s)]) }
 battery_rows <- list()
 for (f in num_ok) {
@@ -279,8 +348,10 @@ if (nrow(batch) >= 8) {
 ## ---- Bracketing report -------------------------------------------------------
 bracket <- lapply(num_ok, function(f) {
   cv <- as.numeric(dc[[f]]); sv <- as.numeric(subject[[f]])
+  pos <- if (max(cv) > min(cv)) round(100 * (sv - min(cv)) / (max(cv) - min(cv)), 1) else NA
   list(feature = f, subject = sv, comp_min = min(cv), comp_max = max(cv),
-       bracketed = sv >= min(cv) && sv <= max(cv)) })
+       bracketed = sv >= min(cv) && sv <= max(cv),
+       position_pct_of_comp_range = pos) })
 
 ## ---- Location (subdivision) relative to subject ------------------------------
 loc_rows <- list()
@@ -296,13 +367,18 @@ results <- list(
   scope_notice = "Adjustment support only. Model estimates with stated uncertainty; not confirmed market values. No indicated/reconciled/opinion of value. Appraiser makes all final adjustment selections (USPAP AO-41: outputs are information, not assignment results).",
   run = list(date = as.character(Sys.Date()), n_raw = nrow(sales), n_excluded = nrow(excl),
              n_clean = n_clean, subject_is_new = subject_is_new,
+             subject_subdivision_note = subj_subdiv_note,
+             comp_ids_not_found = vi$missing_comps,
              new_construction_rule = ifelse(subject_is_new,
                "retained (subject is new/newer)", "excluded (subject not new/newer)")),
+  data_quality = list(imputed_cells_per_feature = as.list(imputed_counts),
+                      features_dropped_for_missingness = dropped_missing,
+                      unparseable_dates_excluded = sum(grepl("unparseable", excl$exclude_reason))),
   reproducibility = list(master_seed = cfg$master_seed, derived_seeds = seeds,
     earth_version = as.character(packageVersion("earth")),
     r_version = R.version.string, config = cfg, config_sha256 = cfg_hash,
     deterministic = c("MARS/GCV","OLS","Theil-Sen(seeded)","LAD","Grouped","Sensitivity","ModQuantile"),
-    seed_dependent = c("LMS","bootstrap(if used)","CV folds")),
+    seed_dependent = c("LMS","randomized Theil-Sen pair sampling (seeded)")),
   time_index_check = list(vs_half_year_dummies = time_check, repeat_sale_addresses = repeat_sales_n),
   model = list(stage2_terms = rownames(m2$dirs)[m2$selected.terms],
                gcv = m2$gcv, rsq = m2$rsq,
