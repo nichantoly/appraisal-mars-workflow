@@ -1,0 +1,4 @@
+"mls_id","address","sale_price","exclude_reason"
+"MLS0003","103 Test St",880300,"non-arm's-length"
+"MLS0007","107 Test St",858800,"to-be-built (no closed market price)"
+"MLS0011","111 Test St",4995,"impossible: sale/net price"
