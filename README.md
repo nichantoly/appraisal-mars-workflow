@@ -191,6 +191,24 @@ DELIVERABLES:
 
 ---
 
+## Run It Locally (optional — for coders)
+
+A tested reference implementation is included at `R/mars_adjustment_support.R`
+(R + the canonical `earth` MARS package). Validated against synthetic data
+with known true values: exact knot recovery, segment math verified to the
+dollar, exclusion and time-index logic confirmed.
+
+One-time setup: install R from cran.r-project.org, then in R:
+`install.packages(c("earth","quantreg","MASS","jsonlite"))`
+
+Each run (from a terminal in the folder with your files):
+`Rscript R/mars_adjustment_support.R sales.csv subject.csv comps.txt out/`
+
+Inputs: sales.csv (standard schema — see script header), subject.csv (one
+row), comps.txt (one MLS ID per line). Outputs land in `out/`: results.json,
+adjustments.csv, comp_adjustments.csv, time_index.csv, battery.csv,
+exclusions.csv. No AI required — same math, same reproducibility logging.
+
 ## Notes for Adopters
 
 - **Your comp filter vs. the model.** Characteristic filters (size band + levels, or whatever fits your market) are excellent for *selecting comps* and for the *Local Validation Check*. Do not estimate primary coefficients from the filtered batch alone — range restriction inflates standard errors precisely because the batch is homogeneous. Let the full dataset estimate; let your batch validate.
