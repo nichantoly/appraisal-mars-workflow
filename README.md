@@ -204,10 +204,43 @@ One-time setup: install R from cran.r-project.org, then in R:
 Each run (from a terminal in the folder with your files):
 `Rscript R/mars_adjustment_support.R sales.csv subject.csv comps.txt out/`
 
-Inputs: sales.csv (standard schema — see script header), subject.csv (one
-row), comps.txt (one MLS ID per line). Outputs land in `out/`: results.json,
-adjustments.csv, comp_adjustments.csv, time_index.csv, battery.csv,
-exclusions.csv. No AI required — same math, same reproducibility logging.
+### Input File Formats
+
+**`sales.csv`** — one row per comparable sale:
+
+| Column | Format | Description |
+|---|---|---|
+| `mls_id` | text | MLS number, unique per sale |
+| `address` | text | Property address |
+| `sale_price` | number | Gross sale price |
+| `sale_date` | YYYY-MM-DD | Closing date |
+| `concessions` | number | Seller concessions in $ (0 if none) |
+| `gla` | number | Gross living area, above grade, sf |
+| `lot_sf` | number | Lot size, sf |
+| `garage` | number | Garage spaces |
+| `full_baths` | number | Full bathrooms |
+| `half_baths` | number | Half bathrooms |
+| `bsmt_fin_sf` | number | Finished basement, sf |
+| `bsmt_unf_sf` | number | Unfinished basement, sf |
+| `year_built` | number | Year built |
+| `levels` | number | Story count |
+| `subdivision` | text | Subdivision/neighborhood name |
+| `arms_length` | 1 or 0 | 1 = arm's-length sale |
+| `new_construction` | 1 or 0 | 1 = new construction sale |
+| `to_be_built` | 1 or 0 | 1 = not-yet-closed listing (no market price yet) |
+
+Missing values in numeric columns are median-imputed automatically; you don't need every cell filled for every sale.
+
+**`subject.csv`** — exactly one row, same columns as above, plus:
+
+| Column | Format | Description |
+|---|---|---|
+| `subject_is_new` | 1 or 0 | 1 if subject is new/newer construction (controls the new-construction exclusion rule) |
+| `gla_band` | number (optional) | Your declared GLA similarity band in sf for the Local Validation Check — defaults to 500 if omitted |
+
+Subject values should be filled in completely — every adjustment is computed relative to these.
+
+**`comps.txt`** — plain text, one `mls_id` per line: the specific comps you selected for this report. Must match `mls_id` values in `sales.csv`.
 
 ## Notes for Adopters
 
