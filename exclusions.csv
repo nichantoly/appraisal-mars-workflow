@@ -1,5 +1,0 @@
-"feature","grouped","sensitivity_glactl","ols_simple","theil_sen","lad","lms_seeded","mod_quantile","ols_multiple","mars_primary"
-"gla",202.7,NA,203.03,202.92,206.95,173.06,198.09,203.73,231.8
-"lot_sf",1.01,2.73,1.16,0.86,1.12,-1.91,1.19,3.64,4.87
-"bsmt_fin_sf",27.97,35.35,29.97,28.52,16.54,-8.84,22.33,34.88,0
-"year_built",-19.5,594.85,12.26,44.18,-347.21,-626.88,-273.53,569.4,0
