@@ -1,4 +1,4 @@
-# MARS / Regression Adjustment Support Workflow (v1.0)
+MARS / Regression Adjustment Support Workflow (v1.0)
 
 **A statistical adjustment-support protocol for residential appraisers, designed to be run inside an AI assistant (Claude, ChatGPT, Grok, etc.) or implemented directly in R/Python.**
 
@@ -141,11 +141,14 @@ PROCESS:
   new/newer construction — if my subject is new/newer, keep them. Exclude
   non-arm's-length and impossible fields. Net prices of seller concessions.
   Show me what was excluded and why, and which new-construction rule applied.
-- Two-stage MARS (earth-equivalent, additive, GCV backward-pruned):
-  Stage 1 = monthly time index from ln(price) with full hedonic + subdivision
-  controls, cross-validated against a half-year dummy regression and repeat sales.
-  Stage 2 = time-adjusted price with subdivision fixed effects; levels always an
-  explicit variable; adjustment coefficients with exact standard errors.
+- Single-stage MARS (earth-equivalent, additive, GCV backward-pruned):
+  net_price ~ sale_age + features + subdivision in ONE model; no price
+  pre-adjustment. sale_age = days before effective date. Date-of-Sale
+  adjustment per comp = knot-safe fitted-function difference over
+  sale_age with exact SE, reported as its own line in the comp grid.
+  Monthly time index from partial dependence on sale_age; half-year
+  ln-price dummy regression as cross-check; warn if price dispersion
+  (P75/P25 > 1.6) makes additive $/day time questionable.
 - Interaction diagnostic: fit degree=2 as a check; if GLA×levels or GLA×age survives
   GCV pruning, report cohort-specific $/sf; headline stays additive otherwise.
 - KNOT HANDLING (mandatory): where MARS retains a hinge, each comp's adjustment is
