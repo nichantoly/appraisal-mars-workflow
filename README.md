@@ -1,4 +1,4 @@
-MARS / Regression Adjustment Support Workflow (v1.0)
+MARS / Regression Adjustment Support Workflow (v1.2)
 
 **A statistical adjustment-support protocol for residential appraisers, designed to be run inside an AI assistant (Claude, ChatGPT, Grok, etc.) or implemented directly in R/Python.**
 
@@ -8,7 +8,7 @@ This workflow produces defensible, documented, uncertainty-quantified support fo
 
 ---
 
-## Summary of Design Decisions (v1.0)
+## Summary of Design Decisions (v1.2)
 
 This spec evolved through peer review (AppraisersForum MARS threads) and alignment with AO-41:
 
@@ -51,12 +51,23 @@ This spec evolved through peer review (AppraisersForum MARS threads) and alignme
 - Fit MARS (earth-equivalent, additive, GCV backward-pruned) on **ln(price)** with full hedonic controls + subdivision controls; extract the monthly time index.
 - **Cross-validate** the index against (a) a half-year dummy regression and (b) repeat sales, if any exist in the data. Report agreement/divergence.
 
-### Stage 2 — Adjustment Model
-
-- Dependent variable: **time-adjusted price** (from Stage 1 index).
-- MARS with **subdivision fixed effects**; **levels always included** as an explicit variable.
-- **Pruning: GCV backward** (`pmethod="backward"`) — deterministic; headline coefficients are seed-independent by construction.
-- **Interaction diagnostic**: fit degree=2 as a check. If GLA×levels or GLA×age survives GCV pruning, report cohort-specific $/sf; otherwise headline stays additive.
+### The Model (single-stage, v1.2)
+- One MARS model (earth-equivalent, additive, GCV backward-pruned):
+  **net price ~ sale_age + features + subdivision** — no price pre-adjustment.
+- **sale_age** (days before the effective date) is a regular predictor, so the
+  Date-of-Sale adjustment per comp is a knot-safe fitted-function difference
+  with an exact SE — identical machinery to every other feature, reported as
+  its own line in the comp grid.
+- **Monthly time index** derived from the model's partial dependence on
+  sale_age ($ and % at the median price); a **half-year ln-price dummy
+  regression** is retained as a proportionality cross-check; a
+  **price-dispersion diagnostic** (P75/P25 > 1.6) flags when the market area
+  is too price-diverse for the additive-$/day time assumption.
+- **Levels always included** as an explicit variable; subdivision fixed effects.
+- **Pruning: GCV backward** (`pmethod="backward"`) — deterministic; headline
+  coefficients are seed-independent by construction.
+- **Interaction diagnostic**: fit degree=2 as a check. If GLA×levels or GLA×age
+  survives GCV pruning, report cohort-specific $/sf; otherwise headline stays additive.
 - **Location adjustments** computed relative to the subject's subdivision.
 - **Collinear full/half baths**: report the pooled per-bathroom value and say so explicitly.
 
@@ -81,9 +92,9 @@ Grouped Data · Sensitivity · OLS Simple · Theil-Sen · LAD · LMS · Modified
 
 ### Reproducibility Block (Model Detail tab, every run)
 
-- Master seed (one integer per job); derived seeds via deterministic offsets for LMS resampling, bootstrap SEs, Stage 1 CV folds.
+- Master seed (one integer per job); derived seeds via deterministic offsets for LMS resampling, bootstrap SEs, CV folds.
 - MARS implementation + exact version; language runtime version.
-- Full model config: degree, penalty, nk, thresh, pmethod, nfold/ncross; Stage 1 and Stage 2 formulas as fitted (after any pooling).
+- Full model config: degree, penalty, nk, thresh, pmethod, nfold/ncross; model formula as fitted (after any pooling).
 - SHA-256 hash of config + cleaned-data row count.
 - Per-method determinism flag: deterministic (MARS/GCV, OLS, Theil-Sen, LAD, Grouped, Sensitivity, Mod. Quantile) vs. seed-dependent (LMS, bootstrap, CV check).
 
@@ -258,4 +269,4 @@ Subject values should be filled in completely — every adjustment is computed r
 - **Compliance.** This spec and its language are *designed to support* USPAP compliance and AO-41-consistent documentation. No tool can be USPAP-compliant — that determination is yours, per assignment, in your jurisdiction. Have your E&O carrier or an appraisal attorney bless the Scope block once before adopting it as boilerplate.
 - **Competency.** AO-41's COMPETENCY RULE discussion applies: don't rely on outputs or terminology you don't understand. Read the Methods glossary; understand what a hinge function and a GCV-pruned model are before you sign a report that leans on them.
 
-*MARS/Regression Adjustment Support Workflow v1.0 — July 2026. Contributions and market-specific forks welcome.*
+*MARS/Regression Adjustment Support Workflow v1.2 — July 2026. Contributions and market-specific forks welcome.*
