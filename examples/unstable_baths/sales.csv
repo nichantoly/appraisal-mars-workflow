@@ -1,0 +1,254 @@
+"mls_id","address","sale_price","sale_date","concessions","gla","lot_sf","garage","full_baths","half_baths","bsmt_fin_sf","bsmt_unf_sf","year_built","levels","subdivision","style","arms_length","new_construction","to_be_built"
+"MLS0001","1 Colonial Oakton",463135,"2025-03-12",0,2117,9395,1,2,1,900,0,1993,2,"Oakton","Colonial",1,0,0
+"MLS0002","2 Colonial Oakton",543484,"2026-05-20",0,2477,9830,2,3,1,600,0,1995,2,"Oakton","Colonial",1,0,0
+"MLS0003","3 Townhouse Oakton",361256,"2025-11-16",0,1664,1817,1,2,1,0,0,2009,3,"Oakton","Townhouse",1,0,0
+"MLS0004","4 Colonial Dunn Loring",516121,"2025-03-26",0,2561,9858,1,3,1,0,0,1994,2,"Dunn Loring","Colonial",1,0,0
+"MLS0005","5 Colonial Vienna",493205,"2026-01-28",0,2357,8528,1,3,1,600,0,1982,2,"Vienna","Colonial",1,0,0
+"MLS0006","6 Split Foyer Vienna",401579,"2025-07-02",0,1768,9259,1,1,1,0,0,1971,2,"Vienna","Split Foyer",1,0,0
+"MLS0007","7 Colonial Vienna",558869,"2025-07-17",0,2787,9851,2,2,1,600,0,1982,2,"Vienna","Colonial",1,0,0
+"MLS0008","8 Colonial Dunn Loring",504951,"2025-06-07",0,2414,7690,3,2,0,0,0,1998,2,"Dunn Loring","Colonial",1,0,0
+"MLS0009","9 Split Foyer Oakton",414741,"2026-01-14",0,1611,10172,1,1,0,0,0,1992,2,"Oakton","Split Foyer",1,0,0
+"MLS0010","10 Colonial Dunn Loring",552666,"2026-02-27",0,2486,8247,3,2,0,600,0,1983,2,"Dunn Loring","Colonial",1,0,0
+"MLS0011","11 Colonial Oakton",489003,"2025-07-01",0,2406,10937,2,2,1,0,0,1979,2,"Oakton","Colonial",1,0,0
+"MLS0012","12 Townhouse Oakton",358588,"2026-04-18",0,1665,2342,2,1,0,0,0,2006,2,"Oakton","Townhouse",1,0,0
+"MLS0013","13 Split Foyer Vienna",375264,"2025-03-02",0,1740,11091,2,1,0,0,0,1973,2,"Vienna","Split Foyer",1,0,0
+"MLS0014","14 Split Foyer Vienna",369171,"2026-02-16",0,1573,7638,2,1,1,0,0,1964,2,"Vienna","Split Foyer",1,0,0
+"MLS0015","15 Split Foyer Dunn Loring",469747,"2025-05-06",0,1716,10104,1,2,1,0,0,1978,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0016","16 Townhouse Oakton",378149,"2025-10-04",0,1565,1929,2,2,0,0,0,2005,3,"Oakton","Townhouse",1,0,0
+"MLS0017","17 Townhouse Oakton",328019,"2026-04-12",0,1661,2167,1,1,0,0,0,1993,2,"Oakton","Townhouse",1,0,0
+"MLS0018","18 Colonial Oakton",547135,"2025-07-13",0,2689,9213,2,3,0,900,0,1982,2,"Oakton","Colonial",1,0,0
+"MLS0019","19 Colonial Oakton",573709,"2025-12-30",0,2607,10193,2,3,0,900,0,2000,2,"Oakton","Colonial",1,0,0
+"MLS0020","20 Townhouse Vienna",332013,"2025-08-27",0,1503,2451,1,2,0,0,0,2004,3,"Vienna","Townhouse",1,0,0
+"MLS0021","21 Colonial Dunn Loring",593396,"2025-10-03",0,2933,7977,3,2,0,600,0,1980,2,"Dunn Loring","Colonial",1,0,0
+"MLS0022","22 Townhouse Vienna",289522,"2025-03-31",0,1302,2078,1,1,1,0,0,2004,2,"Vienna","Townhouse",1,0,0
+"MLS0023","23 Colonial Vienna",508133,"2025-12-05",0,2312,10467,2,2,1,600,0,1991,2,"Vienna","Colonial",1,0,0
+"MLS0024","24 Colonial Oakton",538173,"2025-12-25",0,2581,11659,1,2,0,600,0,2006,2,"Oakton","Colonial",1,0,0
+"MLS0025","25 Colonial Vienna",533332,"2025-10-24",0,2674,9358,2,3,1,0,0,2000,2,"Vienna","Colonial",1,0,0
+"MLS0026","26 Townhouse Dunn Loring",390645,"2026-03-26",0,1569,2763,1,2,1,0,0,1992,3,"Dunn Loring","Townhouse",1,0,0
+"MLS0027","27 Colonial Vienna",484375,"2025-07-30",0,2146,9740,3,2,1,900,0,1981,2,"Vienna","Colonial",1,0,0
+"MLS0028","28 Colonial Oakton",475649,"2025-12-02",0,2103,7910,1,2,0,600,0,2003,2,"Oakton","Colonial",1,0,0
+"MLS0029","29 Colonial Vienna",460814,"2025-07-21",0,2013,8551,2,2,1,900,0,2007,2,"Vienna","Colonial",1,0,0
+"MLS0030","30 Colonial Oakton",515238,"2025-09-14",0,2474,8675,2,3,0,600,0,1990,2,"Oakton","Colonial",1,0,0
+"MLS0031","31 Townhouse Vienna",337475,"2026-05-13",0,1654,2053,1,1,0,0,0,2010,2,"Vienna","Townhouse",1,0,0
+"MLS0032","32 Colonial Dunn Loring",558056,"2025-05-18",0,2741,12123,2,2,0,600,0,1994,2,"Dunn Loring","Colonial",1,0,0
+"MLS0033","33 Colonial Vienna",465017,"2025-12-06",0,2109,9715,1,2,0,600,0,1986,2,"Vienna","Colonial",1,0,0
+"MLS0034","34 Colonial Dunn Loring",500821,"2025-09-07",0,2059,8484,3,2,1,900,0,1973,2,"Dunn Loring","Colonial",1,0,0
+"MLS0035","35 Split Foyer Oakton",497837,"2026-05-18",0,1885,7881,2,2,1,0,0,1982,3,"Oakton","Split Foyer",1,0,0
+"MLS0036","36 Townhouse Dunn Loring",355104,"2025-07-22",0,1569,2366,1,1,1,0,0,1995,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0037","37 Colonial Vienna",546488,"2026-04-30",0,2430,10165,2,2,1,900,0,1984,2,"Vienna","Colonial",1,0,0
+"MLS0038","38 Colonial Vienna",551532,"2025-02-22",0,2890,10093,1,2,0,0,0,1989,2,"Vienna","Colonial",1,0,0
+"MLS0039","39 Colonial Oakton",542265,"2025-05-17",0,2531,7630,2,2,1,900,0,1982,2,"Oakton","Colonial",1,0,0
+"MLS0040","40 Colonial Vienna",504644,"2025-12-14",0,2477,11358,2,2,1,0,0,2007,2,"Vienna","Colonial",1,0,0
+"MLS0041","41 Colonial Vienna",548848,"2025-09-10",0,2560,10566,2,2,1,900,0,1972,2,"Vienna","Colonial",1,0,0
+"MLS0042","42 Colonial Vienna",502198,"2025-05-09",0,2576,6432,2,2,1,600,0,1982,2,"Vienna","Colonial",1,0,0
+"MLS0043","43 Townhouse Oakton",354820,"2025-09-01",0,1542,2494,1,2,0,0,0,1992,3,"Oakton","Townhouse",1,0,0
+"MLS0044","44 Townhouse Oakton",309246,"2025-03-20",0,1430,2041,1,1,0,0,0,1997,2,"Oakton","Townhouse",1,0,0
+"MLS0045","45 Colonial Oakton",523175,"2025-03-18",0,2431,10433,2,2,0,900,0,1990,2,"Oakton","Colonial",1,0,0
+"MLS0046","46 Split Foyer Dunn Loring",468679,"2025-12-08",0,1649,8199,1,2,1,0,0,1980,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0047","47 Townhouse Dunn Loring",389421,"2025-07-16",0,1704,2351,2,2,0,0,0,2003,3,"Dunn Loring","Townhouse",1,0,0
+"MLS0048","48 Colonial Vienna",578295,"2025-10-10",0,2741,9780,1,3,0,900,0,1993,2,"Vienna","Colonial",1,0,0
+"MLS0049","49 Townhouse Dunn Loring",371682,"2025-10-10",0,1701,2415,1,1,0,0,0,1996,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0050","50 Split Foyer Oakton",387597,"2025-11-20",0,1738,10115,1,1,0,0,0,1970,3,"Oakton","Split Foyer",1,0,0
+"MLS0051","51 Townhouse Oakton",341925,"2025-12-31",0,1667,2052,2,1,0,0,0,1993,2,"Oakton","Townhouse",1,0,0
+"MLS0052","52 Townhouse Vienna",341340,"2025-03-10",0,1603,1877,1,2,0,0,0,2000,3,"Vienna","Townhouse",1,0,0
+"MLS0053","53 Townhouse Vienna",318316,"2026-03-31",0,1368,1917,2,1,1,0,0,2004,2,"Vienna","Townhouse",1,0,0
+"MLS0054","54 Colonial Vienna",501583,"2025-09-19",0,2359,8622,2,2,0,600,0,1988,2,"Vienna","Colonial",1,0,0
+"MLS0055","55 Colonial Vienna",523987,"2025-12-26",0,2511,10107,2,2,0,900,0,1981,2,"Vienna","Colonial",1,0,0
+"MLS0056","56 Townhouse Vienna",354617,"2026-04-26",0,1631,2283,2,1,0,0,0,2008,2,"Vienna","Townhouse",1,0,0
+"MLS0057","57 Colonial Oakton",526970,"2026-04-09",0,2274,12927,1,2,1,900,0,2025,2,"Oakton","Colonial",1,0,0
+"MLS0058","58 Split Foyer Oakton",366272,"2025-04-26",0,1616,10522,3,1,0,0,0,1970,2,"Oakton","Split Foyer",1,0,0
+"MLS0059","59 Colonial Vienna",492823,"2025-02-10",0,2270,10783,3,2,1,900,0,1982,2,"Vienna","Colonial",1,0,0
+"MLS0060","60 Townhouse Oakton",306425,"2025-07-22",0,1287,2096,2,1,1,0,0,1998,2,"Oakton","Townhouse",1,0,0
+"MLS0061","61 Colonial Dunn Loring",537549,"2025-06-20",0,2706,8858,1,2,1,0,0,1994,2,"Dunn Loring","Colonial",1,0,0
+"MLS0062","62 Split Foyer Vienna",400026,"2025-07-08",0,1664,9134,3,1,0,0,0,1979,2,"Vienna","Split Foyer",1,0,0
+"MLS0063","63 Colonial Dunn Loring",580486,"2026-04-21",0,2651,9521,2,2,0,900,0,1989,2,"Dunn Loring","Colonial",1,0,0
+"MLS0064","64 Townhouse Vienna",302585,"2025-04-26",0,1436,2905,1,1,1,0,0,2012,2,"Vienna","Townhouse",1,0,0
+"MLS0065","65 Split Foyer Oakton",390544,"2025-07-28",0,1756,9879,3,1,0,0,0,1973,2,"Oakton","Split Foyer",1,0,0
+"MLS0066","66 Colonial Oakton",555855,"2026-04-18",0,2706,7413,3,2,1,0,0,1997,2,"Oakton","Colonial",1,0,0
+"MLS0067","67 Colonial Oakton",503162,"2026-03-27",0,2194,10025,2,3,0,600,0,1983,2,"Oakton","Colonial",1,0,0
+"MLS0068","68 Townhouse Dunn Loring",361024,"2026-03-23",0,1526,2063,1,1,0,0,0,2000,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0069","69 Colonial Oakton",507070,"2025-07-01",0,2370,9255,1,2,0,600,0,2008,2,"Oakton","Colonial",1,0,0
+"MLS0070","70 Townhouse Oakton",321563,"2025-07-14",0,1572,2132,1,1,0,0,0,1996,2,"Oakton","Townhouse",1,0,0
+"MLS0071","71 Townhouse Oakton",314650,"2026-02-10",0,1420,1847,1,1,0,0,0,2002,2,"Oakton","Townhouse",1,0,0
+"MLS0072","72 Townhouse Dunn Loring",325384,"2025-08-26",0,1504,2328,2,1,0,0,0,1998,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0073","73 Townhouse Oakton",371202,"2026-06-01",0,1400,1797,2,2,1,0,0,1999,3,"Oakton","Townhouse",1,0,0
+"MLS0074","74 Colonial Vienna",503718,"2026-02-14",0,2346,6595,3,2,1,0,0,1999,2,"Vienna","Colonial",1,0,0
+"MLS0075","75 Split Foyer Oakton",482498,"2025-09-20",0,1747,10347,1,2,1,0,0,1983,3,"Oakton","Split Foyer",1,0,0
+"MLS0076","76 Townhouse Oakton",345448,"2026-01-24",0,1623,1840,1,1,0,0,0,1994,2,"Oakton","Townhouse",1,0,0
+"MLS0077","77 Colonial Dunn Loring",606913,"2025-08-16",0,2965,10528,3,3,0,600,0,1981,2,"Dunn Loring","Colonial",1,0,0
+"MLS0078","78 Colonial Dunn Loring",508359,"2025-08-17",0,2178,9688,2,3,0,900,0,1984,2,"Dunn Loring","Colonial",1,0,0
+"MLS0079","79 Colonial Oakton",498366,"2025-05-06",0,2246,8697,1,2,0,900,0,1993,2,"Oakton","Colonial",1,0,0
+"MLS0080","80 Colonial Vienna",510966,"2026-05-20",0,2086,8720,1,3,1,900,0,1998,2,"Vienna","Colonial",1,0,0
+"MLS0081","81 Colonial Oakton",533243,"2025-08-12",0,2609,8012,2,2,1,900,0,1995,2,"Oakton","Colonial",1,0,0
+"MLS0082","82 Townhouse Oakton",334293,"2025-08-31",0,1223,2033,2,2,0,0,0,2006,3,"Oakton","Townhouse",1,0,0
+"MLS0083","83 Townhouse Oakton",365992,"2025-10-30",0,1799,2194,1,1,1,0,0,1998,2,"Oakton","Townhouse",1,0,0
+"MLS0084","84 Colonial Vienna",458650,"2025-04-27",0,2221,10946,2,2,0,0,0,1986,2,"Vienna","Colonial",1,0,0
+"MLS0085","85 Split Foyer Oakton",451606,"2025-03-02",0,1717,8976,2,2,1,0,0,1979,2,"Oakton","Split Foyer",1,0,0
+"MLS0086","86 Colonial Dunn Loring",476668,"2025-07-05",0,2143,8899,2,3,1,0,0,1973,2,"Dunn Loring","Colonial",1,0,0
+"MLS0087","87 Colonial Vienna",488863,"2025-10-30",0,2333,9801,2,2,1,600,0,1979,2,"Vienna","Colonial",1,0,0
+"MLS0088","88 Townhouse Vienna",356022,"2026-05-28",0,1654,2232,1,1,0,0,0,2002,2,"Vienna","Townhouse",1,0,0
+"MLS0089","89 Split Foyer Vienna",486939,"2026-02-08",0,1736,7048,3,2,0,0,0,1976,2,"Vienna","Split Foyer",1,0,0
+"MLS0090","90 Colonial Oakton",541760,"2026-02-12",0,2497,9212,1,2,0,900,0,2004,2,"Oakton","Colonial",1,0,0
+"MLS0091","91 Colonial Oakton",530463,"2026-02-25",0,2472,10132,3,2,0,600,0,1984,2,"Oakton","Colonial",1,0,0
+"MLS0092","92 Split Foyer Dunn Loring",433185,"2025-10-04",0,1755,8088,3,1,0,0,0,1983,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0093","93 Colonial Oakton",481780,"2026-04-28",0,2101,10490,1,2,1,600,0,1998,2,"Oakton","Colonial",1,0,0
+"MLS0094","94 Townhouse Dunn Loring",393180,"2026-05-02",0,1565,1853,2,2,0,0,0,1996,3,"Dunn Loring","Townhouse",1,0,0
+"MLS0095","95 Split Foyer Oakton",438407,"2025-06-27",0,1654,6871,1,2,1,0,0,1983,2,"Oakton","Split Foyer",1,0,0
+"MLS0096","96 Colonial Dunn Loring",470684,"2025-06-08",0,2009,6776,2,2,1,600,0,1991,2,"Dunn Loring","Colonial",1,0,0
+"MLS0097","97 Split Foyer Dunn Loring",418228,"2026-04-14",0,1765,8553,2,1,0,0,0,1975,3,"Dunn Loring","Split Foyer",1,0,0
+"MLS0098","98 Colonial Vienna",526349,"2025-11-28",0,2625,8385,2,2,0,0,0,1996,2,"Vienna","Colonial",1,0,0
+"MLS0099","99 Townhouse Vienna",354815,"2025-10-17",0,1807,2575,1,1,1,0,0,2004,2,"Vienna","Townhouse",1,0,0
+"MLS0100","100 Colonial Vienna",497425,"2025-02-07",0,2440,9233,3,2,0,0,0,1978,2,"Vienna","Colonial",1,0,0
+"MLS0101","101 Split Foyer Dunn Loring",410764,"2025-08-20",0,1687,9236,2,1,0,0,0,1975,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0102","102 Townhouse Dunn Loring",320158,"2025-02-14",0,1617,1885,1,1,0,0,0,1997,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0103","103 Colonial Dunn Loring",504378,"2025-02-05",0,2245,10544,3,2,0,900,0,1996,2,"Dunn Loring","Colonial",1,0,0
+"MLS0104","104 Colonial Oakton",536864,"2025-12-21",0,2514,9820,2,2,1,600,0,1961,2,"Oakton","Colonial",1,0,0
+"MLS0105","105 Colonial Dunn Loring",508428,"2025-10-15",0,2336,8400,1,2,0,900,0,2000,2,"Dunn Loring","Colonial",1,0,0
+"MLS0106","106 Colonial Dunn Loring",499011,"2026-05-23",0,2148,9522,2,2,0,600,0,1986,2,"Dunn Loring","Colonial",1,0,0
+"MLS0107","107 Townhouse Oakton",349312,"2025-09-05",0,1516,1935,1,2,0,0,0,1997,3,"Oakton","Townhouse",1,0,0
+"MLS0108","108 Split Foyer Vienna",434973,"2026-04-27",0,1712,9851,3,1,0,0,0,1975,2,"Vienna","Split Foyer",1,0,0
+"MLS0109","109 Townhouse Oakton",376531,"2026-05-26",0,1531,2269,1,2,0,0,0,2000,3,"Oakton","Townhouse",1,0,0
+"MLS0110","110 Colonial Oakton",505257,"2025-03-28",0,2500,8886,3,2,1,0,0,1995,2,"Oakton","Colonial",1,0,0
+"MLS0111","111 Townhouse Oakton",338056,"2025-01-20",0,1477,2013,2,2,0,0,0,1997,3,"Oakton","Townhouse",1,0,0
+"MLS0112","112 Colonial Dunn Loring",528749,"2026-03-27",0,2335,9448,1,2,0,600,0,1994,2,"Dunn Loring","Colonial",1,0,0
+"MLS0113","113 Townhouse Vienna",313776,"2026-01-23",0,1356,1947,2,1,0,0,0,2012,2,"Vienna","Townhouse",1,0,0
+"MLS0114","114 Split Foyer Vienna",402319,"2026-02-02",0,1793,7509,2,1,0,0,0,1978,2,"Vienna","Split Foyer",1,0,0
+"MLS0115","115 Townhouse Dunn Loring",349744,"2025-02-14",0,1489,2388,2,2,0,0,0,1998,3,"Dunn Loring","Townhouse",1,0,0
+"MLS0116","116 Colonial Dunn Loring",544563,"2026-04-29",0,2563,10595,3,2,0,0,0,1986,2,"Dunn Loring","Colonial",1,0,0
+"MLS0117","117 Split Foyer Oakton",491788,"2025-12-19",0,1882,9396,2,2,1,0,0,1979,2,"Oakton","Split Foyer",1,0,0
+"MLS0118","118 Townhouse Oakton",363789,"2025-09-27",0,1747,1879,1,1,0,0,0,2005,2,"Oakton","Townhouse",1,0,0
+"MLS0119","119 Townhouse Oakton",364277,"2026-01-20",0,1285,2239,1,2,1,0,0,2016,3,"Oakton","Townhouse",1,0,0
+"MLS0120","120 Colonial Dunn Loring",479421,"2025-07-16",0,2289,6795,1,2,1,0,0,1980,2,"Dunn Loring","Colonial",1,0,0
+"MLS0121","121 Colonial Oakton",487873,"2025-03-25",0,2400,7114,1,2,0,600,0,1986,2,"Oakton","Colonial",1,0,0
+"MLS0122","122 Colonial Dunn Loring",481973,"2025-07-18",0,2237,10026,2,2,0,0,0,1985,2,"Dunn Loring","Colonial",1,0,0
+"MLS0123","123 Split Foyer Dunn Loring",442883,"2025-11-12",0,1901,8116,3,1,0,0,0,1980,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0124","124 Colonial Vienna",508387,"2025-06-18",0,2417,12793,1,2,0,0,0,1996,2,"Vienna","Colonial",1,0,0
+"MLS0125","125 Townhouse Vienna",316147,"2025-04-12",0,1631,2065,1,1,1,0,0,2003,2,"Vienna","Townhouse",1,0,0
+"MLS0126","126 Colonial Dunn Loring",470139,"2025-11-11",0,2248,8299,3,2,0,900,0,1972,2,"Dunn Loring","Colonial",1,0,0
+"MLS0127","127 Colonial Vienna",520412,"2026-04-03",0,2218,10251,2,2,1,600,0,1989,2,"Vienna","Colonial",1,0,0
+"MLS0128","128 Split Foyer Oakton",381135,"2025-11-05",0,1533,12125,1,1,0,0,0,1982,3,"Oakton","Split Foyer",1,0,0
+"MLS0129","129 Townhouse Oakton",351131,"2025-01-18",0,1681,2029,1,2,0,0,0,1998,3,"Oakton","Townhouse",1,0,0
+"MLS0130","130 Townhouse Vienna",378689,"2026-03-28",0,1452,2525,2,2,1,0,0,1999,3,"Vienna","Townhouse",1,0,0
+"MLS0131","131 Split Foyer Oakton",479035,"2026-05-13",0,1736,6796,3,2,1,0,0,1978,3,"Oakton","Split Foyer",1,0,0
+"MLS0132","132 Townhouse Dunn Loring",354056,"2025-11-14",0,1620,2308,1,1,1,0,0,2011,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0133","133 Colonial Vienna",493433,"2026-04-04",0,2150,8347,2,3,0,600,0,1981,2,"Vienna","Colonial",1,0,0
+"MLS0134","134 Townhouse Vienna",310025,"2025-04-04",0,1388,2361,1,2,1,0,0,1996,3,"Vienna","Townhouse",1,0,0
+"MLS0135","135 Colonial Oakton",561825,"2026-03-10",0,2601,8032,3,2,0,900,0,2003,2,"Oakton","Colonial",1,0,0
+"MLS0136","136 Townhouse Dunn Loring",361826,"2025-10-07",0,1693,2705,2,1,1,0,0,1995,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0137","137 Colonial Dunn Loring",511479,"2025-05-29",0,2372,8508,2,2,1,600,0,2010,2,"Dunn Loring","Colonial",1,0,0
+"MLS0138","138 Townhouse Dunn Loring",372027,"2026-01-14",0,1406,1828,1,2,1,0,0,2012,3,"Dunn Loring","Townhouse",1,0,0
+"MLS0139","139 Split Foyer Oakton",387130,"2025-06-11",0,1719,8409,1,1,0,0,0,1978,2,"Oakton","Split Foyer",1,0,0
+"MLS0140","140 Split Foyer Vienna",359771,"2025-08-04",0,1634,4605,2,1,1,0,0,1972,3,"Vienna","Split Foyer",1,0,0
+"MLS0141","141 Townhouse Oakton",356240,"2026-01-02",0,1431,2363,2,2,1,0,0,2009,3,"Oakton","Townhouse",1,0,0
+"MLS0142","142 Townhouse Oakton",348086,"2026-01-03",0,1539,1737,2,1,0,0,0,1998,2,"Oakton","Townhouse",1,0,0
+"MLS0143","143 Townhouse Vienna",340672,"2026-04-04",0,1423,2374,1,1,1,0,0,2003,2,"Vienna","Townhouse",1,0,0
+"MLS0144","144 Townhouse Oakton",379532,"2026-01-01",0,1646,2199,1,2,0,0,0,2006,3,"Oakton","Townhouse",1,0,0
+"MLS0145","145 Colonial Vienna",476188,"2026-01-28",0,2026,10914,2,2,1,600,0,1981,2,"Vienna","Colonial",1,0,0
+"MLS0146","146 Townhouse Vienna",304182,"2025-07-20",0,1457,2813,1,1,0,0,0,2007,2,"Vienna","Townhouse",1,0,0
+"MLS0147","147 Townhouse Vienna",306958,"2025-05-17",0,1469,2420,1,1,0,0,0,1994,2,"Vienna","Townhouse",1,0,0
+"MLS0148","148 Colonial Oakton",439844,"2025-02-14",0,2243,10259,1,3,0,0,0,1991,2,"Oakton","Colonial",1,0,0
+"MLS0149","149 Split Foyer Oakton",428300,"2026-04-16",0,1768,9089,2,1,0,0,0,1980,3,"Oakton","Split Foyer",1,0,0
+"MLS0150","150 Colonial Oakton",481879,"2026-04-12",0,2213,9086,2,3,1,0,0,1990,2,"Oakton","Colonial",1,0,0
+"MLS0151","151 Townhouse Dunn Loring",314029,"2025-11-25",0,1407,2289,1,1,0,0,0,1991,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0152","152 Split Foyer Oakton",413161,"2025-09-12",0,1662,10731,2,1,1,0,0,1986,2,"Oakton","Split Foyer",1,0,0
+"MLS0153","153 Colonial Dunn Loring",519034,"2026-02-04",0,2248,8477,2,2,1,600,0,1976,2,"Dunn Loring","Colonial",1,0,0
+"MLS0154","154 Split Foyer Vienna",386410,"2025-06-28",0,1659,8195,2,1,0,0,0,1978,3,"Vienna","Split Foyer",1,0,0
+"MLS0155","155 Townhouse Vienna",329117,"2025-01-27",0,1402,1908,2,2,1,0,0,2009,3,"Vienna","Townhouse",1,0,0
+"MLS0156","156 Townhouse Vienna",315526,"2025-03-03",0,1515,1788,2,1,0,0,0,1997,2,"Vienna","Townhouse",1,0,0
+"MLS0157","157 Colonial Dunn Loring",555690,"2026-01-28",0,2541,8765,2,2,1,900,0,1986,2,"Dunn Loring","Colonial",1,0,0
+"MLS0158","158 Colonial Vienna",552104,"2026-01-19",0,2816,10357,3,2,0,0,0,1989,2,"Vienna","Colonial",1,0,0
+"MLS0159","159 Townhouse Vienna",360663,"2026-03-23",0,1579,2281,2,2,1,0,0,1999,3,"Vienna","Townhouse",1,0,0
+"MLS0160","160 Townhouse Oakton",346794,"2025-05-13",0,1683,2371,1,1,0,0,0,1997,2,"Oakton","Townhouse",1,0,0
+"MLS0161","161 Townhouse Oakton",409106,"2026-05-15",0,1714,1540,1,2,1,0,0,2007,3,"Oakton","Townhouse",1,0,0
+"MLS0162","162 Colonial Vienna",530504,"2025-07-06",0,2605,7880,2,2,0,900,0,1986,2,"Vienna","Colonial",1,0,0
+"MLS0163","163 Townhouse Dunn Loring",363593,"2025-12-15",0,1593,1821,1,1,0,0,0,1992,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0164","164 Colonial Oakton",493400,"2025-11-01",0,2233,8227,3,2,0,900,0,1988,2,"Oakton","Colonial",1,0,0
+"MLS0165","165 Colonial Vienna",516942,"2026-04-24",0,2495,7862,2,2,1,600,0,1990,2,"Vienna","Colonial",1,0,0
+"MLS0166","166 Split Foyer Dunn Loring",437741,"2025-12-07",0,1813,9473,2,1,0,0,0,1975,3,"Dunn Loring","Split Foyer",1,0,0
+"MLS0167","167 Colonial Oakton",508037,"2025-06-24",0,2468,8890,1,2,1,600,0,1989,2,"Oakton","Colonial",1,0,0
+"MLS0168","168 Colonial Dunn Loring",530437,"2026-05-05",0,2476,8810,2,2,1,0,0,1972,2,"Dunn Loring","Colonial",1,0,0
+"MLS0169","169 Split Foyer Oakton",478250,"2026-05-04",0,1727,9929,2,2,0,0,0,1974,3,"Oakton","Split Foyer",1,0,0
+"MLS0170","170 Colonial Vienna",562669,"2025-12-02",0,2793,10489,3,2,1,600,0,1992,2,"Vienna","Colonial",1,0,0
+"MLS0171","171 Colonial Oakton",533320,"2025-02-26",0,2591,11175,2,2,0,900,0,1987,2,"Oakton","Colonial",1,0,0
+"MLS0172","172 Split Foyer Vienna",448278,"2025-07-29",0,1798,9982,2,2,1,0,0,1970,2,"Vienna","Split Foyer",1,0,0
+"MLS0173","173 Colonial Oakton",527802,"2026-01-24",0,2173,11877,2,3,1,600,0,1988,2,"Oakton","Colonial",1,0,0
+"MLS0174","174 Split Foyer Vienna",415823,"2026-03-14",0,1818,8452,3,1,1,0,0,1963,2,"Vienna","Split Foyer",1,0,0
+"MLS0175","175 Townhouse Oakton",338739,"2025-12-03",0,1604,2111,1,1,0,0,0,2010,2,"Oakton","Townhouse",1,0,0
+"MLS0176","176 Townhouse Dunn Loring",354473,"2026-03-10",0,1490,2088,2,1,1,0,0,2007,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0177","177 Colonial Vienna",516511,"2025-05-30",0,2596,8814,2,2,1,900,0,1974,2,"Vienna","Colonial",1,0,0
+"MLS0178","178 Split Foyer Oakton",508577,"2026-05-08",0,1875,7184,3,2,1,0,0,1984,2,"Oakton","Split Foyer",1,0,0
+"MLS0179","179 Colonial Dunn Loring",494761,"2026-03-01",0,2052,9070,2,3,0,600,0,1983,2,"Dunn Loring","Colonial",1,0,0
+"MLS0180","180 Colonial Vienna",486540,"2025-06-16",0,2271,8139,2,3,1,900,0,1980,2,"Vienna","Colonial",1,0,0
+"MLS0181","181 Split Foyer Oakton",455206,"2025-09-30",0,1695,10689,2,2,0,0,0,1975,2,"Oakton","Split Foyer",1,0,0
+"MLS0182","182 Colonial Oakton",499695,"2025-03-14",0,2437,8482,2,2,0,0,0,1990,2,"Oakton","Colonial",1,0,0
+"MLS0183","183 Colonial Vienna",504120,"2026-04-06",0,2311,8863,2,2,1,0,0,2023,2,"Vienna","Colonial",1,0,0
+"MLS0184","184 Colonial Dunn Loring",544568,"2025-08-16",0,2458,10158,2,2,0,600,0,1995,2,"Dunn Loring","Colonial",1,0,0
+"MLS0185","185 Split Foyer Dunn Loring",434882,"2025-10-18",0,1764,12965,2,1,0,0,0,1979,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0186","186 Colonial Vienna",494085,"2025-06-13",0,2348,8254,2,2,0,900,0,1987,2,"Vienna","Colonial",1,0,0
+"MLS0187","187 Colonial Dunn Loring",556961,"2026-05-19",0,2579,10454,2,2,0,0,0,1990,2,"Dunn Loring","Colonial",1,0,0
+"MLS0188","188 Colonial Dunn Loring",553668,"2025-04-24",0,2819,10794,2,3,0,0,0,1986,2,"Dunn Loring","Colonial",1,0,0
+"MLS0189","189 Townhouse Oakton",303864,"2025-07-29",0,1398,2285,1,2,1,0,0,2004,3,"Oakton","Townhouse",1,0,0
+"MLS0190","190 Split Foyer Vienna",369416,"2025-02-27",0,1755,9991,3,1,0,0,0,1965,2,"Vienna","Split Foyer",1,0,0
+"MLS0191","191 Colonial Oakton",495557,"2026-02-15",0,2226,9854,3,2,1,0,0,2002,2,"Oakton","Colonial",1,0,0
+"MLS0192","192 Colonial Vienna",518910,"2025-02-06",0,2301,11311,3,2,1,600,0,2013,2,"Vienna","Colonial",1,0,0
+"MLS0193","193 Split Foyer Dunn Loring",413120,"2026-03-09",0,1572,8822,2,1,0,0,0,1975,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0194","194 Split Foyer Vienna",458008,"2025-01-19",0,1686,11301,2,2,0,0,0,1977,2,"Vienna","Split Foyer",1,0,0
+"MLS0195","195 Colonial Dunn Loring",504909,"2025-08-12",0,2507,7815,1,2,0,0,0,1999,2,"Dunn Loring","Colonial",1,0,0
+"MLS0196","196 Split Foyer Vienna",373096,"2025-02-20",0,1687,10195,1,1,0,0,0,1977,2,"Vienna","Split Foyer",1,0,0
+"MLS0197","197 Split Foyer Vienna",406293,"2026-04-01",0,1685,9322,2,1,0,0,0,1968,3,"Vienna","Split Foyer",1,0,0
+"MLS0198","198 Townhouse Dunn Loring",326792,"2025-08-01",0,1483,2261,1,1,0,0,0,2002,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0199","199 Colonial Dunn Loring",550720,"2026-05-27",0,2307,8085,1,3,0,600,0,1991,2,"Dunn Loring","Colonial",1,0,0
+"MLS0200","200 Split Foyer Oakton",423579,"2026-01-23",0,1880,10582,2,1,0,0,0,1967,2,"Oakton","Split Foyer",1,0,0
+"MLS0201","201 Colonial Oakton",470151,"2025-06-09",0,2027,8084,2,2,0,0,0,2002,2,"Oakton","Colonial",1,0,0
+"MLS0202","202 Colonial Dunn Loring",532540,"2025-06-15",0,2530,8749,2,3,0,900,0,1988,2,"Dunn Loring","Colonial",1,0,0
+"MLS0203","203 Townhouse Oakton",374524,"2025-04-10",0,1471,2619,1,2,0,0,0,2006,3,"Oakton","Townhouse",1,0,0
+"MLS0204","204 Colonial Dunn Loring",522935,"2025-05-05",0,2478,9279,3,2,0,600,0,2004,2,"Dunn Loring","Colonial",1,0,0
+"MLS0205","205 Split Foyer Vienna",404002,"2025-04-11",0,1960,10588,2,1,0,0,0,1971,2,"Vienna","Split Foyer",1,0,0
+"MLS0206","206 Split Foyer Vienna",445828,"2026-02-21",0,1588,9866,2,2,0,0,0,1968,2,"Vienna","Split Foyer",1,0,0
+"MLS0207","207 Townhouse Dunn Loring",341462,"2026-04-23",0,1512,1939,1,1,1,0,0,1997,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0208","208 Colonial Vienna",499923,"2025-07-08",0,2628,8637,1,3,0,0,0,1975,2,"Vienna","Colonial",1,0,0
+"MLS0209","209 Colonial Vienna",552059,"2025-09-10",0,2930,7999,1,2,1,0,0,1986,2,"Vienna","Colonial",1,0,0
+"MLS0210","210 Townhouse Dunn Loring",378092,"2025-12-11",0,1426,1827,2,2,1,0,0,2002,3,"Dunn Loring","Townhouse",1,0,0
+"MLS0211","211 Split Foyer Oakton",465733,"2025-08-18",0,1846,8953,2,2,0,0,0,1976,2,"Oakton","Split Foyer",1,0,0
+"MLS0212","212 Split Foyer Oakton",453954,"2025-03-01",0,1768,8926,3,2,1,0,0,1967,2,"Oakton","Split Foyer",1,0,0
+"MLS0213","213 Townhouse Vienna",290374,"2025-05-09",0,1445,2314,1,1,0,0,0,1991,2,"Vienna","Townhouse",1,0,0
+"MLS0214","214 Townhouse Vienna",303685,"2025-12-06",0,1242,1966,1,1,0,0,0,2007,2,"Vienna","Townhouse",1,0,0
+"MLS0215","215 Colonial Vienna",516186,"2026-01-05",0,2324,10131,3,2,0,0,0,1984,2,"Vienna","Colonial",1,0,0
+"MLS0216","216 Split Foyer Dunn Loring",437234,"2025-08-13",0,1470,7105,3,2,0,0,0,1971,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0217","217 Split Foyer Vienna",427476,"2025-03-05",0,1807,10260,2,1,0,0,0,1982,2,"Vienna","Split Foyer",1,0,0
+"MLS0218","218 Townhouse Dunn Loring",324439,"2025-12-06",0,1270,1892,1,1,0,0,0,2001,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0219","219 Split Foyer Oakton",394865,"2025-04-20",0,1739,8292,1,1,0,0,0,1975,2,"Oakton","Split Foyer",1,0,0
+"MLS0220","220 Split Foyer Oakton",412645,"2026-01-19",0,1863,8989,2,1,0,0,0,1986,2,"Oakton","Split Foyer",1,0,0
+"MLS0221","221 Split Foyer Oakton",393764,"2026-01-12",0,1548,11915,1,1,0,0,0,1980,2,"Oakton","Split Foyer",1,0,0
+"MLS0222","222 Split Foyer Dunn Loring",423308,"2025-08-12",0,1749,11205,3,1,0,0,0,1983,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0223","223 Split Foyer Oakton",358232,"2025-06-19",0,1466,9390,3,1,0,0,0,1983,2,"Oakton","Split Foyer",1,0,0
+"MLS0224","224 Split Foyer Dunn Loring",461775,"2025-07-06",0,1639,8177,3,2,1,0,0,1977,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0225","225 Townhouse Vienna",326199,"2025-06-24",0,1742,2235,2,1,0,0,0,2013,2,"Vienna","Townhouse",1,0,0
+"MLS0226","226 Split Foyer Vienna",387715,"2025-12-31",0,1777,7535,2,1,0,0,0,1970,2,"Vienna","Split Foyer",1,0,0
+"MLS0227","227 Colonial Oakton",515997,"2026-01-29",0,2447,9685,3,2,1,0,0,1973,2,"Oakton","Colonial",1,0,0
+"MLS0228","228 Townhouse Dunn Loring",361004,"2025-05-28",0,1607,1868,1,2,0,0,0,1989,3,"Dunn Loring","Townhouse",1,0,0
+"MLS0229","229 Townhouse Vienna",320804,"2025-11-19",0,1592,2552,1,1,0,0,0,2003,2,"Vienna","Townhouse",1,0,0
+"MLS0230","230 Colonial Dunn Loring",526201,"2025-04-15",0,2448,8777,1,2,1,600,0,2021,2,"Dunn Loring","Colonial",1,0,0
+"MLS0231","231 Colonial Vienna",525692,"2025-05-11",0,2521,8968,1,3,0,900,0,1997,2,"Vienna","Colonial",1,0,0
+"MLS0232","232 Colonial Vienna",502234,"2025-05-10",0,2327,11232,3,2,1,0,0,2008,2,"Vienna","Colonial",1,0,0
+"MLS0233","233 Colonial Dunn Loring",471291,"2025-10-02",0,2035,10900,3,2,1,0,0,1978,2,"Dunn Loring","Colonial",1,0,0
+"MLS0234","234 Townhouse Oakton",313176,"2025-10-05",0,1464,1820,1,1,0,0,0,2000,2,"Oakton","Townhouse",1,0,0
+"MLS0235","235 Townhouse Dunn Loring",348522,"2025-10-15",0,1512,2321,2,1,0,0,0,1995,2,"Dunn Loring","Townhouse",1,0,0
+"MLS0236","236 Townhouse Oakton",379557,"2026-03-16",0,1554,2397,2,2,0,0,0,2012,3,"Oakton","Townhouse",1,0,0
+"MLS0237","237 Townhouse Dunn Loring",420812,"2026-01-04",0,1655,2374,2,2,1,0,0,2007,3,"Dunn Loring","Townhouse",1,0,0
+"MLS0238","238 Split Foyer Oakton",414225,"2025-09-16",0,1771,9426,2,1,0,0,0,1981,2,"Oakton","Split Foyer",1,0,0
+"MLS0239","239 Townhouse Oakton",331030,"2025-07-19",0,1591,2108,1,1,0,0,0,1998,2,"Oakton","Townhouse",1,0,0
+"MLS0240","240 Colonial Vienna",491507,"2025-08-07",0,2101,8585,2,2,0,900,0,2025,2,"Vienna","Colonial",1,0,0
+"MLS0241","241 Split Foyer Dunn Loring",459870,"2025-04-07",0,1529,9099,1,2,1,0,0,1975,3,"Dunn Loring","Split Foyer",1,0,0
+"MLS0242","242 Townhouse Vienna",337932,"2026-03-07",0,1439,2266,2,1,0,0,0,2000,2,"Vienna","Townhouse",1,0,0
+"MLS0243","243 Colonial Vienna",494736,"2025-03-02",0,2468,12327,1,2,0,600,0,1989,2,"Vienna","Colonial",1,0,0
+"MLS0244","244 Split Foyer Oakton",414188,"2026-03-07",0,1676,7739,1,1,1,0,0,1972,3,"Oakton","Split Foyer",1,0,0
+"MLS0245","245 Split Foyer Dunn Loring",401765,"2026-02-06",0,1711,11989,2,1,0,0,0,1978,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0246","246 Townhouse Oakton",348080,"2025-03-26",0,1679,2238,2,1,0,0,0,2007,2,"Oakton","Townhouse",1,0,0
+"MLS0247","247 Split Foyer Dunn Loring",414666,"2025-11-25",0,1790,10451,2,1,0,0,0,1970,2,"Dunn Loring","Split Foyer",1,0,0
+"MLS0248","248 Split Foyer Vienna",360874,"2025-03-01",0,1589,9428,3,1,0,0,0,1972,2,"Vienna","Split Foyer",1,0,0
+"MLS0249","249 Colonial Oakton",532527,"2026-01-04",0,2364,11815,1,2,0,600,0,1993,2,"Oakton","Colonial",1,0,0
+"MLS0250","250 Colonial Vienna",474446,"2025-10-10",0,2013,8381,1,3,1,900,0,1981,2,"Vienna","Colonial",1,0,0
+"MLS9001","1 Not Closed",4e+05,"2026-05-01",0,1500,2000,1,1,0,0,0,2000,2,"Oakton","Townhouse",1,0,1
+"MLS9002","2 Family Transfer",410000,"2026-04-01",0,1600,8000,2,2,1,0,0,1990,2,"Vienna","Colonial",0,0,0
+"MLS9003","3 Brand New",520000,"2026-03-01",0,2400,9000,2,3,1,600,0,2026,2,"Oakton","Colonial",1,1,0

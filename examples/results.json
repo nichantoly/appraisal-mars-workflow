@@ -1,14 +1,16 @@
 {
   "scope_notice": "Adjustment support only. Model estimates with stated uncertainty; not confirmed market values. No indicated/reconciled/opinion of value. Appraiser makes all final adjustment selections (USPAP AO-41: outputs are information, not assignment results).",
   "run": {
-    "date": "2026-07-10",
+    "date": "2026-10-22",
     "n_raw": 240,
     "n_excluded": 3,
     "n_clean": 237,
     "subject_is_new": false,
     "new_construction_rule": "excluded (subject not new/newer)",
     "subject_subdivision_note": "subject subdivision present in sales data",
-    "comp_ids_not_found": []
+    "subject_style_note": "no style column — style was not held constant",
+    "comp_ids_not_found": [],
+    "legacy_v1_2": false
   },
   "data_quality": {
     "imputed_cells_per_feature": {
@@ -23,7 +25,9 @@
       "levels": 0
     },
     "features_dropped_for_missingness": [],
-    "unparseable_dates_excluded": 0
+    "unparseable_dates_excluded": 0,
+    "discrete_features_linear_only": ["garage", "full_baths", "half_baths", "levels"],
+    "parsing_warnings": []
   },
   "reproducibility": {
     "master_seed": 20260709,
@@ -34,6 +38,8 @@
     },
     "earth_version": "5.3.3",
     "r_version": "R version 4.3.3 (2024-02-29)",
+    "rng": "Mersenne-Twister / Inversion / Rejection",
+    "row_order": "sales sorted by mls_id (radix) before the fit",
     "config": {
       "master_seed": 20260709,
       "degree": 1,
@@ -43,11 +49,30 @@
       "theilsen_max_pairs": 50000,
       "min_n_feature": 20,
       "max_missing_frac": 0.3,
-      "gla_band_default": 500
+      "gla_band_default": 500,
+      "legacy_v1_2": false,
+      "discrete_linear_only": true,
+      "include_style_control": true,
+      "stability_checks": true,
+      "discrete_max_unique": 6,
+      "discrete_max_span": 8,
+      "min_level_n": 15,
+      "vif_flag": 8,
+      "boot_reps": 40,
+      "plausibility_pct_full_baths": 0.08,
+      "plausibility_pct_half_baths": 0.04,
+      "plausibility_pct_garage": 0.08,
+      "plausibility_pct_levels": 0.12,
+      "disagree_ratio": 2,
+      "disagree_gap_floor": 15000,
+      "disagree_gap_pct": 0.04,
+      "pair_gla_tol": 150,
+      "pair_year_tol": 12,
+      "pair_min_n": 8
     },
-    "config_sha256": "95ac168c0d09dab66a429bbb6f2d63ff59fbde9eb114d57e4ae061a12ca03962",
-    "deterministic": ["MARS/GCV", "OLS", "LAD", "Grouped", "Sensitivity", "ModQuantile", "Theil-Sen(seeded)"],
-    "seed_dependent": ["LMS", "randomized Theil-Sen pair sampling (seeded)"]
+    "config_sha256": "c3b9664c5782af9ceabb67c560b701c055f6bf6bd0911df61963522329f32c12",
+    "deterministic": ["MARS/GCV", "OLS", "LAD", "Grouped", "Sensitivity", "ModQuantile", "Theil-Sen(seeded)", "bootstrap(seeded)"],
+    "seed_dependent": ["LMS", "randomized Theil-Sen pair sampling (seeded)", "bootstrap resamples (seeded)"]
   },
   "time": {
     "effective_date": "2026-07-02",
@@ -56,24 +81,24 @@
       {
         "half_year": "1",
         "dummy_reg_ln": -0.0201,
-        "mars_pct_at_median": -0.0274,
-        "divergence_pct": 0.73
+        "mars_pct_at_median": -0.0277,
+        "divergence_pct": 0.76
       },
       {
         "half_year": "2",
         "dummy_reg_ln": -0.0464,
-        "mars_pct_at_median": -0.0495,
-        "divergence_pct": 0.31
+        "mars_pct_at_median": -0.0499,
+        "divergence_pct": 0.35
       }
     ],
     "repeat_sale_addresses": 0,
     "sale_age_interactions_deg2": "h(77-sale_age)*subdivisionOakton"
   },
   "model": {
-    "architecture": "single-stage (v1.2, Craytor): net_price ~ sale_age + features + subdivision",
-    "terms": ["(Intercept)", "h(gla-2400)", "h(2400-gla)", "subdivisionVienna", "h(421-sale_age)", "h(800-bsmt_fin_sf)", "subdivisionOakton", "levels", "h(lot_sf-7600)", "h(garage-2)", "h(2-garage)", "h(1998-year_built)"],
-    "gcv": 591244295.61784,
-    "rsq": 0.967449,
+    "architecture": "single-stage (v1.3): net_price ~ sale_age + features + optional style + subdivision; count features linear",
+    "terms": ["(Intercept)", "h(gla-2400)", "h(2400-gla)", "subdivisionVienna", "h(421-sale_age)", "h(800-bsmt_fin_sf)", "subdivisionOakton", "levels", "h(lot_sf-7600)", "garage", "h(1998-year_built)"],
+    "gcv": 587112240.965086,
+    "rsq": 0.96707,
     "interaction_diagnostic": {
       "retained": false,
       "terms": []
@@ -82,42 +107,71 @@
   "adjustments": [
     {
       "feature": "sale_age",
-      "mars_per_unit": -117.45,
-      "se": 10.74,
-      "low": -138.5,
-      "high": -96.41,
+      "mars_per_unit": -118.49,
+      "se": 10.76,
+      "low": -139.58,
+      "high": -97.41,
       "n_knots": 1,
       "status": "SUPPORTED",
+      "reliable": "yes",
+      "flag": "",
+      "boot_p10": -195.58,
+      "boot_p90": -49.01,
+      "support": "",
+      "flag_reason": "",
+      "note": "",
       "_row": "sale_age"
     },
     {
       "feature": "gla",
-      "mars_per_unit": 223.2,
+      "mars_per_unit": 223.87,
       "se": 5.73,
-      "low": 211.97,
-      "high": 234.42,
+      "low": 212.64,
+      "high": 235.11,
       "n_knots": 1,
       "status": "SUPPORTED",
+      "reliable": "yes",
+      "flag": "",
+      "boot_p10": 181.54,
+      "boot_p90": 237.67,
+      "support": "",
+      "flag_reason": "",
+      "note": "",
       "_row": "gla"
     },
     {
       "feature": "lot_sf",
-      "mars_per_unit": 4.73,
+      "mars_per_unit": 4.8,
       "se": 0.63,
-      "low": 3.49,
-      "high": 5.97,
+      "low": 3.56,
+      "high": 6.04,
       "n_knots": 1,
       "status": "SUPPORTED",
+      "reliable": "yes",
+      "flag": "",
+      "boot_p10": 3.42,
+      "boot_p90": 6.11,
+      "support": "",
+      "flag_reason": "",
+      "note": "",
       "_row": "lot_sf"
     },
     {
       "feature": "garage",
-      "mars_per_unit": 17637.7,
-      "se": 3976.25,
-      "low": 9844.25,
-      "high": 25431.16,
-      "n_knots": 1,
+      "mars_per_unit": 12406.28,
+      "se": 2327.34,
+      "low": 7844.7,
+      "high": 16967.87,
+      "n_knots": 0,
       "status": "SUPPORTED",
+      "reliable": "yes",
+      "flag": "",
+      "boot_p10": 9946.13,
+      "boot_p90": 15929.27,
+      "vif": 1.06,
+      "support": "1:54, 2:138, 3:45",
+      "flag_reason": "",
+      "note": "",
       "_row": "garage"
     },
     {
@@ -128,6 +182,14 @@
       "high": 0,
       "n_knots": 0,
       "status": "NOT RETAINED BY GCV (below noise floor here) - see battery",
+      "reliable": "no",
+      "flag": "",
+      "boot_p10": 0,
+      "boot_p90": 0,
+      "vif": 1.05,
+      "support": "2:111, 3:126",
+      "flag_reason": "",
+      "note": "",
       "_row": "full_baths"
     },
     {
@@ -138,6 +200,14 @@
       "high": 0,
       "n_knots": 0,
       "status": "NOT RETAINED BY GCV (below noise floor here) - see battery",
+      "reliable": "no",
+      "flag": "",
+      "boot_p10": 0,
+      "boot_p90": 0,
+      "vif": 1.08,
+      "support": "0:131, 1:106",
+      "flag_reason": "",
+      "note": "",
       "_row": "half_baths"
     },
     {
@@ -148,6 +218,13 @@
       "high": 0,
       "n_knots": 1,
       "status": "RETAINED BUT FLAT AT SUBJECT POSITION - see per-segment slopes",
+      "reliable": "no",
+      "flag": "",
+      "boot_p10": 0,
+      "boot_p90": 30.58,
+      "support": "",
+      "flag_reason": "",
+      "note": "",
       "_row": "bsmt_fin_sf"
     },
     {
@@ -158,6 +235,13 @@
       "high": 0,
       "n_knots": 0,
       "status": "NOT RETAINED BY GCV (below noise floor here) - see battery",
+      "reliable": "no",
+      "flag": "",
+      "boot_p10": 0,
+      "boot_p90": 0,
+      "support": "",
+      "flag_reason": "",
+      "note": "",
       "_row": "bsmt_unf_sf"
     },
     {
@@ -168,16 +252,31 @@
       "high": 0,
       "n_knots": 1,
       "status": "RETAINED BUT FLAT AT SUBJECT POSITION - see per-segment slopes",
+      "reliable": "no",
+      "flag": "",
+      "boot_p10": 0,
+      "boot_p90": 710.35,
+      "support": "",
+      "flag_reason": "",
+      "note": "",
       "_row": "year_built"
     },
     {
       "feature": "levels",
-      "mars_per_unit": 29333,
-      "se": 2987.76,
-      "low": 23477,
-      "high": 35189.01,
-      "n_knots": 1,
+      "mars_per_unit": 29247,
+      "se": 2998,
+      "low": 23370.93,
+      "high": 35123.07,
+      "n_knots": 0,
       "status": "SUPPORTED",
+      "reliable": "yes",
+      "flag": "",
+      "boot_p10": 25392.03,
+      "boot_p90": 32547.65,
+      "vif": 1.06,
+      "support": "2:124, 3:113",
+      "flag_reason": "",
+      "note": "",
       "_row": "levels"
     }
   ],
@@ -186,7 +285,7 @@
       "feature": "sale_age",
       "from": 0,
       "to": 421,
-      "slope_per_unit": -117.45,
+      "slope_per_unit": -118.49,
       "_row": "sale_age.est"
     },
     {
@@ -200,14 +299,14 @@
       "feature": "gla",
       "from": 1410,
       "to": 2400,
-      "slope_per_unit": 223.2,
+      "slope_per_unit": 223.87,
       "_row": "gla.est"
     },
     {
       "feature": "gla",
       "from": 2400,
       "to": 3380,
-      "slope_per_unit": 163.23,
+      "slope_per_unit": 163.08,
       "_row": "gla.est1"
     },
     {
@@ -221,22 +320,15 @@
       "feature": "lot_sf",
       "from": 7600,
       "to": 15000,
-      "slope_per_unit": 4.73,
+      "slope_per_unit": 4.8,
       "_row": "lot_sf.est1"
     },
     {
       "feature": "garage",
       "from": 1,
-      "to": 2,
-      "slope_per_unit": 7858.07,
-      "_row": "garage.est"
-    },
-    {
-      "feature": "garage",
-      "from": 2,
       "to": 3,
-      "slope_per_unit": 17637.7,
-      "_row": "garage.est1"
+      "slope_per_unit": 12406.28,
+      "_row": "garage"
     },
     {
       "feature": "full_baths",
@@ -256,7 +348,7 @@
       "feature": "bsmt_fin_sf",
       "from": 0,
       "to": 800,
-      "slope_per_unit": 49.63,
+      "slope_per_unit": 48.86,
       "_row": "bsmt_fin_sf.est"
     },
     {
@@ -277,7 +369,7 @@
       "feature": "year_built",
       "from": 1975,
       "to": 1998,
-      "slope_per_unit": 804.1,
+      "slope_per_unit": 803.33,
       "_row": "year_built.est"
     },
     {
@@ -291,17 +383,91 @@
       "feature": "levels",
       "from": 2,
       "to": 3,
-      "slope_per_unit": 29333,
+      "slope_per_unit": 29247,
       "_row": "levels"
+    }
+  ],
+  "step_contrasts": [
+    {
+      "feature": "garage",
+      "kind": "adjacent_step",
+      "label": "1 to 2",
+      "n_low": 54,
+      "n_high": 138,
+      "dollars": 9978
+    },
+    {
+      "feature": "garage",
+      "kind": "adjacent_step",
+      "label": "2 to 3",
+      "n_low": 138,
+      "n_high": 45,
+      "dollars": 13523
+    },
+    {
+      "feature": "garage",
+      "kind": "matched_pairs",
+      "label": "all close pairs",
+      "n_low": 502,
+      "n_high": 502,
+      "dollars": 7514
+    },
+    {
+      "feature": "full_baths",
+      "kind": "adjacent_step",
+      "label": "2 to 3",
+      "n_low": 111,
+      "n_high": 126,
+      "dollars": 4855
+    },
+    {
+      "feature": "full_baths",
+      "kind": "matched_pairs",
+      "label": "all close pairs",
+      "n_low": 536,
+      "n_high": 536,
+      "dollars": 5197
+    },
+    {
+      "feature": "half_baths",
+      "kind": "adjacent_step",
+      "label": "0 to 1",
+      "n_low": 131,
+      "n_high": 106,
+      "dollars": -9648
+    },
+    {
+      "feature": "half_baths",
+      "kind": "matched_pairs",
+      "label": "all close pairs",
+      "n_low": 501,
+      "n_high": 501,
+      "dollars": -13104
+    },
+    {
+      "feature": "levels",
+      "kind": "adjacent_step",
+      "label": "2 to 3",
+      "n_low": 124,
+      "n_high": 113,
+      "dollars": 32263
+    },
+    {
+      "feature": "levels",
+      "kind": "matched_pairs",
+      "label": "all close pairs",
+      "n_low": 1045,
+      "n_high": 1045,
+      "dollars": 34273
     }
   ],
   "local_validation": {
     "gla_band_declared": 500,
     "batch_n": 58,
-    "batch_price_range": [656447.551943, 944479.241879],
-    "batch_ols_slope": 206.55,
-    "batch_theilsen_slope": 206.22,
-    "mars_slope_at_subject": 223.2,
+    "batch_price_range": [656885.949965, 944495.903087],
+    "batch_ols_slope": 206.54,
+    "batch_theilsen_slope": 206.4,
+    "mars_slope_at_subject": 223.87,
     "mars_se": 5.73,
     "verdict": "DIVERGES - FLAG FOR APPRAISER JUDGMENT"
   },
@@ -382,7 +548,7 @@
   "location": [
     {
       "subdivision": "Dunn Loring",
-      "vs_subject_subdivision": 41606,
+      "vs_subject_subdivision": 41323,
       "_row": "Dunn Loring"
     },
     {
@@ -392,8 +558,9 @@
     },
     {
       "subdivision": "Vienna",
-      "vs_subject_subdivision": -16050,
+      "vs_subject_subdivision": -16341,
       "_row": "Vienna"
     }
-  ]
+  ],
+  "style_control": {}
 }

@@ -1,0 +1,10 @@
+"feature","kind","label","n_low","n_high","dollars"
+"garage","adjacent_step","1 to 2",54,138,9978
+"garage","adjacent_step","2 to 3",138,45,13523
+"garage","matched_pairs","all close pairs",502,502,7514
+"full_baths","adjacent_step","2 to 3",111,126,4855
+"full_baths","matched_pairs","all close pairs",536,536,5197
+"half_baths","adjacent_step","0 to 1",131,106,-9648
+"half_baths","matched_pairs","all close pairs",501,501,-13104
+"levels","adjacent_step","2 to 3",124,113,32263
+"levels","matched_pairs","all close pairs",1045,1045,34273

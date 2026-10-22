@@ -1,0 +1,32 @@
+"feature","kind","label","n_low","n_high","dollars"
+"garage","adjacent_step","1 to 2",94,113,12697
+"garage","adjacent_step","2 to 3",113,43,12159
+"garage","within_style","Colonial",111,3,2961
+"garage","within_style","Split Foyer",61,3,369
+"garage","within_style","Townhouse",78,2,11872
+"garage","matched_pairs","all close pairs",1305,1305,4715
+"garage","matched_pairs","Colonial",626,626,3381
+"garage","matched_pairs","Townhouse",345,345,6935
+"garage","matched_pairs","Split Foyer",334,334,5755
+"full_baths","adjacent_step","1 to 2",89,136,40009
+"full_baths","adjacent_step","2 to 3",136,25,2386
+"full_baths","within_style","Colonial",111,2,2764
+"full_baths","within_style","Split Foyer",61,2,65386
+"full_baths","within_style","Townhouse",78,2,33163
+"full_baths","matched_pairs","all close pairs",763,763,26730
+"full_baths","matched_pairs","Split Foyer",315,315,62377
+"full_baths","matched_pairs","Colonial",448,448,2817
+"half_baths","adjacent_step","0 to 1",152,98,10820
+"half_baths","within_style","Colonial",111,2,-3017
+"half_baths","within_style","Split Foyer",61,2,32866
+"half_baths","within_style","Townhouse",78,2,9452
+"half_baths","matched_pairs","all close pairs",1178,1178,1886
+"half_baths","matched_pairs","Colonial",605,605,-4623
+"half_baths","matched_pairs","Split Foyer",287,287,43054
+"half_baths","matched_pairs","Townhouse",286,286,1898
+"levels","adjacent_step","2 to 3",206,44,12341
+"levels","within_style","Split Foyer",61,2,2955
+"levels","within_style","Townhouse",78,2,33163
+"levels","matched_pairs","all close pairs",1123,1123,23221
+"levels","matched_pairs","Split Foyer",419,419,-1508
+"levels","matched_pairs","Townhouse",704,704,31545

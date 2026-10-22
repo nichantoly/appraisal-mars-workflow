@@ -1,0 +1,14 @@
+{
+  "seed": 11,
+  "true_dollars": {
+    "gla_per_sf": 120,
+    "full_bath": 10000,
+    "half_bath": 3500,
+    "garage_space": 5000,
+    "level": 6000,
+    "lot_per_sf": 3,
+    "finished_basement_per_sf": 20,
+    "sale_age_per_day": -70
+  },
+  "what_is_not_a_bath": "Split foyers with 2 baths above grade also include a $52,000 finished-lower-level premium. Townhouses with 2 baths include a $20,000 end-unit premium, and in this file every 2-story townhouse has 1 bath and every 3-story townhouse has 2 baths. Those extras are not in any column. A hinge on full baths can pick them up."
+}

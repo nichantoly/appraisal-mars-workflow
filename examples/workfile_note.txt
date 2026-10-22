@@ -1,0 +1,16 @@
+MARS/REGRESSION ADJUSTMENT SUPPORT — WORKFILE NOTE
+Run date: 2026-10-22
+Clean sales: 237 (excluded 3). Config SHA-256: c3b9664c5782af9ceabb67c560b701c055f6bf6bd0911df61963522329f32c12
+Earth 5.3.3 | R version 4.3.3 (2024-02-29) | degree 1 | pmethod backward | discrete linear: garage, full_baths, half_baths, levels
+Master seed 20260709. RNG: Mersenne-Twister / Inversion / Rejection.
+No count-feature stability flags on this run.
+
+I reviewed the MARS/regression statistical output for this assignment (see attached addendum). I considered the modeled per-unit estimates, standard errors, and ranges in the context of the specific comparable sales, market conditions, and traditional paired-sales support where available. Final adjustments were determined by my independent professional judgment and reconciliation of all evidence. Where data support was insufficient, adjustments were treated as not supported or developed qualitatively. ☐ Adopted ☐ Modified ☐ Rejected (notes: ______)
+
+Scope and Use of This Analysis
+
+This addendum presents statistical analysis performed as a tool to support the appraiser's adjustment development. The per-unit figures shown are model-derived estimates with stated uncertainty (standard errors and low/high ranges) — they are analytical output, not confirmed market facts. Market participants do not transact at extracted coefficients; these figures describe patterns in the sale data under the stated model assumptions.
+
+The appraiser has exercised independent professional judgment in reviewing this analysis and makes all final adjustment determinations, whether within or outside the supported ranges shown, based on the totality of evidence and market knowledge. This analysis supports, and does not replace, the appraiser's reasoning and reconciliation. No indicated value, reconciled value, or opinion of value is produced by this analysis. Where the data could not support an adjustment, it is marked NOT SUPPORTED rather than estimated.
+
+Consistent with USPAP Advisory Opinion 41, outputs of this tool are information considered by the appraiser, not assignment results; only the appraiser can comply with USPAP. Data sources, exclusion criteria, model configuration, and reproducibility parameters are documented herein for workfile retention.
