@@ -1,0 +1,43 @@
+"comp_mls","comp_address","feature","subject_value","comp_value","adjustment","se_cond","se_hc1","cond_low","cond_high","half_sample_p2.5","half_sample_p97.5","knot_crossed","extrapolated","segment_math","status","review_flag","half_sample_share_nonzero","half_sample_same_sign","half_sample_n","half_sample_same_sign_n"
+"DEMO100003","106 Oak Ridge Dr","time (sale_age)","0","119",0,0,0,0,0,0,7969.23,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",0.17,0,200,0
+"DEMO100003","106 Oak Ridge Dr","gla","1650","1950",-35279.16,1332.82,1254.01,-37891.5,-32666.83,-45055.43,-24544.47,TRUE,FALSE,"1,650 to 1,700 @ $73.50/sf; 1,700 to 1,950 @ $126/sf","SUPPORTED","",1,1,200,200
+"DEMO100003","106 Oak Ridge Dr","bg_fin_sf","700","0",21692.15,2970.54,2986.88,15837.85,27546.44,0,35993.89,FALSE,FALSE,"","SUPPORTED","",0.97,0.97,200,194
+"DEMO100003","106 Oak Ridge Dr","lot_ac","3.5","4.71",-10475.81,2344.4,2151.83,-15070.82,-5880.8,-35008.81,0,TRUE,FALSE,"3.5 to 3.7 @ $18,160/acre; 3.7 to 4.71 @ $6,776/acre","SUPPORTED","",0.94,0.94,200,188
+"DEMO100003","106 Oak Ridge Dr","ag_baths","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NOT IN MODEL: below the GCV noise floor here (see battery / residual layer)","",0,0,200,0
+"DEMO100003","106 Oak Ridge Dr","garage","2","1",9872.11,2242.6,2278.55,5406.15,14338.06,0,20236.26,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",0.74,0.74,200,147
+"DEMO100003","106 Oak Ridge Dr","year_built","1995","1983",1992.55,416.05,386.24,1177.09,2808.01,-33838.33,5287.93,TRUE,FALSE,"1983 to 1994 @ $0.00/year; 1994 to 1995 @ $1,993/year","UNSTABLE: same sign in only 68 of 200 half-samples","",0.51,0.34,200,68
+"DEMO100003","106 Oak Ridge Dr","levels","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NOT IN MODEL: below the GCV noise floor here (see battery / residual layer)","",0,0,200,0
+"DEMO100003","106 Oak Ridge Dr","location","22406","22406",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",0,0,200,0
+"DEMO100040","180 Stony Brook Way","time (sale_age)","0","100",0,0,0,0,0,0,6696.83,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",0.16,0,200,0
+"DEMO100040","180 Stony Brook Way","gla","1650","1330",23518.92,3639,3379.46,16386.48,30651.35,5810.72,38531.13,FALSE,FALSE,"","SUPPORTED","",0.98,0.98,200,197
+"DEMO100040","180 Stony Brook Way","bg_fin_sf","700","1360",-17353.72,2376.43,2389.51,-22037.15,-12670.28,-34191.29,15995.41,TRUE,FALSE,"700 to 1,260 @ $30.99/sf; 1,260 to 1,360 @ $0.00/sf","SUPPORTED, SIZE VARIABLE","",0.76,0.61,200,122
+"DEMO100040","180 Stony Brook Way","lot_ac","3.5","0.9",47216.95,6096.62,6078.55,35267.57,59166.32,20653.6,70085.16,FALSE,FALSE,"","SUPPORTED","",1,1,200,200
+"DEMO100040","180 Stony Brook Way","ag_baths","2","1",0,0,0,0,0,-20128.37,8120.69,FALSE,FALSE,"","NOT IN MODEL: below the GCV noise floor here (see battery / residual layer)","",0.1,0,200,0
+"DEMO100040","180 Stony Brook Way","garage","2","1",9872.11,2242.6,2278.55,5406.15,14338.06,0,20236.26,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",0.74,0.74,200,147
+"DEMO100040","180 Stony Brook Way","year_built","1995","2005",-19925.48,4160.5,3862.43,-28080.06,-11770.91,-48844.54,0,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",0.76,0.76,200,152
+"DEMO100040","180 Stony Brook Way","levels","2","1.5",0,0,0,0,0,-16101.22,0,FALSE,FALSE,"","NOT IN MODEL: below the GCV noise floor here (see battery / residual layer)","",0.07,0,200,0
+"DEMO100040","180 Stony Brook Way","location","22406","22406",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",0,0,200,0
+"DEMO100104","308 Meadow Bend Rd","time (sale_age)","0","401",11037.26,2579.53,2416.03,5981.39,16093.13,-3192.26,26497.28,TRUE,FALSE,"0 to 175 @ $0.00/day; 175 to 401 @ -$48.84/day","UNSTABLE: same sign in only 102 of 200 half-samples","",0.54,0.51,200,102
+"DEMO100104","308 Meadow Bend Rd","gla","1650","2180",-64355.15,2615.52,2480.24,-69481.56,-59228.73,-81357.28,-45641.66,TRUE,FALSE,"1,650 to 1,700 @ $73.50/sf; 1,700 to 2,180 @ $126/sf","SUPPORTED","",1,1,200,200
+"DEMO100104","308 Meadow Bend Rd","bg_fin_sf","700","1100",-12395.51,1697.45,1706.79,-15740.82,-9050.2,-29717.2,0,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",0.74,0.74,200,148
+"DEMO100104","308 Meadow Bend Rd","lot_ac","3.5","0.99",45582.51,5885.58,5868.14,34046.77,57118.25,20653.6,66806.6,FALSE,FALSE,"","SUPPORTED","",1,1,200,200
+"DEMO100104","308 Meadow Bend Rd","ag_baths","2","3.5",0,0,0,0,0,-37034.02,0,FALSE,FALSE,"","NOT IN MODEL: below the GCV noise floor here (see battery / residual layer)","",0.2,0,200,0
+"DEMO100104","308 Meadow Bend Rd","garage","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",0,0,200,0
+"DEMO100104","308 Meadow Bend Rd","year_built","1995","2003",-15940.39,3328.4,3089.94,-22464.05,-9416.73,-41553.09,0,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",0.73,0.73,200,146
+"DEMO100104","308 Meadow Bend Rd","levels","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NOT IN MODEL: below the GCV noise floor here (see battery / residual layer)","",0,0,200,0
+"DEMO100104","308 Meadow Bend Rd","location","22406","22554",-16241.75,4923.16,4778.05,-25891.15,-6592.36,-30059.11,0,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",0.78,0.78,200,155
+"DEMO100003","106 Oak Ridge Dr","fireplaces (residual layer)","1","1",0,0,NA,0,0,NA,NA,FALSE,FALSE,"","NO DIFFERENCE","",NA,NA,NA,NA
+"DEMO100003","106 Oak Ridge Dr","pool (residual layer)","0","0",0,0,NA,0,0,NA,NA,FALSE,FALSE,"","NO DIFFERENCE","",NA,NA,NA,NA
+"DEMO100003","106 Oak Ridge Dr","deck (residual layer)","1","0",-2183.08,3750.48,NA,-9534.01,5167.86,NA,NA,FALSE,FALSE,"","weak (|t| < 2): direction not resolved","REVERSED SIGN: residual-layer estimate is -$2,183 per deck. More of this feature normally adds value.",NA,NA,NA,NA
+"DEMO100003","106 Oak Ridge Dr","porch (residual layer)","1","0",-573.46,4177.96,NA,-8762.27,7615.35,NA,NA,FALSE,FALSE,"","weak (|t| < 2): direction not resolved","REVERSED SIGN: residual-layer estimate is -$573 per porch. More of this feature normally adds value.",NA,NA,NA,NA
+"DEMO100003","106 Oak Ridge Dr","carport (residual layer)","0","0",0,0,NA,0,0,NA,NA,FALSE,FALSE,"","NO DIFFERENCE","",NA,NA,NA,NA
+"DEMO100040","180 Stony Brook Way","fireplaces (residual layer)","1","0",4191.13,2981.05,NA,-1651.71,10033.98,NA,NA,FALSE,FALSE,"","weak (|t| < 2): direction not resolved","",NA,NA,NA,NA
+"DEMO100040","180 Stony Brook Way","pool (residual layer)","0","0",0,0,NA,0,0,NA,NA,FALSE,FALSE,"","NO DIFFERENCE","",NA,NA,NA,NA
+"DEMO100040","180 Stony Brook Way","deck (residual layer)","1","0",-2183.08,3750.48,NA,-9534.01,5167.86,NA,NA,FALSE,FALSE,"","weak (|t| < 2): direction not resolved","REVERSED SIGN: residual-layer estimate is -$2,183 per deck. More of this feature normally adds value.",NA,NA,NA,NA
+"DEMO100040","180 Stony Brook Way","porch (residual layer)","1","0",-573.46,4177.96,NA,-8762.27,7615.35,NA,NA,FALSE,FALSE,"","weak (|t| < 2): direction not resolved","REVERSED SIGN: residual-layer estimate is -$573 per porch. More of this feature normally adds value.",NA,NA,NA,NA
+"DEMO100040","180 Stony Brook Way","carport (residual layer)","0","0",0,0,NA,0,0,NA,NA,FALSE,FALSE,"","NO DIFFERENCE","",NA,NA,NA,NA
+"DEMO100104","308 Meadow Bend Rd","fireplaces (residual layer)","1","1",0,0,NA,0,0,NA,NA,FALSE,FALSE,"","NO DIFFERENCE","",NA,NA,NA,NA
+"DEMO100104","308 Meadow Bend Rd","pool (residual layer)","0","1",-13482.64,6361.06,NA,-25950.32,-1014.95,NA,NA,FALSE,FALSE,"","residual-layer estimate","",NA,NA,NA,NA
+"DEMO100104","308 Meadow Bend Rd","deck (residual layer)","1","1",0,0,NA,0,0,NA,NA,FALSE,FALSE,"","NO DIFFERENCE","",NA,NA,NA,NA
+"DEMO100104","308 Meadow Bend Rd","porch (residual layer)","1","0",-573.46,4177.96,NA,-8762.27,7615.35,NA,NA,FALSE,FALSE,"","weak (|t| < 2): direction not resolved","REVERSED SIGN: residual-layer estimate is -$573 per porch. More of this feature normally adds value.",NA,NA,NA,NA
+"DEMO100104","308 Meadow Bend Rd","carport (residual layer)","0","0",0,0,NA,0,0,NA,NA,FALSE,FALSE,"","NO DIFFERENCE","",NA,NA,NA,NA

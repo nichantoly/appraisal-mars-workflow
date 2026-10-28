@@ -1,2 +1,2 @@
-gla,lot_sf,garage,full_baths,half_baths,bsmt_fin_sf,bsmt_unf_sf,year_built,levels,subdivision,subject_is_new,gla_band
-2300,9500,2,2,1,800,300,1998,3,Oakton,0,500
+effective_date,address,gla,bg_fin_sf,lot_ac,ag_baths,garage,year_built,levels,zip,fireplaces,pool,deck,porch,carport,subject_is_new
+2026-06-06,Demo subject,1650,700,3.5,2,2,1995,2,22406,1,0,1,1,0,0

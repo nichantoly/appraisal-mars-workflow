@@ -1,0 +1,441 @@
+{
+  "scope_notice": "Scope and use: statistical analysis supporting the appraiser's adjustment development. Per-unit figures and line amounts are model estimates with stated uncertainty, not confirmed market facts. The appraiser makes all final adjustment selections, within or outside the supported ranges. No indicated, reconciled or opinion-of-value figure is produced. Prepared with reference to USPAP Advisory Opinion 41 (Use of Technology in an Appraisal or Appraisal Review Assignment): the tool cannot comply with USPAP; the appraiser remains responsible for judging whether this output is accurate and relevant to the assignment.",
+  "engine": {
+    "name": "MARS / Regression Adjustment Support",
+    "version": "2.1.0",
+    "earth_version": "5.3.3",
+    "r_version": "R version 4.3.3 (2024-02-29)",
+    "run_date": "2026-10-28"
+  },
+  "assignment": {
+    "effective_date": "2026-06-06",
+    "date_basis": "sale_date",
+    "exclude_after_effective": true,
+    "concession_reaction": 0,
+    "subject_is_new": false,
+    "location_variable": "zip",
+    "subject_location": "22406",
+    "location_status": "subject level present in data"
+  },
+  "data": {
+    "n_raw": 262,
+    "n_modeled": 241,
+    "n_excluded": 21,
+    "window": ["2024-07-09", "2026-06-03"],
+    "days_from_most_recent_sale_to_effective_date": 3,
+    "time_gap_days_allowed": 91,
+    "exclusion_counts": {
+      "distressed / non-market sale type": 8,
+      "sale date after effective date": 13
+    },
+    "notes": ["Raw Bright MLS export detected; mapped to standard schema (blank garage/half bath/fireplace/carport = 0).", "No MLS entry date column: market-exposure check skipped.", "Cleaning: 262 raw -> 241 modeled (21 excluded). Effective date 2026-06-06, sale age from closing date, window 2024-07-09 to 2026-06-03."]
+  },
+  "review_flags": [
+    {
+      "comp_mls": "DEMO100003",
+      "feature": "deck (residual layer)",
+      "review_flag": "REVERSED SIGN: residual-layer estimate is -$2,183 per deck. More of this feature normally adds value."
+    },
+    {
+      "comp_mls": "DEMO100003",
+      "feature": "porch (residual layer)",
+      "review_flag": "REVERSED SIGN: residual-layer estimate is -$573 per porch. More of this feature normally adds value."
+    },
+    {
+      "comp_mls": "DEMO100040",
+      "feature": "deck (residual layer)",
+      "review_flag": "REVERSED SIGN: residual-layer estimate is -$2,183 per deck. More of this feature normally adds value."
+    },
+    {
+      "comp_mls": "DEMO100040",
+      "feature": "porch (residual layer)",
+      "review_flag": "REVERSED SIGN: residual-layer estimate is -$573 per porch. More of this feature normally adds value."
+    },
+    {
+      "comp_mls": "DEMO100104",
+      "feature": "porch (residual layer)",
+      "review_flag": "REVERSED SIGN: residual-layer estimate is -$573 per porch. More of this feature normally adds value."
+    }
+  ],
+  "model": {
+    "terms": ["(Intercept)", "h(2510-gla)", "h(lot_ac-3.7)", "h(3.7-lot_ac)", "h(1260-bg_fin_sf)", "h(2-garage)", "loc_X22556", "h(year_built-1994)", "loc_X22554", "h(sale_age-175)", "loc_X22406", "h(year_built-2010)", "h(gla-1700)"],
+    "coefficients": [475750.0922, -73.4966, 6775.9782, -18160.3636, -30.9888, -9872.106, 39985.6272, 1992.5485, 33937.5485, -48.8374, 17695.7941, -6803.5142, 52.9207],
+    "groups": ["gla", "lot_ac", "bg_fin_sf", "garage", "location", "year_built", "sale_age"],
+    "rsq": 0.8215,
+    "grsq": 0.7796,
+    "cvrsq": 0.7512,
+    "cvrsq_sd": 0.0537,
+    "rmse": 28834,
+    "mae": 23477,
+    "n_terms": 13,
+    "params": {
+      "degree": 1,
+      "nk": 24,
+      "minspan": 9,
+      "endspan": 13,
+      "penalty": 2,
+      "newvar_penalty": 0.1,
+      "thresh": 0.001,
+      "pmethod": "backward",
+      "nfold": 5,
+      "ncross": 16,
+      "stratify": true
+    },
+    "bootstrap_selection_frequency": {
+      "sale_age": 0.76,
+      "gla": 1,
+      "bg_fin_sf": 1,
+      "lot_ac": 1,
+      "ag_baths": 0.23,
+      "garage": 0.91,
+      "year_built": 0.775,
+      "levels": 0.07,
+      "location": 0.93
+    }
+  },
+  "location_effects": [
+    {
+      "level": "22405",
+      "n_sales": 53,
+      "vs_subject": -17696
+    },
+    {
+      "level": "22406",
+      "n_sales": 84,
+      "vs_subject": 0
+    },
+    {
+      "level": "22554",
+      "n_sales": 67,
+      "vs_subject": 16242
+    },
+    {
+      "level": "22556",
+      "n_sales": 37,
+      "vs_subject": 22290
+    }
+  ],
+  "per_segment_slopes": [
+    {
+      "feature": "sale_age",
+      "from": 3,
+      "to": 175,
+      "slope_per_unit": 0,
+      "in_model": true,
+      "_row": "sale_age.1"
+    },
+    {
+      "feature": "sale_age",
+      "from": 175,
+      "to": 697,
+      "slope_per_unit": -48.84,
+      "in_model": true,
+      "_row": "sale_age.2"
+    },
+    {
+      "feature": "gla",
+      "from": 1100,
+      "to": 1700,
+      "slope_per_unit": 73.5,
+      "in_model": true,
+      "_row": "gla.1"
+    },
+    {
+      "feature": "gla",
+      "from": 1700,
+      "to": 2510,
+      "slope_per_unit": 126.42,
+      "in_model": true,
+      "_row": "gla.2"
+    },
+    {
+      "feature": "gla",
+      "from": 2510,
+      "to": 2780,
+      "slope_per_unit": 52.92,
+      "in_model": true,
+      "_row": "gla.3"
+    },
+    {
+      "feature": "bg_fin_sf",
+      "from": 0,
+      "to": 1260,
+      "slope_per_unit": 30.99,
+      "in_model": true,
+      "_row": "bg_fin_sf.1"
+    },
+    {
+      "feature": "bg_fin_sf",
+      "from": 1260,
+      "to": 1400,
+      "slope_per_unit": 0,
+      "in_model": true,
+      "_row": "bg_fin_sf.2"
+    },
+    {
+      "feature": "lot_ac",
+      "from": 0.9,
+      "to": 3.7,
+      "slope_per_unit": 18160.36,
+      "in_model": true,
+      "_row": "lot_ac.1"
+    },
+    {
+      "feature": "lot_ac",
+      "from": 3.7,
+      "to": 8,
+      "slope_per_unit": 6775.98,
+      "in_model": true,
+      "_row": "lot_ac.2"
+    },
+    {
+      "feature": "ag_baths",
+      "from": 1,
+      "to": 3.5,
+      "slope_per_unit": 0,
+      "in_model": false,
+      "_row": "ag_baths"
+    },
+    {
+      "feature": "garage",
+      "from": 0,
+      "to": 2,
+      "slope_per_unit": 9872.11,
+      "in_model": true,
+      "_row": "garage.1"
+    },
+    {
+      "feature": "garage",
+      "from": 2,
+      "to": 3,
+      "slope_per_unit": 0,
+      "in_model": true,
+      "_row": "garage.2"
+    },
+    {
+      "feature": "year_built",
+      "from": 1960,
+      "to": 1994,
+      "slope_per_unit": 0,
+      "in_model": true,
+      "_row": "year_built.1"
+    },
+    {
+      "feature": "year_built",
+      "from": 1994,
+      "to": 2010,
+      "slope_per_unit": 1992.55,
+      "in_model": true,
+      "_row": "year_built.2"
+    },
+    {
+      "feature": "year_built",
+      "from": 2010,
+      "to": 2015,
+      "slope_per_unit": -4810.97,
+      "in_model": true,
+      "_row": "year_built.3"
+    },
+    {
+      "feature": "levels",
+      "from": 1,
+      "to": 2,
+      "slope_per_unit": 0,
+      "in_model": false,
+      "_row": "levels"
+    }
+  ],
+  "time_ln_price_cross_check": [
+    {
+      "half_year_back": "1",
+      "ln_price_vs_latest_half": -0.0048
+    },
+    {
+      "half_year_back": "2",
+      "ln_price_vs_latest_half": -0.0391
+    },
+    {
+      "half_year_back": "3",
+      "ln_price_vs_latest_half": -0.0628
+    }
+  ],
+  "residual_layer": [
+    {
+      "feature": "fireplaces",
+      "estimate": 4191,
+      "std_error": 2981,
+      "t_value": 1.41,
+      "n_nonzero": 116,
+      "note": "weak (|t| < 2): direction not resolved",
+      "_row": "fireplaces"
+    },
+    {
+      "feature": "pool",
+      "estimate": 13483,
+      "std_error": 6361,
+      "t_value": 2.12,
+      "n_nonzero": 23,
+      "note": "residual-layer estimate",
+      "_row": "pool"
+    },
+    {
+      "feature": "deck",
+      "estimate": -2183,
+      "std_error": 3750,
+      "t_value": -0.58,
+      "n_nonzero": 130,
+      "note": "weak (|t| < 2): direction not resolved",
+      "_row": "deck"
+    },
+    {
+      "feature": "porch",
+      "estimate": -573,
+      "std_error": 4178,
+      "t_value": -0.14,
+      "n_nonzero": 65,
+      "note": "weak (|t| < 2): direction not resolved",
+      "_row": "porch"
+    },
+    {
+      "feature": "carport",
+      "estimate": -1617,
+      "std_error": 6602,
+      "t_value": -0.24,
+      "n_nonzero": 21,
+      "note": "weak (|t| < 2): direction not resolved",
+      "_row": "carport"
+    }
+  ],
+  "concession_diagnostic": {
+    "n_with_concessions": 89,
+    "price_change_per_concession_dollar": 0.55,
+    "std_error": 0.455,
+    "reading": "A value near +1 means concessions were added on top of price (net them). Near 0 means they did not move price (gross is right)."
+  },
+  "comp_diagnostics": [
+    {
+      "mls_id": "DEMO100003",
+      "address": "106 Oak Ridge Dr",
+      "price_used": 443200,
+      "model_estimate": 423444,
+      "residual": 19756,
+      "cqa": 7.39,
+      "in_fit": true,
+      "reading": "Residual = sold above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+    },
+    {
+      "mls_id": "DEMO100040",
+      "address": "180 Stony Brook Way",
+      "price_used": 404200,
+      "model_estimate": 367917,
+      "residual": 36283,
+      "cqa": 9.05,
+      "in_fit": true,
+      "reading": "Residual = sold above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+    },
+    {
+      "mls_id": "DEMO100104",
+      "address": "308 Meadow Bend Rd",
+      "price_used": 488000,
+      "model_estimate": 463559,
+      "residual": 24441,
+      "cqa": 7.88,
+      "in_fit": true,
+      "reading": "Residual = sold above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+    }
+  ],
+  "repeat_sales": {},
+  "local_validation": {
+    "gla_band_sf": 250,
+    "batch_n": 29,
+    "batch_gla_range": [1400, 1890],
+    "batch_slope_per_sf": 55.23,
+    "batch_slope_se": 48.12,
+    "mars_avg_slope_over_band": 94.02,
+    "verdict": "LOCALLY VALIDATED"
+  },
+  "bracketing": [
+    {
+      "feature": "gla",
+      "subject": 1650,
+      "comp_min": 1330,
+      "comp_max": 2180,
+      "bracketed": true,
+      "data_min": 1100,
+      "data_max": 2780
+    },
+    {
+      "feature": "bg_fin_sf",
+      "subject": 700,
+      "comp_min": 0,
+      "comp_max": 1360,
+      "bracketed": true,
+      "data_min": 0,
+      "data_max": 1400
+    },
+    {
+      "feature": "lot_ac",
+      "subject": 3.5,
+      "comp_min": 0.9,
+      "comp_max": 4.71,
+      "bracketed": true,
+      "data_min": 0.9,
+      "data_max": 8
+    },
+    {
+      "feature": "ag_baths",
+      "subject": 2,
+      "comp_min": 1,
+      "comp_max": 3.5,
+      "bracketed": true,
+      "data_min": 1,
+      "data_max": 3.5
+    },
+    {
+      "feature": "garage",
+      "subject": 2,
+      "comp_min": 1,
+      "comp_max": 2,
+      "bracketed": true,
+      "data_min": 0,
+      "data_max": 3
+    },
+    {
+      "feature": "year_built",
+      "subject": 1995,
+      "comp_min": 1983,
+      "comp_max": 2005,
+      "bracketed": true,
+      "data_min": 1960,
+      "data_max": 2015
+    },
+    {
+      "feature": "levels",
+      "subject": 2,
+      "comp_min": 1.5,
+      "comp_max": 2,
+      "bracketed": true,
+      "data_min": 1,
+      "data_max": 2
+    }
+  ],
+  "interaction_diagnostic": {
+    "terms": ["h(1260-bg_fin_sf)*h(garage-1)", "h(1260-bg_fin_sf)*loc_X22556", "h(sale_age-362)*h(2510-gla)", "h(3.7-lot_ac)*h(year_built-1993)", "h(2510-gla)*loc_X22406", "h(ag_baths-1.5)*loc_X22554", "h(1.5-ag_baths)*loc_X22554", "h(gla-1810)*h(lot_ac-3.7)"],
+    "any_retained": true,
+    "sale_age_interaction": true,
+    "reading": "Headline model stays additive. A retained GLA x levels or GLA x year_built term means $/sf differs by cohort; a sale_age term means time trends differ by segment."
+  },
+  "reproducibility": {
+    "master_seed": 20260606,
+    "derived_seeds": {
+      "cv": 20260607,
+      "boot": 20270606,
+      "theilsen": 20290606,
+      "lms": 20300606
+    },
+    "data_sha256": "12187094becabda07f5f3a008b53c3dccb6578f17d02088864fc682e4d2e1357",
+    "config_sha256": "26efd0ae255bebeac4b535ea8c34a51a911ba76d20d0166276b3968df0ccec17",
+    "deterministic": ["MARS fit (GCV backward pruning)", "segments", "conditional and HC1 SEs", "residual layer"],
+    "seed_dependent": ["CVRSq (fold assignment)", "bootstrap ranges", "Theil-Sen pair sampling", "LMS"]
+  }
+}

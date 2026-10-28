@@ -1,0 +1,12 @@
+WORKFILE NOTE - MARS / Regression Adjustment Support v2.1.0
+Run date: 2026-10-28   Effective date: 2026-06-06   Sale age basis: closing date
+Data: 241 sales modeled of 262 in export (21 excluded, reasons in exclusions.csv). Window 2024-07-09 to 2026-06-03.
+Model: earth 5.3.3, degree 1, 13 terms. RSq 0.822, GRSq 0.780, CVRSq 0.751 (sd 0.054, 5-fold x 16). RMSE $28,834, MAE $23,477.
+Data rules: gross prices (concessions not deducted); sales after the effective date excluded; likely flip purchases excluded; sales with no MLS exposure not checked (no MLS entry date in the file).
+Data SHA-256: 12187094becabda07f5f3a008b53c3dccb6578f17d02088864fc682e4d2e1357   Config SHA-256: 26efd0ae255bebeac4b535ea8c34a51a911ba76d20d0166276b3968df0ccec17   Master seed: 20260606
+Review flags: 5 grid line(s) carry a REVERSED SEGMENT or REVERSED SIGN flag (comp_grid.csv, review_flag column).
+
+Scope and use: statistical analysis supporting the appraiser's adjustment development. Per-unit figures and line amounts are model estimates with stated uncertainty, not confirmed market facts. The appraiser makes all final adjustment selections, within or outside the supported ranges. No indicated, reconciled or opinion-of-value figure is produced. Prepared with reference to USPAP Advisory Opinion 41 (Use of Technology in an Appraisal or Appraisal Review Assignment): the tool cannot comply with USPAP; the appraiser remains responsible for judging whether this output is accurate and relevant to the assignment.
+
+I reviewed the MARS/regression statistical output for this assignment. I considered the modeled estimates, standard errors and ranges in the context of the specific comparable sales, market conditions and paired-sales support where available. Final adjustments were determined by my independent professional judgment and reconciliation of all evidence. Where data support was insufficient, adjustments were treated as not supported or developed qualitatively.
+[ ] Adopted   [ ] Modified   [ ] Rejected   Notes: ________________________________
