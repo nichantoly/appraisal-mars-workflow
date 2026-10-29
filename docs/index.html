@@ -483,7 +483,7 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
         <span class="or">or drop the file here</span>
         <button type="button" class="btn" id="demo">Try the demo market</button>
       </div>
-      <p class="hint small" id="demo-note">The page opens with a synthetic demo market already loaded and run: 320 made-up sales built with known adjustment values, salted with the listing errors realtors make (basement rooms on the main line, driveway spots counted as garage spaces). Your own subject, comps and market file replace it.</p>
+      <p class="hint small" id="demo-note">The page opens empty. The demo loads and runs a synthetic market: 320 made-up sales built with known adjustment values, salted with the listing errors realtors make (basement rooms on the main line, driveway spots counted as garage spaces). Your own subject, comps and market file replace it.</p>
       <div id="file-summary"></div>
       <details class="more" id="mapping-box" hidden>
         <summary><span id="mapping-title">Column mapping</span></summary>
@@ -2875,16 +2875,18 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     var t;
     try { t = A.parseCSV(text); } catch (e) { showFileError("That file could not be read as CSV."); return; }
     if (!t.header.length || !t.rows.length) { showFileError("No rows found in that file."); return; }
+    stopRun();   // new market data: a run still going on the old data is dropped
     if (!isDemo) exitDemo();
     S.table = t; S.fileName = name; S.isDemo = !!isDemo; S.map = A.autoMap(t.header);
     S.result = null; $("p-results").hidden = true; $("rail-results").hidden = true;
     applyMapping();
     renderMapping();
   }
-  // The page opens on the synthetic demo. The first file of the user's own (subject, comps or market) or the
+  // The demo button loads the synthetic demo. The first file of the user's own (subject, comps or market) or the
   // "Start my own assignment" button clears every demo piece, so no made-up value can carry into real work.
   function exitDemo(force) {
     if (!S.isDemo && !force) return false;
+    stopRun();   // a demo run still going must not land its results on the user's own work
     var edits = force ? {} : (S.demoEdits || {}), keep = {};
     Object.keys(edits).forEach(function (k) { if (k !== "eff" && S.subject[k] !== undefined) keep[k] = S.subject[k]; });
     S.isDemo = false; S.table = null; S.rows = []; S.map = {}; S.fileName = ""; S.demoEdits = {};
@@ -3229,9 +3231,11 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     S.running = true; updateChecklist(); $("progress").hidden = false; $("cancel").hidden = false; setProgress("Starting", 0.01);
     var started = false, url = null;
     var ids = S.comps.map(function (c) { return c.id; });
-    function onDone(res) { if (url) URL.revokeObjectURL(url); finishRun(); S.result = res; S.payload = payload; S.runCompIds = ids; renderResults(res, quiet); }
+    var token = S.runToken = (S.runToken || 0) + 1;   // a run that was stopped (new data, cancel) can never land its results
+    function live() { return token === S.runToken; }
+    function onDone(res) { if (url) URL.revokeObjectURL(url); if (!live()) return; finishRun(); S.result = res; S.payload = payload; S.runCompIds = ids; renderResults(res, quiet); }
     function mainThread() {
-      A.run(payload.sales, payload.subject, payload.comps, payload.opts, setProgress).then(onDone, function (err) { runFailed(String(err && err.message || err)); });
+      A.run(payload.sales, payload.subject, payload.comps, payload.opts, function (m, f) { if (live()) setProgress(m, f); }).then(onDone, function (err) { if (live()) runFailed(String(err && err.message || err)); });
     }
     try {
       url = URL.createObjectURL(new Blob([workerSource()], { type: "text/javascript" }));
@@ -3240,15 +3244,17 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
       w.onmessage = function (e) {
         started = true;
         var d = e.data;
+        if (!live()) { w.terminate(); return; }
         if (d.type === "progress") setProgress(d.msg, d.frac);
         else if (d.type === "done") { w.terminate(); onDone(d.res); }
         else if (d.type === "error") { w.terminate(); if (url) URL.revokeObjectURL(url); runFailed(d.message); }
       };
-      w.onerror = function (ev) { if (ev && ev.preventDefault) ev.preventDefault(); w.terminate(); S.worker = null; if (!started) mainThread(); else runFailed("The analysis stopped unexpectedly."); };
+      w.onerror = function (ev) { if (ev && ev.preventDefault) ev.preventDefault(); w.terminate(); if (!live()) return; S.worker = null; if (!started) mainThread(); else runFailed("The analysis stopped unexpectedly."); };
       w.postMessage(payload);
     } catch (e) { S.worker = null; mainThread(); }
   }
-  function cancel() { if (S.worker) { S.worker.terminate(); S.worker = null; } finishRun(); toast("Run cancelled"); }
+  function stopRun() { S.runToken = (S.runToken || 0) + 1; if (S.worker) { S.worker.terminate(); S.worker = null; } if (S.running) finishRun(); }
+  function cancel() { stopRun(); toast("Run cancelled"); }
 
   // ------------------------------------------------------------- results helpers
   function baseStatus(L) {
@@ -4372,9 +4378,21 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     DEMO_COMPS.forEach(function (id) { var r = S.rows.filter(function (x) { return x.mls_id === id; })[0]; if (r) addComp({ source: "file", mls: id, base: Object.assign({}, r) }); });
     renderSubject(); renderComps(); updatePoolCount(); updateChecklist();
     $("demo-banner").hidden = false;
-    if (quiet !== true) toast("Demo loaded: subject, four comps and an effective date are filled in");
+    if (quiet !== true) toast("Demo loaded and running: subject, four comps and an effective date are filled in");
+  }
+  // the page opens empty: every field goes back to its default, so a browser reload cannot bring back an earlier assignment
+  function resetFields() {
+    Array.prototype.forEach.call(document.querySelectorAll("input, select, textarea"), function (el) {
+      try {
+        if (el.type === "file") el.value = "";
+        else if (el.type === "checkbox" || el.type === "radio") el.checked = el.defaultChecked;
+        else if (el.tagName === "SELECT") { var d = 0; Array.prototype.some.call(el.options, function (o, i) { if (o.defaultSelected) { d = i; return true; } return false; }); el.selectedIndex = el.options.length ? d : -1; }
+        else el.value = el.defaultValue;
+      } catch (e) { }
+    });
   }
   function init() {
+    resetFields();
     $("scope-text").textContent = SCOPE;
     var drop = $("drop");
     $("file").addEventListener("change", function (e) { readFile(e.target.files[0], function (t, n) { loadText(t, n, false); }); e.target.value = ""; });
@@ -4385,6 +4403,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
       var b = e.currentTarget, yours = !S.isDemo && (S.comps.length || S.rows.length || Object.keys(S.subject).some(function (k) { return k !== "_mls" && String(S.subject[k] || "").trim(); }));
       if (yours && !b._armed) { b._armed = true; b.textContent = "Click again: the demo replaces your subject, comps and market"; setTimeout(function () { b._armed = false; b.textContent = "Try the demo market"; }, 5000); return; }
       b._armed = false; b.textContent = "Try the demo market"; loadDemo(false);
+      if (requirements().every(function (r) { return r[0]; })) run(false);   // one click shows a finished run
     });
     ["eff", "clock", "r-after", "r-trim", "r-flip", "r-exposed", "r-new", "r-types", "r-flip-days", "r-flip-pct", "w-list", "w-price"].forEach(function (id) { $(id).addEventListener("change", function () { updatePoolCount(); updateChecklist(); }); });
     POOL.forEach(function (p) { [p[1], p[2]].forEach(function (id) { $(id).addEventListener("input", function () { updatePoolCount(); updateChecklist(); }); }); });
@@ -4463,8 +4482,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     if (window.claude && typeof window.claude.use === "function") {
       try { window.claude.use("downloads").then(function (dl) { S.downloads = dl || null; refreshReportButtons(); }, function () { S.downloads = null; refreshReportButtons(); }); } catch (e) { S.downloads = null; }
     }
-    // open in a working state: the synthetic demo market, loaded and run, clearly marked as a demo
-    loadDemo(true); run(true);
+    // the page opens empty; the synthetic demo loads only from its button in step 03
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();

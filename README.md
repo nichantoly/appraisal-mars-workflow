@@ -92,7 +92,7 @@ tests/synthetic/run_coverage.sh
 
 ### Browser
 
-Open `docs/index.html` in a current browser, or host it: GitHub repository Settings, Pages, deploy from branch `main`, folder `/docs`. The page opens with a synthetic demo market loaded and run; your first file (subject, comps or market) clears it.
+Open `docs/index.html` in a current browser, or host it: GitHub repository Settings, Pages, deploy from branch `main`, folder `/docs`. The page opens empty. Try the demo market (step 03) loads and runs a synthetic demo market; your first file (subject, comps or market) clears it.
 
 1. Subject: enter the effective date, your name and the file number for the report, then load the subject from a Spark CSV or type it in, as of the effective date.
 2. Comps: load the comps in your report from a Spark CSV, or type them in. Edited values are treated as verified data for the grid; the model keeps the MLS record. Each comp's record gets the same listing check as the pool sales.
