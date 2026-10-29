@@ -1,9 +1,9 @@
-/* MARS adjustment-support analysis (browser port of mars_adjustment_support.R v2.2).
+/* MARS adjustment-support analysis (browser port of mars_adjustment_support.R v2.3).
    Requires MarsEngine. Produces adjustment SUPPORT only: no indicated, reconciled
    or opinion-of-value figure. */
 var MarsAnalysis = (function (M) {
   "use strict";
-  var VERSION = "2.2.0";
+  var VERSION = "2.3.0";
   var MONTH = 30.4375;
 
   // ------------------------------------------------------------------ parsing
@@ -62,31 +62,32 @@ var MarsAnalysis = (function (M) {
     ["sale_price", "Close price", ["Close Price", "Sold Price", "Sale Price", "ClosePrice", "sale_price"]],
     ["contract_date", "Contract date", ["Agreement of Sale/Signed Lease Date", "Contract Date", "Purchase Contract Date", "Pending Date", "Agreement Date", "contract_date"]],
     ["close_date", "Close date", ["Close Date", "Settlement Date", "Sold Date", "Closing Date", "sale_date", "close_date"]],
-    ["concessions", "Concessions", ["Concessions Final", "Concessions", "Seller Concessions", "Concessions Amount", "concessions"]],
     ["gla", "Above-grade finished sf", ["Above Grade Finished SQFT", "Above Grade Finished Sq Ft", "Above Grade Finished Area", "GLA", "Living Area", "gla"]],
-    ["basement", "Basement (yes/no)", ["Basement", "Basement YN", "basement"]],
-    ["bg_fin_sf", "Below-grade finished sf", ["Below Grade Finished SQFT", "Below Grade Finished Sq Ft", "Below Grade Finished Area", "bg_fin_sf"]],
-    ["bg_unf_sf", "Below-grade unfinished sf", ["Below Grade Unfinished SQFT", "Below Grade Unfinished Sq Ft", "Below Grade Unfinished Area", "bg_unf_sf"]],
-    ["lot_ac", "Lot acres", ["Lot Size Acres", "Lot Acres", "Acres", "lot_ac"]],
-    ["lot_sf", "Lot square feet", ["Lot Size SqFt", "Lot Size Square Feet", "Lot SqFt", "lot_sf"]],
+    ["beds", "Bedrooms (total)", ["Beds", "Bedrooms Total", "Bedrooms", "Total Bedrooms", "BedroomsTotal", "Beds Total"]],
+    ["beds_ag", "Bedrooms above grade (already computed)", ["beds_ag"]],
     ["baths_full", "Full baths (total)", ["Bathrooms Full", "Full Baths", "Baths Full", "full_baths"]],
     ["baths_half", "Half baths (total)", ["Bathrooms Half", "Half Baths", "Baths Half", "half_baths"]],
+    ["fb_ag", "Full baths above grade (already computed)", ["fb_ag"]],
+    ["hb_ag", "Half baths above grade (already computed)", ["hb_ag"]],
+    ["ag_baths", "Above-grade baths, combined (older files)", ["ag_baths"]],
+    ["ll_beds", "Lower-level bedrooms", ["Lower Levels Total Bedrooms", "bg_bedrooms"]],
     ["ll_full", "Lower-level full baths", ["Lower Levels Total Full Baths", "bg_full_baths"]],
     ["ll_half", "Lower-level half baths", ["Lower Levels Total Half Baths", "bg_half_baths"]],
-    ["ll_beds", "Lower-level bedrooms", ["Lower Levels Total Bedrooms", "bg_bedrooms"]],
-    ["ag_baths", "Above-grade baths (already computed)", ["ag_baths"]],
     ["garage_flag", "Garage (yes/no)", ["Garage", "Garage YN"]],
     ["garage", "Garage spaces", ["Total Garage Spaces", "Garage Spaces", "garage"]],
     ["carport_att", "Attached carport spaces", ["Attached Carport - # of Spaces"]],
     ["carport_det", "Detached carport spaces", ["Detached Carport - # of Spaces"]],
     ["carport", "Carport spaces", ["Carport Spaces", "carport"]],
-    ["fireplaces", "Fireplaces", ["Fireplaces Total", "Fireplaces", "Fireplace Count", "fireplaces"]],
     ["pool", "Pool", ["Pool", "pool"]],
-    ["outdoor", "Outdoor living (deck/porch)", ["Outdoor Living Structures", "Patio and Porch Features", "Porch"]],
-    ["deck", "Deck (1/0)", ["deck"]],
-    ["porch", "Porch (1/0)", ["porch"]],
+    ["lot_sf", "Lot square feet", ["Lot Size SqFt", "Lot Size Square Feet", "Lot SqFt", "lot_sf"]],
+    ["lot_ac", "Lot acres", ["Lot Size Acres", "Lot Acres", "Acres", "lot_ac"]],
     ["year_built", "Year built", ["Year Built", "year_built"]],
     ["levels", "Levels / stories", ["Levels/Stories", "Levels", "Stories", "levels"]],
+    ["basement", "Basement (yes/no)", ["Basement", "Basement YN", "basement"]],
+    ["basement_type", "Basement type", ["Basement Type", "basement_type"]],
+    ["bg_fin_sf", "Below-grade finished sf (only to spot a finished basement)", ["Below Grade Finished SQFT", "Below Grade Finished Sq Ft", "Below Grade Finished Area", "bg_fin_sf"]],
+    ["fin_bsmt", "Finished basement (1/0)", ["fin_bsmt"]],
+    ["ll_blank", "Lower-level rooms left blank (1/0)", ["ll_blank"]],
     ["zip", "Zip code", ["Zip Code", "Postal Code", "Zip", "zip"]],
     ["subdivision", "Subdivision", ["Legal Subdivision", "Subdivision", "Subdivision Name", "Neighborhood", "subdivision"]],
     ["county", "County", ["County", "County Or Parish", "county"]],
@@ -102,11 +103,12 @@ var MarsAnalysis = (function (M) {
   // matched on exact field names only, so a standard "garage" (spaces) column is
   // never read as a yes/no garage flag the way a raw MLS "Garage" column is.
   var STD = { mls_id: ["mls_id"], address: ["address"], sale_price: ["sale_price"], contract_date: ["contract_date"],
-    close_date: ["sale_date", "close_date"], concessions: ["concessions"], gla: ["gla"], basement: ["basement"],
-    bg_fin_sf: ["bg_fin_sf", "bsmt_fin_sf"], bg_unf_sf: ["bg_unf_sf", "bsmt_unf_sf"], lot_ac: ["lot_ac"], lot_sf: ["lot_sf"], ag_baths: ["ag_baths"],
-    baths_full: ["full_baths"], baths_half: ["half_baths"], ll_full: ["bg_full_baths", "bg_baths"], ll_half: ["bg_half_baths"],
-    ll_beds: ["bg_bedrooms"], garage: ["garage"], carport: ["carport"], fireplaces: ["fireplaces"], pool: ["pool"], deck: ["deck"],
-    porch: ["porch"], year_built: ["year_built"], levels: ["levels"], zip: ["zip"], subdivision: ["subdivision"], county: ["county"],
+    close_date: ["sale_date", "close_date"], gla: ["gla"], beds: ["bedrooms", "beds"], beds_ag: ["beds_ag"],
+    baths_full: ["full_baths"], baths_half: ["half_baths"], fb_ag: ["fb_ag"], hb_ag: ["hb_ag"], ag_baths: ["ag_baths"],
+    ll_beds: ["bg_bedrooms"], ll_full: ["bg_full_baths", "bg_baths"], ll_half: ["bg_half_baths"],
+    garage: ["garage"], carport: ["carport"], pool: ["pool"], lot_sf: ["lot_sf"], lot_ac: ["lot_ac"],
+    year_built: ["year_built"], levels: ["levels"], basement: ["basement"], basement_type: ["basement_type"], bg_fin_sf: ["bg_fin_sf", "bsmt_fin_sf"],
+    fin_bsmt: ["fin_bsmt"], ll_blank: ["ll_blank"], zip: ["zip"], subdivision: ["subdivision"], county: ["county"],
     sale_type: ["sale_type"], status: ["status"], arms_length: ["arms_length"], new_construction: ["new_construction"],
     tax_id: ["tax_id"], list_date: ["list_date"] };
   function isStandard(header) {   // the engine's own lowercase snake_case schema (sales, comps or subject file)
@@ -136,39 +138,48 @@ var MarsAnalysis = (function (M) {
     return map;
   }
 
+  function rnd(x) { return Math.floor(x + 0.5); }   // round half up (the R reference uses floor(x + 0.5) too)
+
   // Map raw rows to the standard schema. Blank counts that mean "none" become 0.
+  // Bedrooms and baths are ABOVE GRADE: the MLS total minus the lower-level count.
   function mapRows(table, map) {
-    var H = table.header;
     return table.rows.map(function (cells) {
       function g(role) { var c = map[role]; return (c === undefined || c < 0) ? undefined : cells[c]; }
       function has(role) { return map[role] !== undefined && map[role] >= 0; }
       var zero = function (v) { var x = num(v); return isNaN(x) ? 0 : x; };
-      var basementNo = has("basement") && falsy(g("basement"));   // strict: blank or unrecognized is not "no basement"
-      function bgRule(v) { var x = num(v); if (isNaN(x) && basementNo) x = 0; return x; }
-      var full = zero(g("baths_full")), half = zero(g("baths_half"));
-      var llf = zero(g("ll_full")), llh = zero(g("ll_half"));
-      var agb = has("ag_baths") ? num(g("ag_baths")) : (has("baths_full") ? (full - llf) + 0.5 * (half - llh) : NaN);
+      var llBr = g("ll_beds"), llFr = g("ll_full"), llHr = g("ll_half");
+      var llb = zero(llBr), llf = zero(llFr), llh = zero(llHr);
+      var hasLL = has("ll_beds") || has("ll_full") || has("ll_half");
+      var beds = NaN;
+      if (has("beds_ag")) beds = num(g("beds_ag"));
+      else if (has("beds")) { var bt = num(g("beds")); beds = isNaN(bt) ? NaN : bt - llb; }
+      if (beds < 0) beds = NaN;
+      var fb = NaN, hb = NaN;
+      if (has("fb_ag")) { fb = num(g("fb_ag")); hb = has("hb_ag") ? zero(g("hb_ag")) : NaN; }
+      else if (has("baths_full")) { var ft = num(g("baths_full")); fb = isNaN(ft) ? NaN : ft - llf; hb = has("baths_half") ? zero(g("baths_half")) - llh : NaN; }
+      else if (has("ag_baths")) { var ab = num(g("ag_baths")); if (!isNaN(ab)) { fb = Math.floor(ab + 1e-9); hb = Math.round(2 * (ab - fb)); } }
+      if (fb < 0) fb = NaN;
+      if (hb < 0) hb = NaN;
       var gar = num(g("garage"));
       if (isNaN(gar) && has("garage_flag") && falsy(g("garage_flag"))) gar = 0;   // Garage = No: blank spaces means none
-      var lot = num(g("lot_ac"));
-      if (isNaN(lot) && has("lot_sf")) { var lsf = num(g("lot_sf")); if (!isNaN(lsf)) lot = lsf / 43560; }
-      var outdoor = String(g("outdoor") || "").toLowerCase();
+      var lot = num(g("lot_sf"));
+      if (isNaN(lot) || lot <= 0) { var la = num(g("lot_ac")); if (!isNaN(la) && la > 0) lot = la * 43560; }
+      if (!isNaN(lot)) lot = rnd(lot);
       var poolRaw = String(g("pool") == null ? "" : g("pool")).trim();
-      var pool = has("pool") ? (/^yes - personal$/i.test(poolRaw) || poolRaw === "1" || /^(true|y)$/i.test(poolRaw) ? 1 : 0) : NaN;
-      var deck = has("deck") ? zero(g("deck")) : (has("outdoor") ? (/deck|patio/.test(outdoor) ? 1 : 0) : NaN);
-      var porch = has("porch") ? zero(g("porch")) : (has("outdoor") ? (/porch|enclosed|screen/.test(outdoor) ? 1 : 0) : NaN);
+      var pool = has("pool") ? (/yes - personal/i.test(poolRaw) || poolRaw === "1" || /^(true|y)$/i.test(poolRaw) ? 1 : 0) : NaN;
       var carport = has("carport") ? zero(g("carport")) : ((has("carport_att") || has("carport_det")) ? zero(g("carport_att")) + zero(g("carport_det")) : NaN);
+      var bfs = num(g("bg_fin_sf")), btype = String(g("basement_type") == null ? "" : g("basement_type"));
+      var finB = has("fin_bsmt") ? num(g("fin_bsmt")) :
+        ((bfs > 0 || /(fully|partially) finished/i.test(btype)) ? 1 : ((has("bg_fin_sf") || has("basement_type")) ? 0 : NaN));
+      var llBlank = has("ll_blank") ? num(g("ll_blank")) : (hasLL ? ((blank(llBr) && blank(llFr) && blank(llHr)) ? 1 : 0) : NaN);
       return {
         mls_id: String(g("mls_id") == null ? "" : g("mls_id")).trim(),
         address: String(g("address") == null ? "" : g("address")).trim(),
         sale_price: num(g("sale_price")),
         contract_date: dayNum(g("contract_date")), sale_date: dayNum(g("close_date")),
-        concessions: zero(g("concessions")),
-        gla: num(g("gla")), bg_fin_sf: bgRule(g("bg_fin_sf")), bg_unf_sf: bgRule(g("bg_unf_sf")),
-        lot_ac: lot, ag_baths: agb, bg_baths: llf + 0.5 * llh, bg_bedrooms: zero(g("ll_beds")),
-        garage: gar, carport: carport, fireplaces: has("fireplaces") ? zero(g("fireplaces")) : NaN,
-        pool: pool, deck: deck, porch: porch,
+        gla: num(g("gla")), beds_ag: beds, fb_ag: fb, hb_ag: hb, garage: gar, carport: carport, pool: pool, lot_sf: lot,
         year_built: num(g("year_built")), levels: num(g("levels")),
+        fin_bsmt: finB, ll_blank: llBlank,
         zip: String(g("zip") == null ? "" : g("zip")).trim(),
         subdivision: String(g("subdivision") == null ? "" : g("subdivision")).trim().toUpperCase(),
         county: String(g("county") == null ? "" : g("county")).trim(),
@@ -212,17 +223,24 @@ var MarsAnalysis = (function (M) {
     } else for (var i = 0; i < n; i++) for (var j = i + 1; j < n; j++) { var dx = x[j] - x[i]; if (dx !== 0) slopes.push((y[j] - y[i]) / dx); }
     return slopes.length ? median(slopes) : NaN;
   }
-  function lad(x, y) {                     // least absolute deviation slope (convex search)
+  // Least absolute deviation slope. With counts (baths, garage spaces) the LAD minimum is often a flat
+  // stretch of slopes, so the answer is the middle of that stretch (the R reference does the same).
+  function lad(x, y) {
     function obj(b) { var res = x.map(function (xi, i) { return y[i] - b * xi; }); var a = median(res); return res.reduce(function (s, v) { return s + Math.abs(v - a); }, 0); }
     var o = ols([x], y); if (!o) return NaN;
     var b0 = o.beta[1], w = Math.max(Math.abs(b0) * 4, 1e-6) + 4 * Math.abs(o.se[1] || 0);
-    var lo = b0 - w, hi = b0 + w;
-    for (var it = 0; it < 200; it++) {
+    var lo0 = b0 - w, hi0 = b0 + w, lo = lo0, hi = hi0, it, m;
+    for (it = 0; it < 200; it++) {
       var m1 = lo + (hi - lo) / 3, m2 = hi - (hi - lo) / 3;
       if (obj(m1) <= obj(m2)) hi = m2; else lo = m1;
       if (hi - lo < 1e-9 * Math.max(1, Math.abs(lo))) break;
     }
-    return (lo + hi) / 2;
+    var bm = (lo + hi) / 2, thr = obj(bm) * (1 + 1e-9);
+    var a = lo0, c = bm;                    // left end of the flat stretch
+    for (it = 0; it < 100; it++) { m = (a + c) / 2; if (obj(m) <= thr) c = m; else a = m; }
+    var bL = c; a = bm; c = hi0;            // right end
+    for (it = 0; it < 100; it++) { m = (a + c) / 2; if (obj(m) <= thr) a = m; else c = m; }
+    return (bL + a) / 2;
   }
   function groupedQuintiles(x, y) {
     var br = [0, 0.2, 0.4, 0.6, 0.8, 1].map(function (p) { return quantile7(x, p); });
@@ -285,15 +303,22 @@ var MarsAnalysis = (function (M) {
   var DEFAULTS = {
     masterSeed: 20260606, dateBasis: "close", trimContractEdge: true, excludeAfterEffective: true, cutoffBasis: "close",
     excludeFlips: true, flipDays: 365, flipRatio: 1.2, excludeUnexposed: true,
-    concessionReaction: 0,
-    features: ["gla", "bg_fin_sf", "lot_ac", "ag_baths", "garage", "year_built", "levels"],
-    linearOnly: [], location: "zip", locationMinN: 5,
-    residualFeatures: ["fireplaces", "pool", "deck", "porch", "carport"],
+    // priced on the grid, in grid order (URAR order: site, room count, GLA, garage/carport, pool)
+    features: ["lot_sf", "beds_ag", "fb_ag", "hb_ag", "gla", "garage", "carport", "pool"],
+    // in the model as background controls so they cannot leak into the priced lines; never on the grid
+    controls: ["year_built", "levels"],
+    linearOnly: [], location: "", locationMinN: 5,
+    minVary: 10,            // a line is priced only when at least this many pool sales differ from the most common value
+    countWeightCut: 2,      // a bedroom, bath, garage or carport count more than this far from what is typical for the sale's size gets less weight
+    lumpedWeight: 0.5,      // finished basement, lower-level rooms left blank, more above-grade rooms than typical: likely rooms on one line
+    normShare: 0.2, normMin: 30,   // "typical for its size": median count of the nearest 20% of the market by GLA (at least 30 sales)
+    huberK: 1.345, irlsMaxIter: 30, irlsTol: 1e-6,   // prices far from the model count for less (Huber weights)
+    clipForSelection: true,  // where MARS looks for bends, counts far from typical are pulled in to the edge of the normal band
     excludeSaleTypes: ["REO", "BANK OWNED", "SHORT SALE", "FORECLOSURE", "AUCTION"],
     penalty: 2, newvarPenalty: 0.1, thresh: 0.001, halfSamples: 200, glaBand: NaN, subjectIsNew: false,
     timeGapDays: 91,   // newest clean sale more than this many days before the effective date: time lines flagged (1004MC "current 3 months")
-    expectedPositive: ["gla", "bg_fin_sf", "bg_unf_sf", "lot_ac", "ag_baths", "bg_baths", "garage", "carport", "fireplaces", "pool", "deck", "porch", "year_built"],
-    poolRanges: {},          // adjustment pool: { gla: [2200, 3200], year_built: [1985, 2015], lot_ac: [1, 10] }; NaN or null = open end
+    expectedPositive: ["gla", "lot_sf", "beds_ag", "fb_ag", "hb_ag", "garage", "carport", "pool"],
+    poolRanges: {},          // adjustment pool: { gla: [2200, 3200], year_built: [1985, 2015], lot_sf: [6000, 20000] }; NaN or null = open end
     timeKnotMonths: 6,       // the time curve may bend only on this calendar grid (6 = Jan 1 and Jul 1)
     timeMinSide: 20,         // a bend needs at least this many sales before it and after it
     timeSeason: "auto",      // quarter-of-year control: "auto", "on", "off"
@@ -301,6 +326,9 @@ var MarsAnalysis = (function (M) {
     fhfa: null,              // { label, values: [{ date, value }] }
     leaveCompsOut: true
   };
+  var COUNT_VARS = ["beds_ag", "fb_ag", "hb_ag", "garage", "carport"];
+  var COUNT_WORDS = { beds_ag: ["bedroom", "bedrooms"], fb_ag: ["full bath", "full baths"], hb_ag: ["half bath", "half baths"],
+    garage: ["garage space", "garage spaces"], carport: ["carport space", "carport spaces"] };
   function fmtMoney(v) { return isNaN(v) ? "NA" : (v < 0 ? "-" : "") + "$" + Math.abs(Math.round(v)).toLocaleString("en-US"); }
   function fmtRate(v) {
     if (isNaN(v)) return "NA";
@@ -308,13 +336,31 @@ var MarsAnalysis = (function (M) {
     return (v < 0 ? "-" : "") + "$" + (a >= 100 ? Math.round(a).toLocaleString("en-US") : a.toFixed(2));
   }
   function fmtVal(f, v) { return (f === "year_built" || f === "levels") ? String(v) : Number(v).toLocaleString("en-US", { maximumFractionDigits: 6 }); }
-  var LABELS = { time: "Market conditions (time)", sale_age: "Date of sale / time", gla: "Gross living area", bg_fin_sf: "Basement finished sf", lot_ac: "Site (acres)",
-    ag_baths: "Baths above grade", garage: "Garage spaces", year_built: "Year built", levels: "Levels", location: "Location",
-    fireplaces: "Fireplaces", pool: "Pool", deck: "Deck / patio", porch: "Porch / enclosed", carport: "Carport spaces",
-    bg_unf_sf: "Basement unfinished sf", bg_baths: "Baths below grade", bg_bedrooms: "Bedrooms below grade" };
-  var UNITS = { sale_age: "day", gla: "sf", bg_fin_sf: "sf", lot_ac: "acre", ag_baths: "bath", garage: "space", year_built: "year", levels: "level",
-    fireplaces: "fireplace", pool: "pool", deck: "deck", porch: "porch", carport: "space", bg_unf_sf: "sf", bg_baths: "bath" };
+  var LABELS = { time: "Market conditions (time)", gla: "Gross living area", lot_sf: "Site", beds_ag: "Bedrooms", fb_ag: "Full baths", hb_ag: "Half baths",
+    garage: "Garage", carport: "Carport", pool: "Pool", year_built: "Year built", levels: "Levels", location: "Location" };
+  var UNITS = { gla: "sf", lot_sf: "sf", beds_ag: "bedroom", fb_ag: "full bath", hb_ag: "half bath", garage: "space", carport: "space", pool: "pool",
+    year_built: "year", levels: "level" };
   function unitOf(f) { return UNITS[f] || "unit"; }
+  function countText(f, v) { var w = COUNT_WORDS[f] || [f, f]; return gfmt(v) + " " + (v === 1 ? w[0] : w[1]); }
+
+  // Weighted least squares on column-normalized normal equations (the R reference does the same steps)
+  function wlsq(B, yv, w) {
+    var k = B.length, n = yv.length, sc = new Array(k), a, c, i, s;
+    for (a = 0; a < k; a++) { s = 0; var col = B[a]; for (i = 0; i < n; i++) s += w[i] * col[i] * col[i]; sc[a] = s > 0 ? Math.sqrt(s) : 1; }
+    var A = [], bb = new Array(k);
+    for (a = 0; a < k; a++) { A.push(new Float64Array(k)); s = 0; var ca = B[a]; for (i = 0; i < n; i++) s += w[i] * ca[i] * yv[i]; bb[a] = s / sc[a]; }
+    for (a = 0; a < k; a++) for (c = a; c < k; c++) {
+      var cA = B[a], cC = B[c]; s = 0; for (i = 0; i < n; i++) s += w[i] * cA[i] * cC[i];
+      s /= sc[a] * sc[c]; A[a][c] = s; A[c][a] = s;
+    }
+    var inv = M.invSym(A); if (!inv) return null;
+    var beta = new Array(k);
+    for (a = 0; a < k; a++) { s = 0; for (c = 0; c < k; c++) s += inv[a][c] * bb[c]; beta[a] = s / sc[a]; }
+    var fit = new Float64Array(n);
+    for (a = 0; a < k; a++) { var cb = B[a], ba = beta[a]; for (i = 0; i < n; i++) fit[i] += ba * cb[i]; }
+    var XtWXi = inv.map(function (row, ra) { return row.map(function (v, cb2) { return v / (sc[ra] * sc[cb2]); }); });
+    return { beta: beta, fit: fit, XtWXi: XtWXi };
+  }
 
   // ------------------------------------------------------------------ dates
   function ymd(dn) { var t = new Date(dn * 86400000); return [t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()]; }
@@ -385,9 +431,12 @@ var MarsAnalysis = (function (M) {
       notes.push("No " + (dateKey === "contract_date" ? "contract" : "close") + " dates found; sale age uses the closing date instead.");
       dateKey = "sale_date";
     }
-    var dateLabel = dateKey === "contract_date" ? "contract date" : "closing date";
-    var features = cfg.features.filter(function (f) { return sales.some(function (r) { return r[f] !== undefined && !isNaN(r[f]); }); });
-    cfg.features.forEach(function (f) { if (features.indexOf(f) < 0) notes.push("Feature not in this file and skipped: " + (LABELS[f] || f) + "."); });
+    function present(f) { return sales.some(function (r) { return typeof r[f] === "number" && !isNaN(r[f]); }); }
+    var features = cfg.features.filter(present);
+    cfg.features.forEach(function (f) { if (features.indexOf(f) < 0) notes.push("Not in this file, so not priced: " + (LABELS[f] || f) + "."); });
+    var controls = (cfg.controls || []).filter(function (f) { return features.indexOf(f) < 0 && present(f); });
+    var modelVars = features.concat(controls);
+    var countVars = COUNT_VARS.filter(function (f) { return features.indexOf(f) >= 0; });
     var locVar = cfg.location && sales.some(function (r) { return !blank(r[cfg.location]); }) ? cfg.location : "";
 
     // ---- cleaning: first reason wins, in the R engine's order
@@ -419,7 +468,7 @@ var MarsAnalysis = (function (M) {
       if (trim) mark(isFinite(du) && du < firstClose, "contract dated before the first closing in the file (only slow closings visible for that period)");
       mark(isFinite(r.gla) && r.gla <= 0, "impossible GLA");
       mark(isFinite(r.year_built) && (r.year_built < 1700 || r.year_built > 2100), "impossible year built");
-      features.forEach(function (f) { mark(isNaN(r[f]), "unknown " + f + " (left blank on a property where blank is not 'none')"); });
+      modelVars.forEach(function (f) { mark(typeof r[f] !== "number" || isNaN(r[f]), "unknown " + (LABELS[f] || f).toLowerCase() + " (left blank on a property where blank is not 'none')"); });
       if (locVar) mark(blank(r[locVar]), "no " + locVar + " value");
       return reason;
     });
@@ -459,15 +508,15 @@ var MarsAnalysis = (function (M) {
       " meet the likely-flip rule (resold within " + cfg.flipDays + " days for " + Math.round(100 * (cfg.flipRatio - 1)) + "% or more)" +
       (cfg.excludeFlips ? "; the earlier sale of each is excluded." : "; none excluded (rule switched off)."));
 
-    // ---- time index machinery: log price on features + location + quarter + f(time), bends on a calendar grid
-    function tmTransform(f, v) { return f === "gla" ? Math.log(v) : f === "lot_ac" ? Math.log1p(v) : v; }
-    var excl, dm, nMarket, inPool, poolDesc, poolUsed, tmLoc, seasonOn;
+    // ---- market pool, listing weights and the time index
+    function tmTransform(f, v) { return f === "gla" ? Math.log(v) : f === "lot_sf" ? Math.log1p(v / 43560) : v; }
+    var excl, dm, nMarket, inPool, poolDesc, poolUsed, tmLoc, seasonOn, normK;
     function buildMarket() {
       excl = []; dm = [];
       sales.forEach(function (r, i) {
         var du = r[dateKey];
         if (reasons[i]) excl.push({ mls_id: r.mls_id, address: r.address, sale_price: r.sale_price, date: dayStr(du), reason: reasons[i] });
-        else dm.push(Object.assign({}, r, { price_used: r.sale_price - cfg.concessionReaction * r.concessions, sale_age: eff - du, date_used: du, _row: i }));
+        else dm.push(Object.assign({}, r, { price_used: r.sale_price, sale_age: eff - du, date_used: du, _row: i }));
       });
       nMarket = dm.length;
       if (nMarket < 60) throw new Error("Only " + nMarket + " usable sales after cleaning. Widen the market area or the time window (aim for 150 to 300).");
@@ -491,6 +540,38 @@ var MarsAnalysis = (function (M) {
       var dmin0 = Infinity, dmax0 = -Infinity; dm.forEach(function (r) { if (r.date_used < dmin0) dmin0 = r.date_used; if (r.date_used > dmax0) dmax0 = r.date_used; });
       var ts = String(cfg.timeSeason);
       seasonOn = ts === "on" ? qn.every(function (c) { return c > 0; }) : ts === "off" ? false : (dmax0 - dmin0 >= 730 && qn.every(function (c) { return c >= 10; }));
+      computeListingWeights();
+    }
+    // Listing weights: a bedroom, bath, garage or carport count far from what is typical for a sale's
+    // size counts for less (never dropped). "Typical" is the median count of the nearest sales by GLA.
+    var byGla = modelVars.indexOf("gla") >= 0;
+    function normsAt(glaV) {
+      var nb;
+      if (byGla && isFinite(glaV)) {
+        var idx = dm.map(function (_, j) { return j; });
+        idx.sort(function (a, b) { var da = Math.abs(dm[a].gla - glaV), db = Math.abs(dm[b].gla - glaV); return (da - db) || (a - b); });
+        nb = idx.slice(0, normK);
+      } else nb = dm.map(function (_, j) { return j; });
+      var out = {};
+      countVars.forEach(function (f) { out[f] = median(nb.map(function (j) { return dm[j][f]; })); });
+      return out;
+    }
+    function listingWeight(r, nrm) {
+      var w = 1, why = [];
+      countVars.forEach(function (f) {
+        var dv = Math.abs(r[f] - nrm[f]);
+        if (dv > cfg.countWeightCut) { w *= cfg.countWeightCut / dv; why.push(countText(f, r[f]) + " where " + gfmt(nrm[f]) + " is typical for its size"); }
+      });
+      var up = (countVars.indexOf("beds_ag") >= 0 && r.beds_ag - nrm.beds_ag >= 1) || (countVars.indexOf("fb_ag") >= 0 && r.fb_ag - nrm.fb_ag >= 1);
+      if (r.fin_bsmt === 1 && r.ll_blank === 1 && up) {
+        w *= cfg.lumpedWeight;
+        why.push("finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)");
+      }
+      return { w: w, why: why };
+    }
+    function computeListingWeights() {
+      normK = byGla ? Math.min(dm.length, Math.max(cfg.normMin, rnd(cfg.normShare * dm.length))) : dm.length;
+      dm.forEach(function (r) { var nrm = normsAt(r.gla), lw = listingWeight(r, nrm); r.lw = lw.w; r.lwWhy = lw.why; r.lwNorm = nrm; });
     }
     function tmCandidates(dates) {
       var lo = Infinity, hi = -Infinity; dates.forEach(function (t) { if (t < lo) lo = t; if (t > hi) hi = t; });
@@ -504,12 +585,17 @@ var MarsAnalysis = (function (M) {
     }
     function tmPhi(fit, age) { return fit.terms.map(function (k) { return k === null ? age : Math.max(0, age - k) - Math.max(0, -k); }); }
     function tmF(fit, age) { if (!isFinite(age)) return NaN; var s = 0; for (var j = 0; j < fit.terms.length; j++) { var k = fit.terms[j]; s += fit.coef[j] * (k === null ? age : Math.max(0, age - k) - Math.max(0, -k)); } return s; }
+    function huberOf(e) {   // Huber weights: residuals past 1.345 robust SDs count for less
+      var med = median(e), s = 1.4826 * median(e.map(function (v) { return Math.abs(v - med); })), hk = cfg.huberK * s;
+      return e.map(function (v) { var a = Math.abs(v); return s > 0 && a > hk ? hk / a : 1; });
+    }
     function tmFit(ix, full) {
       var nn = ix.length, rows = ix.map(function (i) { return dm[i]; });
       var age = rows.map(function (r) { return r.sale_age / MONTH; });
       var yv = rows.map(function (r) { return Math.log(r.price_used); }), ym = mean(yv), yc = yv.map(function (v) { return v - ym; });
+      var Lw = rows.map(function (r) { return r.lw; });
       var F = [], fnames = [];
-      features.forEach(function (f) { F.push(rows.map(function (r) { return tmTransform(f, r[f]); })); fnames.push("f:" + f); });
+      modelVars.forEach(function (f) { F.push(rows.map(function (r) { return tmTransform(f, r[f]); })); fnames.push("f:" + f); });
       tmLoc.forEach(function (l) { F.push(rows.map(function (r) { return r.tm_loc === l ? 1 : 0; })); fnames.push("loc:" + l); });
       if (seasonOn) [2, 3, 4].forEach(function (q) { F.push(rows.map(function (r) { return qtrOf(r.date_used) === q ? 1 : 0; })); fnames.push("season:Q" + q); });
       var Fk = [], fk = [];
@@ -518,16 +604,51 @@ var MarsAnalysis = (function (M) {
       var kd = tmCandidates(rows.map(function (r) { return r.date_used; })), ka = kd.map(function (k) { return (eff - k) / MONTH; });
       var T = [age].concat(ka.map(function (k) { return age.map(function (a) { return Math.max(0, a - k) - Math.max(0, -k); }); }));
       var Z = [new Array(nn).fill(1)].concat(Fk).concat(T), p0 = 1 + Fk.length, P = Z.length;
-      var G = []; for (var a = 0; a < P; a++) G.push(new Array(P).fill(0));
-      for (a = 0; a < P; a++) for (var b = a; b < P; b++) { var s = 0, za = Z[a], zb = Z[b]; for (var i = 0; i < nn; i++) s += za[i] * zb[i]; G[a][b] = s; G[b][a] = s; }
-      var Zy = Z.map(function (c) { var s2 = 0; for (var i2 = 0; i2 < nn; i2++) s2 += c[i2] * yc[i2]; return s2; });
-      var yy = 0; for (i = 0; i < nn; i++) yy += yc[i] * yc[i];
-      var base = []; for (a = 0; a < p0; a++) base.push(a);
+      var Zr = new Float64Array(nn * P);   // row-major copy for fast weighted Gram sums
+      for (var zi = 0; zi < nn; zi++) for (var zc = 0; zc < P; zc++) Zr[zi * P + zc] = Z[zc][zi];
+      function gramW(w, S) {               // weighted Gram over the columns in S (the rest stay 0; gramSolve reads only S)
+        S = S || all; var m = S.length, a, b, i;
+        var Gf = new Float64Array(m * m), Zyf = new Float64Array(m), yy = 0;
+        for (i = 0; i < nn; i++) {
+          var wi = w[i]; if (!(wi > 0)) continue;
+          var off = i * P, yi = yc[i]; yy += wi * yi * yi;
+          for (a = 0; a < m; a++) {
+            var za = Zr[off + S[a]]; if (za === 0) continue;
+            var wz = wi * za, row = a * m; Zyf[a] += wz * yi;
+            for (b = a; b < m; b++) Gf[row + b] += wz * Zr[off + S[b]];
+          }
+        }
+        var G = [], Zy = new Array(P).fill(0);
+        for (a = 0; a < P; a++) G.push(new Array(P).fill(0));
+        for (a = 0; a < m; a++) { Zy[S[a]] = Zyf[a]; for (b = a; b < m; b++) { var v = Gf[a * m + b]; G[S[a]][S[b]] = v; G[S[b]][S[a]] = v; } }
+        return { G: G, Zy: Zy, yy: yy };
+      }
+      function residS(S, bv) {
+        var e = new Array(nn), m = S.length;
+        for (var i = 0; i < nn; i++) { var off = i * P, f0 = 0; for (var a = 0; a < m; a++) f0 += bv[a] * Zr[off + S[a]]; e[i] = yc[i] - f0; }
+        return e;
+      }
+      function irlsT(S) {
+        var h = new Array(nn).fill(1), w, gr, sol, e;
+        for (var it = 0; it < cfg.irlsMaxIter; it++) {
+          w = Lw.map(function (l, i) { return l * h[i]; }); gr = gramW(w, S); sol = gramSolve(gr.G, gr.Zy, gr.yy, S); if (!sol) return null;
+          e = residS(S, sol.b);
+          var hn = huberOf(e), dmax = 0;
+          for (var i = 0; i < nn; i++) { var dd = Math.abs(hn[i] - h[i]); if (dd > dmax) dmax = dd; }
+          h = hn; if (dmax < cfg.irlsTol) break;
+        }
+        w = Lw.map(function (l, i) { return l * h[i]; }); gr = gramW(w, S); sol = gramSolve(gr.G, gr.Zy, gr.yy, S); if (!sol) return null;
+        return { sol: sol, w: w, h: h, e: residS(S, sol.b) };
+      }
+      var all = []; for (var q0 = 0; q0 < P; q0++) all.push(q0);
+      var st1 = irlsT(all);   // weights for the bend search come from the fit with every candidate bend
+      var wP = st1 ? st1.w : Lw.slice(), grP = gramW(wP), swP = 0; wP.forEach(function (v) { swP += v; });
+      var base = []; for (var a = 0; a < p0; a++) base.push(a);
       function gcvOf(keep) {
-        var S = base.concat(keep.map(function (t) { return p0 + t; })), sol = gramSolve(G, Zy, yy, S);
+        var S = base.concat(keep.map(function (t) { return p0 + t; })), sol = gramSolve(grP.G, grP.Zy, grP.yy, S);
         if (!sol) return Infinity;
         var C = S.length + cfg.penalty * keep.filter(function (t) { return t > 0; }).length; if (C >= nn) return Infinity;
-        return (sol.rss / nn) / Math.pow(1 - C / nn, 2);
+        return (sol.rss / swP) / Math.pow(1 - C / nn, 2);
       }
       var keep = T.map(function (_, t) { return t; }), bestKeep = keep.slice(), bestGcv = gcvOf(keep);
       while (keep.length) {
@@ -536,16 +657,19 @@ var MarsAnalysis = (function (M) {
         keep = keep.slice(0, bi).concat(keep.slice(bi + 1));
         if (tries[bi] < bestGcv) { bestGcv = tries[bi]; bestKeep = keep.slice(); }
       }
-      var S = base.concat(bestKeep.map(function (t) { return p0 + t; })), sol = gramSolve(G, Zy, yy, S);
-      if (!sol) throw new Error("time index fit is singular");
+      var S = base.concat(bestKeep.map(function (t) { return p0 + t; })), fin = irlsT(S);
+      if (!fin) throw new Error("time index fit is singular");
+      var sol = fin.sol;
       var fit = { terms: bestKeep.map(function (t) { return t === 0 ? null : ka[t - 1]; }), dates: bestKeep.map(function (t) { return t === 0 ? null : kd[t - 1]; }),
                   coef: sol.b.slice(p0), n: nn, nCandidates: ka.length, candidateDates: kd, gcv: bestGcv };
       if (full) {
-        var k = S.length, e = new Array(nn), rss = 0;
-        for (i = 0; i < nn; i++) { var f0 = 0; for (a = 0; a < k; a++) f0 += sol.b[a] * Z[S[a]][i]; e[i] = yc[i] - f0; rss += e[i] * e[i]; }
-        fit.resid = e; fit.rss = rss; fit.r2 = 1 - rss / yy; fit.sigma = Math.sqrt(rss / (nn - k));
+        var k = S.length, e = fin.e, w = fin.w, rss = 0, sw = 0, ywm = 0, i, b;
+        for (i = 0; i < nn; i++) { rss += w[i] * e[i] * e[i]; sw += w[i]; ywm += w[i] * yc[i]; }
+        ywm /= sw; var tss = 0; for (i = 0; i < nn; i++) tss += w[i] * (yc[i] - ywm) * (yc[i] - ywm);
+        fit.resid = e; fit.rss = rss; fit.r2 = 1 - rss / tss; fit.sigma = Math.sqrt(rss / (nn - k));
+        fit.w = w; fit.hub = fin.h;
         var meat = []; for (a = 0; a < k; a++) meat.push(new Array(k).fill(0));
-        for (i = 0; i < nn; i++) { var e2 = e[i] * e[i]; for (a = 0; a < k; a++) { var za2 = Z[S[a]][i] * e2; if (!za2) continue; for (b = a; b < k; b++) meat[a][b] += za2 * Z[S[b]][i]; } }
+        for (i = 0; i < nn; i++) { var e2 = w[i] * w[i] * e[i] * e[i]; for (a = 0; a < k; a++) { var za2 = Z[S[a]][i] * e2; if (!za2) continue; for (b = a; b < k; b++) meat[a][b] += za2 * Z[S[b]][i]; } }
         for (a = 0; a < k; a++) for (b = 0; b < a; b++) meat[a][b] = meat[b][a];
         var tt = []; for (a = p0; a < k; a++) tt.push(a);
         fit.vc = tt.map(function (r1) { return tt.map(function (r2) { return (rss / (nn - k)) * sol.inv[r1][r2]; }); });
@@ -569,7 +693,7 @@ var MarsAnalysis = (function (M) {
       tm.resid.forEach(function (e, i) { if (Math.abs(e) > lim) badRows.push({ row: dm[i]._row, up: e > 0 }); });
       if (badRows.length) {
         badRows.forEach(function (b) { reasons[b.row] = "price " + (b.up ? "above" : "below") + " the time model's estimate by more than " + gfmt(cfg.timeScreenRatio) + "x (data error or not a market sale)"; });
-        notes.push("Price screen: " + badRows.length + " sale(s) sold for more than " + gfmt(cfg.timeScreenRatio) + "x above or below what the time model expects for their features, location and date; left out of both pools and listed in exclusions: " +
+        notes.push("Price screen: " + badRows.length + " sale(s) sold for more than " + gfmt(cfg.timeScreenRatio) + "x above or below what the time model expects for their " + (tmLoc.length ? "features, location and date" : "features and date") + "; left out of both pools and listed in exclusions: " +
           badRows.map(function (b) { return sales[b.row].mls_id; }).join(", ") + ".");
         buildMarket(); tm = tmFit(allIdx(), true);
       }
@@ -578,6 +702,9 @@ var MarsAnalysis = (function (M) {
     notes.push("Cleaning: " + sales.length + " sales in file, " + nMarket + " clean, " + excl.length + " excluded. Effective date " + dayStr(eff) +
       ", sale age from " + (dateKey === "contract_date" ? "contract" : "closing") + " date, window " + dayStr(dmin) + " to " + dayStr(dmax) + ".");
     if (trim) notes.push("Contract-date clock: contracts dated before " + dayStr(firstClose) + " (the first closing in the file) were dropped. Recent weeks still hold only the contracts that closed by the effective date.");
+    var nListing = dm.filter(function (r) { return r.lw < 1; }).length;
+    if (countVars.length) notes.push("Listing weights: " + nListing + " of " + nMarket + " clean sales count for less because a bedroom, bath, garage or carport count sits more than " + gfmt(cfg.countWeightCut) +
+      " away from what is typical for their size (the median of the nearest " + normK + " sales by GLA), or a finished basement has its lower-level rooms left blank while the main line shows more rooms than typical. Nothing is dropped for this; the list is in the data trail.");
     var ageMaxM = Math.max.apply(null, dm.map(function (r) { return r.sale_age; })) / MONTH;
     var tmBends = [], bendAges = [];
     tm.terms.forEach(function (k, j) { if (k !== null && k > 0 && k < ageMaxM) { tmBends.push(tm.dates[j]); bendAges.push(k); } });
@@ -587,10 +714,12 @@ var MarsAnalysis = (function (M) {
         out.push({ from: eff - Math.round(b * MONTH), to: eff - Math.round(a * MONTH), rate: Math.exp((tmF(tm, a) - tmF(tm, b)) / (b - a)) - 1, total: Math.exp(tmF(tm, a) - tmF(tm, b)) - 1 }); }
       return out.reverse();   // oldest segment first
     })();
+    var tmDown = tm.hub.filter(function (v) { return v < 1 - 1e-9; }).length;
     var keptTxt = !tm.terms.length ? "no time trend (flat)" : [tm.terms.some(function (k) { return k === null; }) ? "overall slope" : null,
       tmBends.length ? "bends at " + tmBends.map(dayStr).join(", ") : null].filter(Boolean).join("; ");
     notes.push("Time index: " + nMarket + " clean sales, log-price model with the model features" + (tmLoc.length ? ", location" : "") + (seasonOn ? " and quarter of the year" : "") +
-      "; bends allowed every " + cfg.timeKnotMonths + " months with " + cfg.timeMinSide + " sales on each side (" + tm.nCandidates + " candidate dates). Kept: " + keptTxt + ". R-squared " + tm.r2.toFixed(3) + ".");
+      "; bends allowed every " + cfg.timeKnotMonths + " months with " + cfg.timeMinSide + " sales on each side (" + tm.nCandidates + " candidate dates). Kept: " + keptTxt + ". R-squared " + tm.r2.toFixed(3) +
+      " (weighted). " + tmDown + " sale(s) priced far from the time model got less weight.");
     if (!seasonOn && String(cfg.timeSeason) === "auto") notes.push("Time index: quarter-of-year control off (needs 2 years of sales and 10 in every quarter).");
     if (nMarket < 200) notes.push("NOTE: " + nMarket + " clean sales for the time index; its ranges will be wide. Several hundred over the window is better.");
 
@@ -605,7 +734,21 @@ var MarsAnalysis = (function (M) {
     if (n < 60) throw new Error("Only " + n + " sales inside the adjustment-pool ranges. Widen the ranges (the time index still uses all " + nMarket + " clean sales).");
     if (n < 150) notes.push("NOTE: " + n + " sales in the adjustment pool; earthUI and this workflow target 150 to 300.");
 
-    // ---- location coding (adjustment pool)
+    // ---- which variables the pool can price: at least minVary sales must differ from the most common value
+    var varyInfo = {};
+    modelVars.forEach(function (f) {
+      var c = {}, mx = 0; d.forEach(function (r) { var key = String(r[f]); c[key] = (c[key] || 0) + 1; if (c[key] > mx) mx = c[key]; });
+      varyInfo[f] = { nDiff: n - mx };
+    });
+    var eligible = modelVars.filter(function (f) { return varyInfo[f].nDiff >= cfg.minVary; });
+    var thinPriced = features.filter(function (f) { return eligible.indexOf(f) < 0; });
+    var ctrlUsed = controls.filter(function (f) { return eligible.indexOf(f) >= 0; });
+    notes.push("Priced on the grid: " + features.filter(function (f) { return eligible.indexOf(f) >= 0; }).map(function (f) { return LABELS[f]; }).join(", ") + "." +
+      (ctrlUsed.length ? " Background controls in the model, never on the grid: " + ctrlUsed.map(function (f) { return LABELS[f].toLowerCase(); }).join(", ") + "." : ""));
+    if (thinPriced.length) notes.push("Not enough data to price: " + thinPriced.map(function (f) { return LABELS[f] + " (" + varyInfo[f].nDiff + " of " + n + " sales differ from the most common value)"; }).join("; ") +
+      ". A line needs " + cfg.minVary + "; those lines read NOT ENOUGH DATA unless the subject and comp match.");
+
+    // ---- location coding (adjustment pool; off unless a location variable is set)
     var levels = [], ref = null, thin = [], subjLoc = null, locStatus = "not used", locKnown = true;
     if (locVar) {
       var counts = {};
@@ -623,11 +766,11 @@ var MarsAnalysis = (function (M) {
       if (!locKnown) notes.push("WARNING: " + locStatus + ".");
     }
     var dummies = levels.slice(1);
-    var colNames = features.concat(dummies.map(function (l) { return "loc:" + l; }));
+    var colNames = eligible.concat(dummies.map(function (l) { return "loc:" + l; }));
     var groupOfCol = colNames.map(function (c) { return c.indexOf("loc:") === 0 ? "location" : c; });
     function xRow(r, locValue) {
       var row = [];
-      features.forEach(function (f) { row.push(r[f]); });
+      eligible.forEach(function (f) { row.push(num(r[f])); });
       var lv = locValue === undefined ? r.loc : locValue;
       dummies.forEach(function (l) { row.push(lv === l ? 1 : 0); });
       return row;
@@ -635,7 +778,16 @@ var MarsAnalysis = (function (M) {
     var X = d.map(function (r) { return xRow(r); });
     var p = colNames.length;
     var cols = []; for (var j = 0; j < p; j++) cols.push(Float64Array.from(X, function (row) { return row[j]; }));
+    // For finding where the curves bend, a count more than countWeightCut from what is typical for the sale's
+    // size is pulled in to the edge of the normal band (a recorded 7-car garage on a 2-car house is read as 4).
+    // The refit that sets the dollar amounts uses the counts as recorded, with the listing weights.
+    var selCols = cols.map(function (c, jj) {
+      var f = colNames[jj];
+      if (!cfg.clipForSelection || countVars.indexOf(f) < 0) return c;
+      return Float64Array.from(c, function (v, ii) { var nm = d[ii].lwNorm[f]; return Math.min(Math.max(v, nm - cfg.countWeightCut), nm + cfg.countWeightCut); });
+    });
     var y = Float64Array.from(d, function (r) { return r.price_ta; });
+    var Lw = d.map(function (r) { return r.lw; });
     var linpreds = colNames.map(function (c, k) { return groupOfCol[k] === "location" || cfg.linearOnly.indexOf(c) >= 0; });
 
     // ---- earthUI recipe
@@ -648,38 +800,108 @@ var MarsAnalysis = (function (M) {
     var ncross = cfg.ncross || (n < 200 ? 20 : n < 400 ? 16 : n < 700 ? 12 : n < 1200 ? 10 : n < 3000 ? 7 : 5);
     var fitOpts = { nk: cfg.nk || rec.nk, minspan: cfg.minspan || rec.minspan, endspan: cfg.endspan || rec.endspan,
                     penalty: cfg.penalty, thresh: cfg.thresh, newvarPenalty: cfg.newvarPenalty, linpreds: linpreds };
-    progress("Fitting MARS model", 0.05); await tick();
-    var m = M.fit(cols, y, fitOpts);
-    var k = m.k, beta = m.terms.map(function (t) { return t.coef; });
-    var termGroup = m.terms.map(function (t) { return t.pred < 0 ? "(Intercept)" : groupOfCol[t.pred]; });
-    var groupsIn = Array.from(new Set(termGroup.filter(function (g) { return g !== "(Intercept)"; })));
-    var fitted = m.fitted, resid = Array.from(y, function (v, i) { return v - fitted[i]; });
-    var sigma2 = m.rss / (n - k);
-    var B = m.basisCols;
-    var Vc = m.XtXi.map(function (row) { return row.map(function (v) { return v * sigma2; }); });
-    var meat = []; for (var a = 0; a < k; a++) meat.push(new Float64Array(k));
-    for (var i = 0; i < n; i++) { var e2 = resid[i] * resid[i]; for (a = 0; a < k; a++) { var ba = B[a][i] * e2; for (var c = a; c < k; c++) meat[a][c] += ba * B[c][i]; } }
-    for (a = 0; a < k; a++) for (c = 0; c < a; c++) meat[a][c] = meat[c][a];
-    var tmp = m.XtXi.map(function (row) { return Array.from({ length: k }, function (_, cc) { var s = 0; for (var q = 0; q < k; q++) s += row[q] * meat[q][cc]; return s; }); });
-    var Vh = tmp.map(function (row) { return Array.from({ length: k }, function (_, cc) { var s = 0; for (var q = 0; q < k; q++) s += row[q] * m.XtXi[q][cc]; return s * n / (n - k); }); });
-    function quadForm(v, V) { var s = 0; for (var r1 = 0; r1 < k; r1++) { if (!v[r1]) continue; for (var r2 = 0; r2 < k; r2++) s += v[r1] * V[r1][r2] * v[r2]; } return Math.max(0, s); }
-    function basis(row) { return M.basisRow(m, row); }
-    function gContrib(row, grp) { var b = basis(row), s = 0; for (var t = 0; t < k; t++) if (termGroup[t] === grp) s += b[t] * beta[t]; return s; }
 
+    // ---- the adjustment model: MARS (earth) finds the curves on every sale; any variable it leaves out goes
+    // back in as a straight line; then the prices come from a weighted refit (listing weight x Huber weight)
+    function irlsFit(Bc, yv, L) {
+      var nn = yv.length, h = new Array(nn).fill(1), w, f, e;
+      for (var it = 0; it < cfg.irlsMaxIter; it++) {
+        w = L.map(function (l, i) { return l * h[i]; }); f = wlsq(Bc, yv, w); if (!f) return null;
+        e = Array.from(yv, function (v, i) { return v - f.fit[i]; });
+        var hn = huberOf(e), dmax = 0;
+        for (var i = 0; i < nn; i++) { var dd = Math.abs(hn[i] - h[i]); if (dd > dmax) dmax = dd; }
+        h = hn; if (dmax < cfg.irlsTol) break;
+      }
+      w = L.map(function (l, i) { return l * h[i]; }); f = wlsq(Bc, yv, w); if (!f) return null;
+      f.w = w; f.h = h; f.resid = Array.from(yv, function (v, i) { return v - f.fit[i]; });
+      return f;
+    }
+    function fitAdj(idx, fo) {
+      var sub = idx ? M.subset(cols, y, idx) : { cols: cols, y: y };
+      var L = idx ? idx.map(function (i) { return Lw[i]; }) : Lw;
+      var me = M.fit(idx ? M.subset(selCols, y, idx).cols : selCols, sub.y, fo);
+      var tms = me.terms.map(function (t) { return { pred: t.pred, dir: t.dir, cut: t.cut, forced: false }; });
+      var sel = {}; tms.forEach(function (t) { if (t.pred >= 0) sel[groupOfCol[t.pred]] = true; });
+      var picked = Object.keys(sel);
+      eligible.forEach(function (g) {
+        if (sel[g]) return;
+        var jj = colNames.indexOf(g), c = sub.cols[jj], lo = Infinity, hi = -Infinity;
+        for (var i = 0; i < c.length; i++) { if (c[i] < lo) lo = c[i]; if (c[i] > hi) hi = c[i]; }
+        if (hi > lo) tms.push({ pred: jj, dir: 2, cut: 0, forced: true });
+      });
+      var nn = sub.y.length;
+      var Bc = tms.map(function (t) { if (t.pred < 0) return new Float64Array(nn).fill(1); var c = sub.cols[t.pred]; return Float64Array.from(c, function (x) { return M.hinge(x, t.cut, t.dir); }); });
+      var f = irlsFit(Bc, sub.y, L);
+      while (!f && tms.some(function (t) { return t.forced; })) {
+        var li = -1; tms.forEach(function (t, q) { if (t.forced) li = q; });
+        tms.splice(li, 1); Bc.splice(li, 1); f = irlsFit(Bc, sub.y, L);
+      }
+      if (!f) throw new Error("adjustment model fit is singular");
+      tms.forEach(function (t, q) { t.coef = f.beta[q]; });
+      return { terms: tms, B: Bc, f: f, earth: me, picked: picked };
+    }
+    function groupsOf(tms) { return tms.map(function (t) { return t.pred < 0 ? "(Intercept)" : groupOfCol[t.pred]; }); }
+    function basisOf(tms, row) { return tms.map(function (t) { return t.pred < 0 ? 1 : M.hinge(row[t.pred], t.cut, t.dir); }); }
+    function predictOf(tms, row) { var b = basisOf(tms, row), s = 0; for (var q = 0; q < b.length; q++) s += b[q] * tms[q].coef; return s; }
+
+    progress("Fitting MARS model", 0.05); await tick();
+    var mod = fitAdj(null, fitOpts);
+    var terms = mod.terms, k = terms.length, beta = terms.map(function (t) { return t.coef; });
+    var termGroup = groupsOf(terms);
+    var groupsIn = Array.from(new Set(termGroup.filter(function (g) { return g !== "(Intercept)"; })));
+    var forcedIn = Array.from(new Set(terms.filter(function (t) { return t.forced; }).map(function (t) { return groupOfCol[t.pred]; })));
+    var wts = mod.f.w, hub = mod.f.h, fitted = mod.f.fit, resid = mod.f.resid;
+    var B = mod.B;
+    var swt = 0, rssW = 0, ywm = 0, a, c, i;
+    for (i = 0; i < n; i++) { swt += wts[i]; rssW += wts[i] * resid[i] * resid[i]; ywm += wts[i] * y[i]; }
+    ywm /= swt; var tssW = 0; for (i = 0; i < n; i++) tssW += wts[i] * (y[i] - ywm) * (y[i] - ywm);
+    var sigma2 = rssW / (n - k);
+    var XtWXi = mod.f.XtWXi;
+    var Vc = XtWXi.map(function (row) { return row.map(function (v) { return v * sigma2; }); });
+    var meat = []; for (a = 0; a < k; a++) meat.push(new Float64Array(k));
+    for (i = 0; i < n; i++) { var e2 = wts[i] * wts[i] * resid[i] * resid[i]; for (a = 0; a < k; a++) { var ba = B[a][i] * e2; for (c = a; c < k; c++) meat[a][c] += ba * B[c][i]; } }
+    for (a = 0; a < k; a++) for (c = 0; c < a; c++) meat[a][c] = meat[c][a];
+    var tmp = XtWXi.map(function (row) { return Array.from({ length: k }, function (_, cc) { var s = 0; for (var q = 0; q < k; q++) s += row[q] * meat[q][cc]; return s; }); });
+    var Vh = tmp.map(function (row) { return Array.from({ length: k }, function (_, cc) { var s = 0; for (var q = 0; q < k; q++) s += row[q] * XtWXi[q][cc]; return s * n / (n - k); }); });
+    var rsqW = 1 - rssW / tssW;
+    var grsqW = 1 - M.gcv(k, n, n * rssW / swt, cfg.penalty) / M.gcv(1, n, n * tssW / swt, cfg.penalty);
+    function quadForm(v, V) { var s = 0; for (var r1 = 0; r1 < k; r1++) { if (!v[r1]) continue; for (var r2 = 0; r2 < k; r2++) s += v[r1] * V[r1][r2] * v[r2]; } return Math.max(0, s); }
+    function basis(row) { return basisOf(terms, row); }
+    function gContrib(row, grp) { var b = basis(row), s = 0; for (var t = 0; t < k; t++) if (termGroup[t] === grp) s += b[t] * beta[t]; return s; }
+    if (forcedIn.length) notes.push("Adjustment model: MARS left out " + forcedIn.map(function (f) { return LABELS[f].toLowerCase(); }).join(", ") +
+      "; each went back in as a straight line so every priced line gets a number and a range.");
+    var mDown = hub.filter(function (v) { return v < 1 - 1e-9; }).length;
+    notes.push("Weighted fit: " + mDown + " of " + n + " pool sales priced far from the model (beyond 1.345 robust standard deviations) got less weight; with the listing weights the pool counts as " +
+      Math.round(swt * swt / wts.reduce(function (s, v) { return s + v * v; }, 0)) + " full-weight sales.");
+
+    // ---- cross-validation: the whole procedure refit on each fold (folds drawn the way earth draws them)
     progress("Cross-validating (" + nfold + "-fold x " + ncross + ")", 0.12); await tick();
-    var cvr = M.cv(cols, y, fitOpts, nfold, ncross, cfg.masterSeed + 1, function (i, tot) {
-      if (i % 4 === 0) progress("Cross-validating: fold " + (i + 1) + " of " + tot, 0.12 + 0.18 * i / tot);
-    });
-    if (cvr.cvrsq < 0.5 || cvr.sd > 0.3) notes.push("WARNING: cross-validated R-squared is " + cvr.cvrsq.toFixed(2) + " (sd " + cvr.sd.toFixed(2) + ") against " + m.rsq.toFixed(2) +
-      " in-sample: the model holds up poorly on sales it was not fit on. A few sales far from the rest (a very large lot, a very high price) usually drive this. Tighten the adjustment-pool ranges or review the largest residuals in the modeled sales.");
+    var rcv = M.rRNG(cfg.masterSeed + 1), cvRsq = [], totF = nfold * ncross;
+    for (var cc0 = 0; cc0 < ncross; cc0++) {
+      var fold = M.stratFolds(y, nfold, rcv);
+      for (var fo0 = 0; fo0 < nfold; fo0++) {
+        var itf = cc0 * nfold + fo0;
+        if (itf % 4 === 0) { progress("Cross-validating: fold " + (itf + 1) + " of " + totF, 0.12 + 0.18 * itf / totF); await tick(); }
+        var tr = [], te = []; for (i = 0; i < n; i++) (fold[i] === fo0 ? te : tr).push(i);
+        var mf; try { mf = fitAdj(tr, fitOpts); } catch (eCv) { continue; }
+        var ymT = 0; te.forEach(function (i4) { ymT += y[i4] / te.length; });
+        var rssO = 0, tssO = 0;
+        te.forEach(function (i4) { var e5 = y[i4] - predictOf(mf.terms, X[i4]); rssO += e5 * e5; tssO += (y[i4] - ymT) * (y[i4] - ymT); });
+        cvRsq.push(1 - rssO / tssO);
+      }
+    }
+    var cvMean = mean(cvRsq), cvSd = Math.sqrt(cvRsq.reduce(function (s, v) { return s + (v - cvMean) * (v - cvMean); }, 0) / (cvRsq.length - 1));
+    if (cvMean < 0.5 || cvSd > 0.3) notes.push("WARNING: cross-validated R-squared is " + cvMean.toFixed(2) + " (sd " + cvSd.toFixed(2) + ") against " + rsqW.toFixed(2) +
+      " in-sample: the model holds up poorly on sales it was not fit on. In a pool of similar houses most of the price spread is condition and updating, which the MLS fields do not carry; a bigger pull (more sales with real differences in the priced features) is the fix.");
 
     // ---- subject & comps
     var subjRow = {};
     features.forEach(function (f) {
       var v = num(subject[f]);
-      if (isNaN(v)) throw new Error("Enter the subject's " + (LABELS[f] || f).toLowerCase() + ". Every model feature needs a subject value.");
+      if (isNaN(v)) throw new Error("Enter the subject's " + (LABELS[f] || f).toLowerCase() + ". Every priced line needs a subject value.");
       subjRow[f] = v;
     });
+    controls.forEach(function (f) { subjRow[f] = num(subject[f]); });   // optional: a control never prices a line
     var Xs = xRow(subjRow, locVar ? (locKnown ? subjLoc : ref) : undefined);
     var ranges = {};
     features.forEach(function (f) {
@@ -687,7 +909,7 @@ var MarsAnalysis = (function (M) {
       ranges[f] = [Math.min.apply(null, vals), Math.max.apply(null, vals)];
     });
     function knotsOf(f) {
-      var kk = []; m.terms.forEach(function (t) { if (t.pred >= 0 && colNames[t.pred] === f && (t.dir === 1 || t.dir === -1)) kk.push(t.cut); });
+      var kk = []; terms.forEach(function (t) { if (t.pred >= 0 && colNames[t.pred] === f && (t.dir === 1 || t.dir === -1)) kk.push(t.cut); });
       return Array.from(new Set(kk)).sort(function (u, v) { return u - v; });
     }
     function slopeBetween(f, lo, hi) {
@@ -707,7 +929,7 @@ var MarsAnalysis = (function (M) {
       if (!bad.length) return "";
       return "REVERSED SEGMENT: " + bad.map(function (s) {
         return fmtVal(f, s.from) + " to " + fmtVal(f, s.to) + " at " + fmtRate(s.slope) + "/" + unitOf(f) + " (" + fmtMoney(s.slope * (s.to - s.from)) + ")";
-      }).join("; ") + ". More of this feature normally adds value; check the segment and its g-function plot before relying on this line.";
+      }).join("; ") + ". More of this feature normally adds value; check the segment and its value curve before relying on this line.";
     }
     // Time: the subject sits at the effective date. A gap up to cfg.timeGapDays between the newest
     // clean sale and the effective date counts as inside the indexed range.
@@ -719,7 +941,7 @@ var MarsAnalysis = (function (M) {
     var compRows = comps.map(function (cr) {
       var du = cr[dateKey];
       var c2 = Object.assign({}, cr, { sale_age: isFinite(du) ? eff - du : NaN, date_used: du });
-      c2.price_comp = cr.sale_price - cfg.concessionReaction * (isFinite(cr.concessions) ? cr.concessions : 0);
+      c2.price_comp = cr.sale_price;
       var cl = { model: undefined, raw: null, known: true };
       if (locVar) {
         var v = String(cr[locVar] == null ? "" : cr[locVar]).trim().toUpperCase();
@@ -731,6 +953,8 @@ var MarsAnalysis = (function (M) {
       c2._loc = cl; c2._X = xRow(c2, locVar ? cl.model : undefined);
       c2._inFit = d.some(function (r) { return r.mls_id && r.mls_id === cr.mls_id; });
       c2._inMarket = dm.some(function (r) { return r.mls_id && r.mls_id === cr.mls_id; });
+      var okCounts = countVars.every(function (f) { return typeof cr[f] === "number" && isFinite(cr[f]); });
+      c2._lw = okCounts ? listingWeight(c2, normsAt(num(cr.gla))) : { w: NaN, why: [] };
       return c2;
     });
     var lost = compRows.filter(function (cr) { return cr.mls_id && !cr._inMarket; }).map(function (cr) {
@@ -740,6 +964,8 @@ var MarsAnalysis = (function (M) {
     if (lost.length) notes.push("Comps not in the modeled data (still adjusted, flagged): " + lost.join("; ") + ".");
     var outside = compRows.filter(function (cr) { return cr._inMarket && !cr._inFit; }).map(function (cr) { return cr.mls_id; });
     if (outside.length) notes.push("Comps outside your adjustment-pool ranges (still adjusted; lines that fall outside the modeled sales are flagged): " + outside.join(", ") + ".");
+    var offComps = compRows.map(function (cr, ci) { return cr._lw.w < 1 ? "C" + (ci + 1) + " " + (cr.address || cr.mls_id) + " (" + cr._lw.why.join("; ") + ")" : null; }).filter(Boolean);
+    if (offComps.length) notes.push("Comp listings that look off by the same test the pool sales get: " + offComps.join("; ") + ". Check those records before relying on their count lines.");
 
     function provisional(L) {
       if (Math.abs(L.adj) < 0.5) { L.status = "NO MODEL DIFFERENCE (same value or flat segment)"; L.tone = "zero"; }
@@ -756,6 +982,7 @@ var MarsAnalysis = (function (M) {
       return { text: list.map(function (s) { return dayStr(s.from) + " to " + dayStr(s.to) + " @ " + fmtPct(s.rate, 2) + "/mo"; }).join("; "), list: list };
     }
     var lineKeys = features.concat(locVar ? ["location"] : []);
+    var modelLines = lineKeys.filter(function (g) { return g === "location" || eligible.indexOf(g) >= 0; });
     var grid = [], timeLine = [];
     var bs = basis(Xs);
     compRows.forEach(function (cr, ci) {
@@ -780,20 +1007,26 @@ var MarsAnalysis = (function (M) {
       grid.push(T); timeLine[ci] = T;
       var bc = basis(cr._X);   // a missing value only poisons the terms of its own variable
       lineKeys.forEach(function (grp) {
-        var sv = grp === "location" ? subjLoc : Xs[colNames.indexOf(grp)];
-        var cv = grp === "location" ? cr._loc.raw : cr._X[colNames.indexOf(grp)];
+        var isLoc = grp === "location";
+        var sv = isLoc ? subjLoc : subjRow[grp];
+        var cv = isLoc ? cr._loc.raw : num(cr[grp]);
         var L = { comp: ci, key: grp, label: LABELS[grp] || grp, subject: sv, compValue: cv, adj: NaN, seC: NaN, seH: NaN, lo: NaN, hi: NaN,
                   hsLo: NaN, hsHi: NaN, hsShare: NaN, hsSame: NaN, knot: false, extrap: false, segments: [], status: "", tone: "", review: "", loo: NaN };
-        var naComp = grp === "location" ? !cr._loc.known : isNaN(cv);
-        if (naComp) { L.status = grp === "location" ? "NOT EXTRACTABLE: comp location level not in the modeled data" : "NOT EXTRACTABLE: comp value missing (never imputed)"; L.tone = "na"; grid.push(L); return; }
-        if (groupsIn.indexOf(grp) < 0) { L.adj = 0; L.seC = L.seH = L.lo = L.hi = 0; L.status = "NOT IN MODEL: below the GCV noise floor here (see battery / residual layer)"; L.tone = "out"; grid.push(L); return; }
-        if (grp === "location" && !locKnown) { L.status = locStatus; L.tone = "na"; grid.push(L); return; }
+        var naComp = isLoc ? !cr._loc.known : isNaN(cv);
+        if (naComp) { L.status = isLoc ? "NOT EXTRACTABLE: comp location level not in the modeled data" : "NOT EXTRACTABLE: comp value missing (never imputed)"; L.tone = "na"; grid.push(L); return; }
+        if (!isLoc && eligible.indexOf(grp) < 0) {
+          if (sv === cv) { L.adj = 0; L.seC = L.seH = L.lo = L.hi = 0; L.status = "NO MODEL DIFFERENCE (same value or flat segment)"; L.tone = "zero"; }
+          else { L.status = "NOT ENOUGH DATA: only " + varyInfo[grp].nDiff + " of the " + n + " sales in the adjustment pool differ from the most common value (" + cfg.minVary + " needed to price this line)"; L.tone = "na"; }
+          grid.push(L); return;
+        }
+        if (groupsIn.indexOf(grp) < 0) { L.adj = 0; L.seC = L.seH = L.lo = L.hi = 0; L.status = "NOT IN MODEL: below the GCV noise floor here"; L.tone = "out"; grid.push(L); return; }
+        if (isLoc && !locKnown) { L.status = locStatus; L.tone = "na"; grid.push(L); return; }
         var cvec = new Array(k).fill(0);
         for (var t = 0; t < k; t++) if (termGroup[t] === grp) cvec[t] = bs[t] - bc[t];
         var est = 0; for (t = 0; t < k; t++) est += cvec[t] * beta[t];
         var seC = Math.sqrt(quadForm(cvec, Vc)), seH = Math.sqrt(quadForm(cvec, Vh)), se2 = Math.max(seC, seH);
         L.adj = est; L.seC = seC; L.seH = seH; L.lo = est - 1.96 * se2; L.hi = est + 1.96 * se2;
-        if (grp !== "location") {
+        if (!isLoc) {
           var ks = knotsOf(grp);
           L.knot = ks.some(function (kn) { return kn > Math.min(sv, cv) && kn < Math.max(sv, cv); });
           L.extrap = cv < rangeLo(grp) || cv > ranges[grp][1] || sv < rangeLo(grp) || sv > ranges[grp][1];
@@ -820,32 +1053,31 @@ var MarsAnalysis = (function (M) {
       }
     }
 
-    // ---- half-sample stability (whole MARS procedure refit on n/2 without replacement)
+    // ---- half-sample stability (whole procedure refit on n/2 without replacement)
     var hsFreq = {}, H = cfg.halfSamples | 0;
-    lineKeys.forEach(function (g) { hsFreq[g] = 0; });
+    var freqKeys = Array.from(new Set(groupOfCol));
+    freqKeys.forEach(function (g) { hsFreq[g] = 0; });
     if (H > 0) {
-      var r = M.rRNG(cfg.masterSeed + 10000), half = Math.floor(n / 2), store = {};   // R: set.seed(master + 10000)
+      var rH = M.rRNG(cfg.masterSeed + 10000), half = Math.floor(n / 2), store = {};   // R: set.seed(master + 10000)
       grid.forEach(function (L) { if (L.key !== "time") store[L.comp + "|" + L.key] = []; });
       var recH = recipe(half);
       for (var hsi = 0; hsi < H; hsi++) {
         if (hsi % 5 === 0) { progress("Half-sample refits: " + hsi + " of " + H, 0.3 + 0.5 * hsi / H); if (hsi % 20 === 0) await tick(); }
-        var idx = r.sampleNoReplace(n, half);                                         // R: sample.int(n, half)
-        var sub = M.subset(cols, y, idx);
+        var idx = rH.sampleNoReplace(n, half);                                        // R: sample.int(n, half)
         var mb;
-        try { mb = M.fit(sub.cols, sub.y, Object.assign({}, fitOpts, recH)); } catch (err) { continue; }
-        var tg = mb.terms.map(function (t) { return t.pred < 0 ? "(Intercept)" : groupOfCol[t.pred]; });
-        Array.from(new Set(tg)).forEach(function (g) { if (g in hsFreq) hsFreq[g]++; });
-        var bsb = M.basisRow(mb, Xs);
+        try { mb = fitAdj(idx, Object.assign({}, fitOpts, recH)); } catch (err) { continue; }
+        var tg = groupsOf(mb.terms);
+        mb.picked.forEach(function (g) { if (g in hsFreq) hsFreq[g]++; });
+        var bsb = basisOf(mb.terms, Xs);
         compRows.forEach(function (cr, ci2) {
-          // a missing comp value only blanks the lines of its own variable
-          var bcb = M.basisRow(mb, cr._X);
-          lineKeys.forEach(function (g) {
+          var bcb = basisOf(mb.terms, cr._X);   // a missing comp value only blanks the lines of its own variable
+          modelLines.forEach(function (g) {
             var s = 0; for (var t2 = 0; t2 < tg.length; t2++) if (tg[t2] === g) s += (bsb[t2] - bcb[t2]) * mb.terms[t2].coef;
             if (isFinite(s)) store[ci2 + "|" + g].push(s);
           });
         });
       }
-      grid.forEach(function (L) { if (L.key !== "time") hsApply(L, store[L.comp + "|" + L.key] || []); });
+      grid.forEach(function (L) { if (L.key !== "time" && modelLines.indexOf(L.key) >= 0) hsApply(L, store[L.comp + "|" + L.key] || []); });
       Object.keys(hsFreq).forEach(function (g) { hsFreq[g] = Math.round(1000 * hsFreq[g] / H) / 1000; });
     }
 
@@ -879,24 +1111,29 @@ var MarsAnalysis = (function (M) {
       return { month: monthKey(t), date: dayStr(t), monthsBack: monthAge[mi2], pct: Math.exp(-curF[mi2]) - 1, hsLo: qOrNa(hsv, 0.025), hsHi: qOrNa(hsv, 0.975), sales: monthCount[monthKey(t)] || 0 };
     });
     function spanPct(fv, idxs) { if (!idxs.length) return NaN; var s = 0; idxs.forEach(function (q) { s += Math.exp(fv[q]); }); return 1 / (s / idxs.length) - 1; }
-    // yearly table: the median-to-median method on the export as pulled, beside the index
+    // yearly table: the median-to-median method on the export as pulled, beside the index. The base is the
+    // effective date's year; when the export has no sales in that year yet, the latest year that has them.
     var pulled = sales.map(function (r) {
       var stOk = r.status === null || r.status === undefined || ["CLS", "CLOSED", "SOLD", ""].indexOf(r.status) >= 0;
       return stOk && r.sale_price > 1000 && isFinite(r.sale_date) && (!cfg.excludeAfterEffective || r.sale_date <= eff);
     });
-    function medOf(pred) { var v = []; sales.forEach(function (r, i) { if (pulled[i] && pred(r, i)) v.push(r.sale_price); }); return v.length ? median(v) : NaN; }
-    var medEff = medOf(function (r) { return yearOf(r.sale_date) === effYear; }), medEffRes = medOf(function (r, i) { return yearOf(r.sale_date) === effYear && !ncFlag[i]; });
+    function medOf(pred) { var v = []; sales.forEach(function (r, i5) { if (pulled[i5] && pred(r, i5)) v.push(r.sale_price); }); return v.length ? median(v) : NaN; }
+    function pulledIn(yy) { return sales.some(function (r, i5) { return pulled[i5] && yearOf(r.sale_date) === yy; }); }
+    var baseYear = effYear;
+    if (!pulledIn(effYear)) for (var by = effYear - 1; by >= yearOf(dmin); by--) if (pulledIn(by)) { baseYear = by; break; }
+    var medBase = medOf(function (r) { return yearOf(r.sale_date) === baseYear; }), medBaseRes = medOf(function (r, i5) { return yearOf(r.sale_date) === baseYear && !ncFlag[i5]; });
     var timeYears = [];
     for (var yy0 = yearOf(dmin); yy0 <= effYear; yy0++) (function (yy) {
-      var nSel = 0, nNc = 0; sales.forEach(function (r, i) { if (pulled[i] && yearOf(r.sale_date) === yy) { nSel++; if (ncFlag[i]) nNc++; } });
+      var nSel = 0, nNc = 0; sales.forEach(function (r, i5) { if (pulled[i5] && yearOf(r.sale_date) === yy) { nSel++; if (ncFlag[i5]) nNc++; } });
       var med = medOf(function (r) { return yearOf(r.sale_date) === yy; }), prev = medOf(function (r) { return yearOf(r.sale_date) === yy - 1; });
-      var res0 = medOf(function (r, i) { return yearOf(r.sale_date) === yy && !ncFlag[i]; });
+      var res0 = medOf(function (r, i5) { return yearOf(r.sale_date) === yy && !ncFlag[i5]; });
       var idxs = []; tmMonths.forEach(function (t, q) { if (yearOf(t) === yy) idxs.push(q); });
       var hsv = hsMonthF ? hsMonthF.filter(Boolean).map(function (row) { return spanPct(row, idxs); }) : [];
-      timeYears.push({ year: yy, salesPulled: nSel, median: med, yoy: med / prev - 1, medianToEffYear: medEff / med - 1, ncShare: nSel ? nNc / nSel : NaN,
-        resaleMedian: res0, resaleToEffYear: medEffRes / res0 - 1, cleanSales: dm.filter(function (r) { return yearOf(r.date_used) === yy; }).length,
+      timeYears.push({ year: yy, salesPulled: nSel, median: med, yoy: med / prev - 1, medianToBase: medBase / med - 1, ncShare: nSel ? nNc / nSel : NaN,
+        resaleMedian: res0, resaleToBase: medBaseRes / res0 - 1, cleanSales: dm.filter(function (r) { return yearOf(r.date_used) === yy; }).length,
         index: spanPct(curF, idxs), indexLo: qOrNa(hsv, 0.025), indexHi: qOrNa(hsv, 0.975) });
     })(yy0);
+    if (baseYear !== effYear) notes.push("Yearly medians: the export has no sales closed in " + effYear + " by the effective date, so " + baseYear + " (the latest year with sales) is the base for the median-to-median column.");
     var mixRows = timeYears.filter(function (t) { return t.salesPulled >= 20 && isFinite(t.ncShare); });
     var mixShares = mixRows.map(function (t) { return Math.round(1000 * t.ncShare) / 10; });
     var mixShift = mixRows.length >= 2 && Math.max.apply(null, mixShares) - Math.min.apply(null, mixShares) >= 10;
@@ -959,14 +1196,14 @@ var MarsAnalysis = (function (M) {
       else if (n - nDrop < 60) notes.push("Leave-comps-out check skipped: fewer than 60 sales would remain.");
       else {
         var keepIdx = []; for (var ki = 0; ki < n; ki++) if (!dropSet[ki]) keepIdx.push(ki);
-        var subL = M.subset(cols, y, keepIdx), ml = null;
-        try { ml = M.fit(subL.cols, subL.y, fitOpts); } catch (err3) { ml = null; }
+        var ml = null;
+        try { ml = fitAdj(keepIdx, fitOpts); } catch (err3) { ml = null; }
         if (ml) {
-          var tgl = ml.terms.map(function (t) { return t.pred < 0 ? "(Intercept)" : groupOfCol[t.pred]; }), bsl = M.basisRow(ml, Xs);
+          var tgl = groupsOf(ml.terms), bsl = basisOf(ml.terms, Xs);
           influence = [];
           grid.forEach(function (L) {
-            if (L.key === "time" || !isFinite(L.adj)) return;
-            var bcl = M.basisRow(ml, compRows[L.comp]._X), v = 0;
+            if (L.key === "time" || !isFinite(L.adj) || modelLines.indexOf(L.key) < 0) return;
+            var bcl = basisOf(ml.terms, compRows[L.comp]._X), v = 0;
             for (var t3 = 0; t3 < tgl.length; t3++) if (tgl[t3] === L.key) v += (bsl[t3] - bcl[t3]) * ml.terms[t3].coef;
             if (!isFinite(v)) return;
             L.loo = v;
@@ -981,7 +1218,7 @@ var MarsAnalysis = (function (M) {
     }
 
     progress("Segments and diagnostics", 0.96); await tick();
-    // ---- per-segment slopes & curves
+    // ---- per-segment slopes & curves (priced lines)
     var segments = [], curves = {};
     features.forEach(function (f) {
       var rg = ranges[f];
@@ -993,7 +1230,7 @@ var MarsAnalysis = (function (M) {
       for (var q = 0; q <= 60; q++) { var xv = rg[0] + (rg[1] - rg[0]) * q / 60, xr = Xs.slice(); xr[jj] = xv; pts.push([xv, gContrib(xr, f)]); }
       bnd.forEach(function (bv) { var xr2 = Xs.slice(); xr2[jj] = bv; pts.push([bv, gContrib(xr2, f)]); });
       pts.sort(function (u, v) { return u[0] - v[0]; });
-      curves[f] = { points: pts, knots: ks, partial: d.map(function (rw, ii) { var xr3 = X[ii]; return [xr3[jj], resid[ii] + gContrib(xr3, f)]; }) };
+      curves[f] = { points: pts, knots: ks, partial: d.map(function (rw, ii) { var xr3 = X[ii]; return [xr3[jj], resid[ii] + gContrib(xr3, f), wts[ii]]; }) };
     });
     var locEffects = null;
     if (locVar) {
@@ -1004,77 +1241,43 @@ var MarsAnalysis = (function (M) {
       });
     }
 
-    // ---- residual layer (earthUI residual-contribution method)
-    var rf = cfg.residualFeatures.filter(function (f) {
-      if (features.indexOf(f) >= 0) return false;
-      var vals = d.map(function (rw) { return rw[f]; }).filter(function (v) { return !isNaN(v); });
-      return vals.length > 20 && new Set(vals).size > 1;
-    });
-    var residTable = [];
-    if (rf.length) {
-      var okRows = d.map(function (rw, ii) { return ii; }).filter(function (ii) { return rf.every(function (f) { return !isNaN(d[ii][f]); }); });
-      var orf = ols(rf.map(function (f) { return okRows.map(function (ii) { return d[ii][f]; }); }), okRows.map(function (ii) { return resid[ii]; }));
-      if (orf) rf.forEach(function (f, ii) {
-        var est2 = orf.beta[1 + ii], se2 = orf.se[1 + ii], tv = est2 / se2, nz = d.filter(function (rw) { return rw[f] !== 0 && !isNaN(rw[f]); }).length;
-        residTable.push({ feature: f, label: LABELS[f] || f, estimate: est2, se: se2, t: tv, nNonzero: nz,
-          note: nz < 10 ? "CAUTION: n < 10, below regression resolution; corroborate with cost or paired data" : (Math.abs(tv) < 2 ? "weak (|t| < 2): direction not resolved" : "residual-layer estimate") });
-      });
-      compRows.forEach(function (cr, ci3) {
-        residTable.forEach(function (rt) {
-          var sv = num(subject[rt.feature]), cv = num(cr[rt.feature]);
-          if (isNaN(sv) || isNaN(cv)) return;
-          var est3 = rt.estimate * (sv - cv), se3 = rt.se * Math.abs(sv - cv);
-          grid.push({ comp: ci3, key: rt.feature, residual: true, label: rt.label + " (residual layer)", subject: sv, compValue: cv, adj: est3, seC: se3, seH: NaN,
-            lo: est3 - 1.96 * se3, hi: est3 + 1.96 * se3, hsLo: NaN, hsHi: NaN, hsShare: NaN, hsSame: NaN, knot: false, extrap: false, segments: [], loo: NaN,
-            status: sv === cv ? "NO DIFFERENCE" : rt.note, tone: sv === cv ? "zero" : (Math.abs(rt.t) >= 2 && rt.nNonzero >= 10 ? "ok" : "warn"),
-            review: sv !== cv && cfg.expectedPositive.indexOf(rt.feature) >= 0 && rt.estimate < 0 ?
-              "REVERSED SIGN: residual-layer estimate is " + fmtRate(rt.estimate) + " per " + unitOf(rt.feature) + ". More of this feature normally adds value." : "" });
-        });
-      });
-    }
-
-    // ---- concession diagnostic
-    var concDiag = null;
-    var withConc = d.filter(function (rw) { return rw.concessions > 0; }).length;
-    if (withConc >= 10) {
-      var oc = ols([d.map(function (rw) { return rw.concessions; })], resid);
-      concDiag = { n: withConc, perDollar: oc ? oc.beta[1] : NaN, se: oc ? oc.se[1] : NaN };
-    } else concDiag = { n: withConc };
-
-    // ---- comp diagnostics: model estimate vs the comp's time-adjusted price, residual, CQA rank
+    // ---- comp diagnostics: model estimate vs the comp's time-adjusted price, residual, CQA rank, listing check
     var compDiag = compRows.map(function (cr) {
-      var pr = (cr._X.some(function (v) { return isNaN(v); }) || !cr._loc.known) ? NaN : M.predict(m, cr._X);
+      var pr = (cr._X.some(function (v) { return isNaN(v); }) || !cr._loc.known) ? NaN : predictOf(terms, cr._X);
       var price = isFinite(cr.sale_age) ? cr.price_comp * Math.exp(-tmF(tm, cr.sale_age / MONTH)) : NaN;
       var rr = price - pr;
+      var at = -1; d.forEach(function (rw, ii) { if (at < 0 && rw.mls_id && rw.mls_id === cr.mls_id) at = ii; });
       return { mls_id: cr.mls_id, address: cr.address, priceUsed: cr.price_comp, priceTimeAdjusted: price, estimate: pr, residual: rr,
-               cqa: isNaN(rr) ? NaN : 10 * resid.filter(function (v) { return v < rr; }).length / n, inFit: cr._inFit };
+               cqa: isNaN(rr) ? NaN : 10 * resid.filter(function (v) { return v < rr; }).length / n, inFit: cr._inFit,
+               listingWeight: cr._lw.w, listingWhy: cr._lw.why.join("; "), modelWeight: at >= 0 ? wts[at] : NaN };
     });
 
     // ---- battery on partial residuals (other model effects removed)
     var tsSeed = cfg.masterSeed + 30000;
-    var battery = features.concat(rf).map(function (f) {
+    var battery = features.filter(function (f) { return eligible.indexOf(f) >= 0; }).map(function (f) {
       var xs = d.map(function (rw) { return rw[f]; });
-      if (new Set(xs).size < 2 || xs.some(function (v) { return isNaN(v); })) return null;
+      if (new Set(xs).size < 2) return null;
       var inM = groupsIn.indexOf(f) >= 0;
       var yv = d.map(function (rw, ii) { return resid[ii] + (inM ? gContrib(X[ii], f) : 0); });
       var o = ols([xs], yv);
-      return { feature: f, label: LABELS[f] || f, inMars: inM, ols: o ? o.beta[1] : NaN, theilSen: theilSen(xs, yv, tsSeed), lad: lad(xs, yv), grouped: groupedQuintiles(xs, yv) };
+      return { feature: f, label: LABELS[f] || f, inMars: inM, picked: mod.picked.indexOf(f) >= 0, ols: o ? o.beta[1] : NaN, theilSen: theilSen(xs, yv, tsSeed), lad: lad(xs, yv), grouped: groupedQuintiles(xs, yv) };
     }).filter(Boolean);
 
     // ---- local validation (GLA band, same levels), partial residuals
     var localVal = { verdict: "not run" };
-    if (features.indexOf("gla") >= 0) {
+    if (features.indexOf("gla") >= 0 && eligible.indexOf("gla") >= 0) {
       var sg = subjRow.gla, band = isFinite(cfg.glaBand) ? cfg.glaBand : Math.max(250, Math.round(0.15 * sg / 10) * 10);
-      var inb = d.map(function (rw) { return Math.abs(rw.gla - sg) <= band && (features.indexOf("levels") < 0 || rw.levels === subjRow.levels); });
+      var sameLv = eligible.indexOf("levels") >= 0 && isFinite(subjRow.levels);
+      var inb = d.map(function (rw) { return Math.abs(rw.gla - sg) <= band && (!sameLv || rw.levels === subjRow.levels); });
       var cnt = inb.filter(Boolean).length;
-      if (cnt >= 10 && groupsIn.indexOf("gla") >= 0) {
+      if (cnt >= 10) {
         var xv2 = [], yv2 = [];
         d.forEach(function (rw, ii) { if (inb[ii]) { xv2.push(rw.gla); yv2.push(resid[ii] + gContrib(X[ii], "gla")); } });
         var ol = ols([xv2], yv2), xr = [Math.min.apply(null, xv2), Math.max.apply(null, xv2)];
         var mAvg = slopeBetween("gla", xr[0], xr[1]);
-        localVal = { band: band, n: cnt, range: xr, slope: ol.beta[1], se: ol.se[1], marsAvg: mAvg,
+        localVal = { band: band, n: cnt, range: xr, slope: ol.beta[1], se: ol.se[1], marsAvg: mAvg, sameLevels: sameLv,
                      verdict: Math.abs(ol.beta[1] - mAvg) <= 1.96 * ol.se[1] ? "LOCALLY VALIDATED" : "DIVERGES: FLAG FOR APPRAISER JUDGMENT" };
-      } else localVal = { band: band, n: cnt, verdict: "BATCH TOO SMALL OR GLA NOT IN MODEL" };
+      } else localVal = { band: band, n: cnt, verdict: "BATCH TOO SMALL" };
     }
 
     // ---- bracketing
@@ -1085,57 +1288,71 @@ var MarsAnalysis = (function (M) {
                bracketed: cv.length ? sv >= Math.min.apply(null, cv) && sv <= Math.max.apply(null, cv) : null, dataMin: ranges[f][0], dataMax: ranges[f][1] };
     });
 
+    // ---- weights, for the data trail
+    var listingRows = [];
+    dm.forEach(function (rw, ii) { if (rw.lw < 1) listingRows.push({ mls_id: rw.mls_id, address: rw.address, sale_price: rw.sale_price, date: dayStr(rw.date_used), weight: rw.lw, reasons: rw.lwWhy.join("; "), inPool: inPool[ii], _i: ii }); });
+    listingRows.sort(function (u, v) { return (u.weight - v.weight) || (u._i - v._i); });
+    var priceRows = [];
+    d.forEach(function (rw, ii) { if (hub[ii] < 1 - 1e-9) priceRows.push({ mls_id: rw.mls_id, address: rw.address, priceTimeAdjusted: rw.price_ta, estimate: fitted[ii], residual: resid[ii], weight: hub[ii], listingWeight: rw.lw, _i: ii }); });
+    priceRows.sort(function (u, v) { return (u.weight - v.weight) || (u._i - v._i); });
+    var nEff = function (w) { var s1 = 0, s2 = 0; w.forEach(function (v) { s1 += v; s2 += v * v; }); return s1 * s1 / s2; };
+
     // ---- reproducibility
     // same fingerprint string as the R reference script: one line per clean sale in the market pool
-    // (mls_id, price used, sale age, features, location as recorded, 1 if in the adjustment pool)
+    // (mls_id, price used, sale age, model variables, location as recorded, 1 if in the adjustment pool)
     var cn = function (v) { var x = Math.round(v * 1e6) / 1e6; return String(x === 0 ? 0 : x); };
     var canon = dm.map(function (rw, ii) {
-      return [rw.mls_id, cn(rw.price_used), cn(rw.sale_age)].concat(features.map(function (f) { return cn(rw[f]); }))
+      return [rw.mls_id, cn(rw.price_used), cn(rw.sale_age)].concat(modelVars.map(function (f) { return cn(rw[f]); }))
         .concat(locVar ? [String(rw[locVar]).trim().toUpperCase()] : []).concat([inPool[ii] ? "1" : "0"]).join(",");
     }).join("\n");
     var settings = { effectiveDate: dayStr(eff), dateBasis: dateKey, trimContractEdge: trim, excludeAfterEffective: cfg.excludeAfterEffective, cutoffBasis: cfg.cutoffBasis,
       excludeUnexposed: cfg.excludeUnexposed, exposureChecked: hasListDate, excludeFlips: cfg.excludeFlips, flipDays: cfg.flipDays, flipRatio: cfg.flipRatio, excludeSaleTypes: cfg.excludeSaleTypes,
-      concessionReaction: cfg.concessionReaction, features: features, location: locVar, locationMinN: cfg.locationMinN, residualFeatures: rf,
+      features: features, controls: controls, location: locVar, locationMinN: cfg.locationMinN, minVary: cfg.minVary,
+      countWeightCut: cfg.countWeightCut, lumpedWeight: cfg.lumpedWeight, normShare: cfg.normShare, normMin: cfg.normMin, huberK: cfg.huberK, irlsMaxIter: cfg.irlsMaxIter, irlsTol: cfg.irlsTol,
       poolRanges: poolUsed, timeKnotMonths: cfg.timeKnotMonths, timeMinSide: cfg.timeMinSide, timeSeason: String(cfg.timeSeason), timeScreenRatio: cfg.timeScreenRatio,
       fhfaLabel: fhfa ? fhfa.label : null, leaveCompsOut: !!cfg.leaveCompsOut,
       degree: 1, nk: fitOpts.nk, minspan: fitOpts.minspan, endspan: fitOpts.endspan, penalty: cfg.penalty, newvarPenalty: cfg.newvarPenalty,
       thresh: cfg.thresh, pmethod: "backward", nfold: nfold, ncross: ncross, halfSamples: H, masterSeed: cfg.masterSeed,
       timeGapDays: cfg.timeGapDays, expectedPositive: cfg.expectedPositive };
     var dataHash = await sha256(canon), cfgHash = await sha256(JSON.stringify(settings));
-    var timeMethod = "Quality-adjusted log-price index from " + nMarket + " clean sales: log price on " + features.join(", ") + (tmLoc.length ? ", location" : "") +
+    var timeMethod = "Quality-adjusted log-price index from " + nMarket + " clean sales: log price on " + modelVars.map(function (f) { return (LABELS[f] || f).toLowerCase(); }).join(", ") + (tmLoc.length ? ", location" : "") +
       (seasonOn ? ", quarter of the year (reported, not applied)" : "") + ", plus a time curve that may bend only on a " + cfg.timeKnotMonths + "-month calendar grid with at least " +
-      cfg.timeMinSide + " sales on each side, bends pruned by GCV (penalty " + gfmt(cfg.penalty) + "). Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.";
+      cfg.timeMinSide + " sales on each side, bends pruned by GCV (penalty " + gfmt(cfg.penalty) + "). Listings far from typical and prices far from the model count for less (listing and Huber weights). " +
+      "Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.";
     progress("Done", 1);
     return {
       version: VERSION, runDate: new Date().toISOString().slice(0, 10), settings: settings, notes: notes,
       data: { nFile: sales.length, nMarket: nMarket, n: n, nExcluded: excl.length, nOutsidePool: poolOut.length, poolRanges: poolUsed, poolDesc: poolDesc,
               window: [dayStr(dmin), dayStr(dmax)], exclusions: excl.concat(poolOut), timeGap: Math.round(timeGap) },
-      model: { terms: m.terms.map(function (t) { return { pred: t.pred, name: t.pred < 0 ? "(Intercept)" : colNames[t.pred], dir: t.dir, cut: t.cut, coef: t.coef }; }),
-               groups: groupsIn, rsq: m.rsq, grsq: m.grsq, cvrsq: cvr.cvrsq, cvsd: cvr.sd, rmse: Math.sqrt(m.rss / n),
-               mae: resid.reduce(function (sm, v) { return sm + Math.abs(v); }, 0) / n, k: k,
-               termcond: m.termcond, nForward: m.nForward, hsFreq: hsFreq },
+      model: { terms: terms.map(function (t) { return { pred: t.pred, name: t.pred < 0 ? "(Intercept)" : colNames[t.pred], dir: t.dir, cut: t.cut, coef: t.coef, forced: t.forced }; }),
+               groups: groupsIn, picked: mod.picked, forced: forcedIn, rsq: rsqW, grsq: grsqW, cvrsq: cvMean, cvsd: cvSd, cvFolds: cvRsq.length,
+               rmse: Math.sqrt(resid.reduce(function (sm, v) { return sm + v * v; }, 0) / n), mae: resid.reduce(function (sm, v) { return sm + Math.abs(v); }, 0) / n, k: k,
+               earthRsq: mod.earth.rsq, earthGrsq: mod.earth.grsq, termcond: mod.earth.termcond, nForward: mod.earth.nForward, hsFreq: hsFreq, nEff: nEff(wts) },
       time: { method: timeMethod, n: nMarket, knotMonths: cfg.timeKnotMonths, minSide: cfg.timeMinSide, seasonOn: seasonOn, season: tm.season,
               candidates: tm.candidateDates.map(dayStr), overallSlope: tm.terms.some(function (k2) { return k2 === null; }), bends: tmBends.map(dayStr),
               flat: !tm.terms.length, segments: tmSegments.map(function (s) { return { from: dayStr(s.from), to: dayStr(s.to), rate: s.rate, total: s.total }; }),
-              r2: tm.r2, halfSamples: H, trendShare: H > 0 ? tmFreq / H : NaN, months: timeMonths, years: timeYears, mixShift: mixShift, fhfa: fhfa },
-      features: features, locVar: locVar, subjectLocation: subjLoc, locStatus: locStatus, subjectRow: subjRow,
-      comps: compRows.map(function (cr) { return { mls_id: cr.mls_id, address: cr.address, sale_price: cr.sale_price, concessions: cr.concessions, price: cr.price_comp,
-        sale_age: cr.sale_age, date: dayStr(cr[dateKey]), inFit: cr._inFit, inMarket: cr._inMarket, location: cr._loc.raw }; }),
+              r2: tm.r2, halfSamples: H, trendShare: H > 0 ? tmFreq / H : NaN, months: timeMonths, years: timeYears, baseYear: baseYear, mixShift: mixShift, fhfa: fhfa,
+              nDown: tmDown, nEff: nEff(tm.w) },
+      features: features, eligible: eligible, controls: ctrlUsed, thin: thinPriced, varyInfo: varyInfo, locVar: locVar, subjectLocation: subjLoc, locStatus: locStatus, subjectRow: subjRow,
+      comps: compRows.map(function (cr) { return { mls_id: cr.mls_id, address: cr.address, sale_price: cr.sale_price, price: cr.price_comp,
+        sale_age: cr.sale_age, date: dayStr(cr[dateKey]), inFit: cr._inFit, inMarket: cr._inMarket, location: cr._loc.raw, listingWeight: cr._lw.w, listingWhy: cr._lw.why.join("; ") }; }),
       grid: grid, segments: segments, curves: curves, ranges: ranges, locEffects: locEffects,
-      residual: residTable, concession: concDiag, compDiag: compDiag, battery: battery, localVal: localVal, bracketing: bracketing,
+      compDiag: compDiag, battery: battery, localVal: localVal, bracketing: bracketing,
       repeatSales: repeatSales, influence: influence,
+      weights: { listing: listingRows, nListing: listingRows.length, normK: normK, price: priceRows, nPrice: priceRows.length },
       modelData: d.map(function (rw, ii) {
         var o = { mls_id: rw.mls_id, address: rw.address, sale_price: rw.sale_price, price_used: rw.price_used, date: dayStr(rw.date_used), sale_age: rw.sale_age };
-        features.forEach(function (f) { o[f] = rw[f]; }); if (locVar) o.location = rw.loc;
+        modelVars.forEach(function (f) { o[f] = rw[f]; }); if (locVar) o.location = rw.loc;
         o.time_factor = rw.time_factor; o.price_time_adjusted = rw.price_ta;
-        o.model_estimate = fitted[ii]; o.residual = resid[ii]; return o;
+        o.model_estimate = fitted[ii]; o.residual = resid[ii]; o.listing_weight = rw.lw; o.price_weight = hub[ii]; o.weight = wts[ii]; return o;
       }),
-      repro: { dataSha256: dataHash, configSha256: cfgHash, masterSeed: cfg.masterSeed, rng: "Mersenne-Twister, R set.seed() compatible (sample.kind Rejection)", engine: "MarsEngine " + VERSION + " (port of R earth 5.3 forward pass, knot search and leaps backward pruning)" }
+      repro: { dataSha256: dataHash, configSha256: cfgHash, masterSeed: cfg.masterSeed, rng: "Mersenne-Twister, R set.seed() compatible (sample.kind Rejection)",
+               engine: "MarsEngine " + VERSION + " (port of R earth 5.3 forward pass, knot search and leaps backward pruning; weighted refit)" }
     };
   }
 
-  return { VERSION: VERSION, ROLES: ROLES, LABELS: LABELS, UNITS: UNITS, DEFAULTS: DEFAULTS,
+  return { VERSION: VERSION, ROLES: ROLES, LABELS: LABELS, UNITS: UNITS, DEFAULTS: DEFAULTS, COUNT_VARS: COUNT_VARS,
            parseCSV: parseCSV, autoMap: autoMap, isStandard: isStandard, mapRows: mapRows, num: num, dayNum: dayNum, dayStr: dayStr, run: run, quantile7: quantile7,
-           fmtMoney: fmtMoney, fmtRate: fmtRate, fmtVal: fmtVal, fmtPct: fmtPct, unitOf: unitOf, sha256js: sha256js, parseIndexSeries: parseIndexSeries };
+           fmtMoney: fmtMoney, fmtRate: fmtRate, fmtVal: fmtVal, fmtPct: fmtPct, unitOf: unitOf, sha256js: sha256js, parseIndexSeries: parseIndexSeries, countText: countText };
 })(typeof MarsEngine !== "undefined" ? MarsEngine : require("./mars_engine.js"));
 if (typeof module !== "undefined") module.exports = MarsAnalysis;

@@ -1,2 +1,2 @@
-effective_date,address,gla,bg_fin_sf,lot_ac,ag_baths,garage,year_built,levels,zip,fireplaces,pool,deck,porch,carport,subject_is_new
-2026-06-06,Demo subject,1650,700,3.5,2,2,1995,2,22406,1,0,1,1,0,0
+address,gla,beds_ag,fb_ag,hb_ag,garage,carport,pool,lot_sf,year_built,levels,effective_date
+Demo subject,2100,4,2,1,2,0,0,15000,1995,2,2026-09-15

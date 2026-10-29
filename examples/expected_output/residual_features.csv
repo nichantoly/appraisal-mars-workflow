@@ -1,6 +1,0 @@
-"feature","estimate","std_error","t_value","n_nonzero","note"
-"fireplaces",3687,3203,1.15,116,"weak (|t| < 2): direction not resolved"
-"pool",16354,6834,2.39,23,"residual-layer estimate"
-"deck",-3246,4030,-0.81,130,"weak (|t| < 2): direction not resolved"
-"porch",-285,4489,-0.06,65,"weak (|t| < 2): direction not resolved"
-"carport",-342,7093,-0.05,21,"weak (|t| < 2): direction not resolved"

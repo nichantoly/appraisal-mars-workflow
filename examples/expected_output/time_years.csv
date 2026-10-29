@@ -1,4 +1,7 @@
-"year","sales_as_pulled","median_price","median_yoy_pct","median_to_effective_year_pct","new_construction_share_pct","resale_median","resale_median_to_effective_year_pct","clean_sales","index_pct_to_effective_date","index_half_sample_p2.5","index_half_sample_p97.5"
-2024,59,400600,NA,5.29,0,400600,5.29,56,6.59,0,10.28
-2025,125,423300,5.67,-0.35,0,423300,-0.35,123,3.59,-2.35,5.56
-2026,65,421800,-0.35,0,0,421800,0,62,0.71,-0.88,1.09
+"year","sales_as_pulled","median_price","median_yoy_pct","median_to_base_year_pct","new_construction_share_pct","resale_median","resale_median_to_base_year_pct","clean_sales","index_pct_to_effective_date","index_half_sample_p2.5","index_half_sample_p97.5"
+2021,32,350950,NA,19.05,0,350950,19.05,31,21.13,14.21,25.53
+2022,76,369150,5.19,13.18,0,369150,13.18,70,17.35,11.52,21.54
+2023,55,353500,-4.24,18.19,0,353500,18.19,53,12.98,8.28,18.75
+2024,57,394200,11.51,5.99,0,394200,5.99,54,8.76,3.22,13.09
+2025,67,401700,1.9,4.01,0,401700,4.01,66,4.7,0,6.96
+2026,33,417800,4.01,0,0,417800,0,33,1.28,0,1.88

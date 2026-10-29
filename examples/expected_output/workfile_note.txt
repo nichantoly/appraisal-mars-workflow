@@ -1,15 +1,17 @@
-WORKFILE NOTE - MARS / Regression Adjustment Support v2.2.0
-Run date: 2026-10-29   Effective date: 2026-06-06   Sale age basis: closing date
-Data: 241 clean sales of 262 in the export (21 excluded, reasons in exclusions.csv). Window 2024-07-09 to 2026-06-03.
-Time index: Quality-adjusted log-price index from 241 clean sales: log price on gla, bg_fin_sf, lot_ac, ag_baths, garage, year_built, levels, location, plus a time curve that may bend only on a 6-month calendar grid with at least 20 sales on each side, bends pruned by GCV (penalty 2). Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.
-Time index result: overall slope kept. Segments: 2024-07-09 to 2026-06-06 +0.32%/mo. R-squared 0.794.
-Adjustment pool: 241 sales (no similarity ranges set); prices time-adjusted to the effective date, then MARS (earth 5.3.3, degree 1, 11 terms). RSq 0.806, GRSq 0.769, CVRSq 0.752 (sd 0.058, 5-fold x 16). RMSE $31,027, MAE $24,839.
-Median-to-median as pulled (yearly medians, 2026 year to date as the base): 2024 +5.3%, 2025 -0.3%.
-FHFA check: no FHFA series supplied.
+WORKFILE NOTE: MARS / Regression Adjustment Support v2.3.0
+Run date: 2026-10-29   Effective date: 2026-09-15   Sale age basis: closing date
+Data: 307 clean sales of 320 in the export (13 excluded, reasons in exclusions.csv). Window 2021-05-08 to 2026-08-18.
+Priced lines: Site, Bedrooms, Full baths, Half baths, Gross living area, Garage, Carport, Pool. Background controls (never on the grid): year built, levels.
+Weights: 37 listing(s) with counts far from typical for their size counted for less (listing_weights.csv); 53 of 281 pool sales priced far from the model got Huber weights below 1. Nothing was dropped for either.
+Time index: Quality-adjusted log-price index from 307 clean sales: log price on site, bedrooms, full baths, half baths, gross living area, garage, carport, pool, year built, levels, quarter of the year (reported, not applied), plus a time curve that may bend only on a 6-month calendar grid with at least 20 sales on each side, bends pruned by GCV (penalty 2). Listings far from typical and prices far from the model count for less (listing and Huber weights). Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.
+Time index result: overall slope kept. Segments: 2021-05-08 to 2026-09-15 +0.32%/mo. R-squared 0.857. Season vs Q1 (reported, not applied): Q2 -1.2%, Q3 -0.1%, Q4 +0.4%.
+Adjustment pool: 281 sales inside the similarity ranges (lot_sf 5,000 to any; year_built 1968 to any); prices time-adjusted to the effective date, then MARS (earth 5.3.3, degree 1) with any priced variable it left out put back as a straight line, refit with weights: 15 terms. RSq 0.862, GRSq 0.829 (weighted), CVRSq 0.769 (sd 0.051, 5-fold x 16). RMSE $33,442, MAE $25,458.
+Median-to-median as pulled (yearly medians, 2026 as the base year to date): 2021 +19.1%, 2022 +13.2%, 2023 +18.2%, 2024 +6.0%, 2025 +4.0%.
+FHFA check: FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A) (annual, 2010 to 2025), compared over the same periods; 2 time line(s) flagged.
 Leave-comps-out check: 0 line(s) moved outside their half-sample range when the comps were left out of the fit.
-Data rules: gross prices (concessions not deducted); sales after the effective date excluded; likely flip purchases excluded; sales with no MLS exposure not checked (no MLS entry date in the file).
-Data SHA-256: a9c2463d0e6f9ee1b8223353d91a0048b53434124b0295c953ce5dbdf1c4b224   Config SHA-256: eecf02661f50c9fa7c6a31fe21c6b7dc335878468b43e3775ee0afdcd3e966bc   Master seed: 20260606
-Review flags: 5 grid line(s) flagged (REVERSED SEGMENT or SIGN 5, FHFA CHECK 0, COMP INFLUENCE 0); see comp_grid.csv, review_flag column.
+Data rules: gross prices; sales after the effective date excluded; likely flip purchases excluded; sales with no MLS exposure excluded.
+Data SHA-256: 3a51a13ae99dd32c9478de9efe1f9e7fa6c5850955cc8fa75dabe9b3f6226b4d   Config SHA-256: f68c289609bb609bce85c00eabe39d7b43c93a472cbb610f2771d2cbd8e9f2be   Master seed: 20260606
+Review flags: 4 grid line(s) flagged (REVERSED SEGMENT 2, FHFA CHECK 2, COMP INFLUENCE 0); see comp_grid.csv, review_flag column.
 
 Scope and use: statistical analysis supporting the appraiser's adjustment development. Per-unit figures and line amounts are model estimates with stated uncertainty, not confirmed market facts. The appraiser makes all final adjustment selections, within or outside the supported ranges. No indicated, reconciled or opinion-of-value figure is produced. Prepared with reference to USPAP Advisory Opinion 41 (Use of Technology in an Appraisal or Appraisal Review Assignment): the tool cannot comply with USPAP; the appraiser remains responsible for judging whether this output is accurate and relevant to the assignment.
 
