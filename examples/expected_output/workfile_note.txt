@@ -1,10 +1,15 @@
-WORKFILE NOTE - MARS / Regression Adjustment Support v2.1.0
-Run date: 2026-10-28   Effective date: 2026-06-06   Sale age basis: closing date
-Data: 241 sales modeled of 262 in export (21 excluded, reasons in exclusions.csv). Window 2024-07-09 to 2026-06-03.
-Model: earth 5.3.3, degree 1, 13 terms. RSq 0.822, GRSq 0.780, CVRSq 0.751 (sd 0.054, 5-fold x 16). RMSE $28,834, MAE $23,477.
+WORKFILE NOTE - MARS / Regression Adjustment Support v2.2.0
+Run date: 2026-10-29   Effective date: 2026-06-06   Sale age basis: closing date
+Data: 241 clean sales of 262 in the export (21 excluded, reasons in exclusions.csv). Window 2024-07-09 to 2026-06-03.
+Time index: Quality-adjusted log-price index from 241 clean sales: log price on gla, bg_fin_sf, lot_ac, ag_baths, garage, year_built, levels, location, plus a time curve that may bend only on a 6-month calendar grid with at least 20 sales on each side, bends pruned by GCV (penalty 2). Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.
+Time index result: overall slope kept. Segments: 2024-07-09 to 2026-06-06 +0.32%/mo. R-squared 0.794.
+Adjustment pool: 241 sales (no similarity ranges set); prices time-adjusted to the effective date, then MARS (earth 5.3.3, degree 1, 11 terms). RSq 0.806, GRSq 0.769, CVRSq 0.752 (sd 0.058, 5-fold x 16). RMSE $31,027, MAE $24,839.
+Median-to-median as pulled (yearly medians, 2026 year to date as the base): 2024 +5.3%, 2025 -0.3%.
+FHFA check: no FHFA series supplied.
+Leave-comps-out check: 0 line(s) moved outside their half-sample range when the comps were left out of the fit.
 Data rules: gross prices (concessions not deducted); sales after the effective date excluded; likely flip purchases excluded; sales with no MLS exposure not checked (no MLS entry date in the file).
-Data SHA-256: 12187094becabda07f5f3a008b53c3dccb6578f17d02088864fc682e4d2e1357   Config SHA-256: 26efd0ae255bebeac4b535ea8c34a51a911ba76d20d0166276b3968df0ccec17   Master seed: 20260606
-Review flags: 5 grid line(s) carry a REVERSED SEGMENT or REVERSED SIGN flag (comp_grid.csv, review_flag column).
+Data SHA-256: a9c2463d0e6f9ee1b8223353d91a0048b53434124b0295c953ce5dbdf1c4b224   Config SHA-256: eecf02661f50c9fa7c6a31fe21c6b7dc335878468b43e3775ee0afdcd3e966bc   Master seed: 20260606
+Review flags: 5 grid line(s) flagged (REVERSED SEGMENT or SIGN 5, FHFA CHECK 0, COMP INFLUENCE 0); see comp_grid.csv, review_flag column.
 
 Scope and use: statistical analysis supporting the appraiser's adjustment development. Per-unit figures and line amounts are model estimates with stated uncertainty, not confirmed market facts. The appraiser makes all final adjustment selections, within or outside the supported ranges. No indicated, reconciled or opinion-of-value figure is produced. Prepared with reference to USPAP Advisory Opinion 41 (Use of Technology in an Appraisal or Appraisal Review Assignment): the tool cannot comply with USPAP; the appraiser remains responsible for judging whether this output is accurate and relevant to the assignment.
 

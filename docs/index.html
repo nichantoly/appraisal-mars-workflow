@@ -49,6 +49,7 @@
   --chip-zero: #ebe9e3;
   --series-1: #2a78d6;
   --series-2: #eb6834;
+  --series-3: #1baf7a;
   --grid: #e1e0d9;
   --axis: #c3c2b7;
   --dot: rgba(18, 26, 43, 0.2);
@@ -66,7 +67,7 @@
     --good: #5cc75c; --warn: #f0b43c; --serious: #f09a72; --bad: #f07c6c;
     --good-icon: #0ca30c; --warn-icon: #fab219; --serious-icon: #ec835a; --bad-icon: #e05252; --neutral-icon: #898781;
     --chip-ok: #14301b; --chip-mid: #332a17; --chip-warn: #3a2219; --chip-bad: #3c1d1c; --chip-zero: #212938;
-    --series-1: #3987e5; --series-2: #d95926; --grid: #252d3c; --axis: #3a4458; --dot: rgba(238, 240, 244, 0.2);
+    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --grid: #252d3c; --axis: #3a4458; --dot: rgba(238, 240, 244, 0.2);
     --shadow: none; --tip-bg: #eef0f4; --tip-ink: #0e131d;
   }
 }
@@ -79,7 +80,7 @@
   --good: #5cc75c; --warn: #f0b43c; --serious: #f09a72; --bad: #f07c6c;
   --good-icon: #0ca30c; --warn-icon: #fab219; --serious-icon: #ec835a; --bad-icon: #e05252; --neutral-icon: #898781;
   --chip-ok: #14301b; --chip-mid: #332a17; --chip-warn: #3a2219; --chip-bad: #3c1d1c; --chip-zero: #212938;
-  --series-1: #3987e5; --series-2: #d95926; --grid: #252d3c; --axis: #3a4458; --dot: rgba(238, 240, 244, 0.2);
+  --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --grid: #252d3c; --axis: #3a4458; --dot: rgba(238, 240, 244, 0.2);
   --shadow: none; --tip-bg: #eef0f4; --tip-ink: #0e131d;
 }
 
@@ -183,7 +184,7 @@ input.missing { border-color: var(--bad-icon); background: var(--chip-bad); }
 .check input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); flex: 0 0 auto; }
 .check .inl { display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .check .inl input { width: 74px; min-height: 32px; padding: 5px 7px; display: inline-block; }
-.group { border: 1px solid var(--line); border-radius: 9px; padding: 14px 16px 16px; display: grid; gap: 12px; background: var(--paper); min-width: 0; }
+.group { border: 1px solid var(--line); border-radius: 9px; padding: 14px 16px 16px; display: grid; gap: 12px; align-content: start; background: var(--paper); min-width: 0; }
 .group > h4 { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
 .cols-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
 
@@ -337,6 +338,14 @@ table.matrix tbody th small.sv { display: none; }
 .keydot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: var(--series-2); }
 .keydot.subj { background: var(--ink); border-radius: 1px; transform: rotate(45deg); width: 7px; height: 7px; }
 .keydot.sale { background: var(--dot); }
+.keyband { width: 14px; height: 10px; display: inline-block; border-radius: 2px; background: var(--series-1); opacity: 0.22; }
+.keysq { width: 9px; height: 9px; display: inline-block; border-radius: 1.5px; background: var(--series-3); }
+.keydia { width: 7px; height: 7px; display: inline-block; transform: rotate(45deg); border: 2px solid var(--ink-2); background: var(--surface); box-sizing: border-box; }
+.keydash { width: 0; height: 12px; display: inline-block; border-left: 1px dashed var(--ink-2); }
+.warn-text { color: var(--serious); font-weight: 600; }
+.fields.ranges { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+#fhfa-own { margin-top: 2px; }
+#fhfa-own textarea { min-height: 112px; font-size: 0.8rem; }
 .tip { position: absolute; pointer-events: none; background: var(--tip-bg); color: var(--tip-ink); font-size: 0.76rem; line-height: 1.35; padding: 7px 9px; border-radius: 6px; max-width: 230px; z-index: 5; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18); }
 .tip b { font-family: "IBM Plex Mono", monospace; font-weight: 600; display: block; font-size: 0.82rem; }
 
@@ -381,7 +390,7 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
   <div class="wrap">
     <div class="eyebrow"><span class="rule"></span>DC Metro Appraisals <span aria-hidden="true">&middot;</span> Appraiser tools</div>
     <h1>MARS Adjustment Support</h1>
-    <p class="lede">Pull adjustment support out of your own MLS export: a dollar amount for every grid line, how well each one holds up, and the paper trail to defend it. Built for litigation work, including divorce assignments with retrospective effective dates.</p>
+    <p class="lede">Pull adjustment support out of your own MLS export: a percent market-conditions adjustment from every sale in the export, a dollar amount for every other grid line, how well each one holds up, and the paper trail to defend it. Built for litigation work, including divorce assignments with retrospective effective dates.</p>
     <div class="proof">
       <div><span class="figure">0 uploads</span><b>Your data stays here</b><span>The MLS file is read right here in the browser and never sent anywhere. Close the tab and it is gone.</span></div>
       <div><span class="figure">71 / 71</span><b>Test fits match R</b><span>The engine reproduces the R earth package model for model, and the open R reference script line for line.</span></div>
@@ -409,7 +418,7 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
     <div class="pbody">
       <div class="phead">
         <h2 id="h-data">Load the market</h2>
-        <p class="hint">Export closed sales from the subject's market as a CSV, same property type, ideally 150 to 300 sales. Bright MLS (Spark) column names map on their own. Anything else, map by hand below. Blank garage, half bath, fireplace and carport fields are read as none, the way the MLS means them.</p>
+        <p class="hint">One CSV export: every closed sale of the subject's property type in its market, over the whole window you need (up to six years is fine). Every clean sale in it builds the time index; the similarity ranges in step 02 pick which of them price the other adjustments. Bright MLS (Spark) column names map on their own. Blank garage, half bath, fireplace and carport fields are read as none, the way the MLS means them.</p>
       </div>
       <div class="drop" id="drop">
         <input type="file" id="file" accept=".csv,text/csv">
@@ -464,6 +473,38 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
           <div id="amen-boxes" class="fields"></div>
         </div>
       </div>
+      <div class="cols-2">
+        <div class="group" id="pool-group">
+          <h4>Adjustment pool: similarity ranges</h4>
+          <p class="hint small">Only sales inside these ranges price the feature adjustments. The time index still uses every clean sale in the export. Leave a box blank for no limit.</p>
+          <div class="fields ranges">
+            <label class="field"><span class="l">GLA from (sf)</span><input type="number" id="pr-gla-lo" class="mono-in" step="1" min="0" inputmode="numeric"></label>
+            <label class="field"><span class="l">GLA to (sf)</span><input type="number" id="pr-gla-hi" class="mono-in" step="1" min="0" inputmode="numeric"></label>
+            <label class="field"><span class="l">Year built from</span><input type="number" id="pr-yb-lo" class="mono-in" step="1" min="1700" max="2100" inputmode="numeric"></label>
+            <label class="field"><span class="l">Year built to</span><input type="number" id="pr-yb-hi" class="mono-in" step="1" min="1700" max="2100" inputmode="numeric"></label>
+            <label class="field"><span class="l">Lot from (acres)</span><input type="number" id="pr-lot-lo" class="mono-in" step="0.01" min="0" inputmode="decimal"></label>
+            <label class="field"><span class="l">Lot to (acres)</span><input type="number" id="pr-lot-hi" class="mono-in" step="0.01" min="0" inputmode="decimal"></label>
+          </div>
+          <div class="row">
+            <button type="button" class="btn small" id="pr-subject">From the subject: GLA &plusmn;500 sf, built &plusmn;15 years</button>
+            <button type="button" class="btn small ghost" id="pr-clear">Clear ranges</button>
+          </div>
+          <p class="small" id="pool-count"></p>
+        </div>
+        <div class="group" id="fhfa-group">
+          <h4>FHFA check</h4>
+          <p class="hint small">FHFA's house price index, compared with this export's own index over the same years. A comp where they disagree gets a review flag; nothing is replaced.</p>
+          <label class="field"><span class="l">FHFA series</span><select id="fhfa-preset"></select><small id="fhfa-status"></small></label>
+          <div id="fhfa-own" class="fields wide" hidden>
+            <label class="field"><span class="l">Paste index values</span><textarea id="fhfa-text" rows="5" class="mono-in" placeholder="observation_date,ATNHPIUS51179A&#10;2024-01-01,287.23&#10;2025-01-01,299.78"></textarea><small>A FRED download (observation_date, value) or one period per line: 2025 299.78, 2026Q2 410.5, 2026-07 412.0.</small></label>
+            <div class="field">
+              <label class="field"><span class="l">Label for the workfile</span><input type="text" id="fhfa-label" placeholder="FHFA HPI, county or metro, frequency"></label>
+              <input type="file" id="fhfa-file" accept=".csv,.txt,text/csv,text/plain" hidden>
+              <button type="button" class="btn small" id="fhfa-file-btn">Load a FRED or FHFA file</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <details class="more">
         <summary>Advanced settings</summary>
         <div class="inner">
@@ -474,7 +515,12 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
             <label class="field"><span class="l">GCV penalty</span><input type="number" id="a-pen" value="2" min="1" max="6" step="0.5"></label>
             <label class="field"><span class="l">New-variable penalty</span><input type="number" id="a-nvp" value="0.1" min="0" max="1" step="0.05"></label>
             <label class="field"><span class="l">Forward-pass threshold</span><input type="number" id="a-thr" value="0.001" min="0.0001" max="0.05" step="0.0005"></label>
+            <label class="field"><span class="l">Time index may bend every</span><select id="a-knot"><option value="3">3 months</option><option value="6" selected>6 months</option><option value="12">12 months</option></select><small>On the calendar: Jan 1 and Jul 1 for 6 months.</small></label>
+            <label class="field"><span class="l">Sales needed on each side of a bend</span><input type="number" id="a-side" value="20" min="5" max="200" step="1"></label>
+            <label class="field"><span class="l">Quarter-of-year control</span><select id="a-season"><option value="auto" selected>Auto (2+ years of sales)</option><option value="on">On</option><option value="off">Off</option></select><small>Keeps the curve from chasing the spring and winter swing. Reported, not applied.</small></label>
+            <label class="field"><span class="l">Price screen (times the time model)</span><input type="number" id="a-screen" value="3" min="0" max="20" step="0.5"><small>A sale this many times above or below what the time model expects is left out and listed. 0 turns it off.</small></label>
           </div>
+          <label class="check"><input type="checkbox" id="a-loo" checked><span>Leave-comps-out check: refit the adjustment model without your comps and flag any line they move outside its range</span></label>
           <p class="hint">nk, minspan and endspan follow the earthUI recipe for the number of sales, and cross-validation folds follow its bands. Both are shown with the results.</p>
         </div>
       </details>
@@ -531,7 +577,7 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
     <div class="pbody">
       <div class="phead">
         <h2 id="h-run">Run the workup</h2>
-        <p class="hint">One run fits the MARS model, cross-validates it, and refits it on 200 random halves of the data to see which adjustments hold up. A few seconds for a few hundred sales.</p>
+        <p class="hint">One run builds the time index from every clean sale, brings the adjustment pool to the effective date, fits the MARS model, cross-validates it, and refits both on 200 random halves of the data to see which adjustments hold up. Several seconds for a thousand sales.</p>
       </div>
       <div class="checklist" id="checklist"></div>
       <div class="row">
@@ -556,8 +602,9 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
     <h3>Method, validation and limits</h3>
     <div class="cols-2">
       <p><b>Model.</b> Multivariate adaptive regression splines (Friedman, 1991), reimplemented in JavaScript from the source of the R earth package by Stephen Milborrow: forward pass, knot search, GCV backward pruning. Settings, the adjustment convention (value contribution of the subject minus the comp, per variable) and the residual pricing of rare amenities follow W. Craytor's open-source earthUI. The browser engine matches R earth on all 71 test fits, including a 1,488-sale fit on earthUI's demo file, and in every test case it matched the open R reference script line for line, folds and half-samples included.</p>
+      <p><b>Time.</b> Market conditions come from a separate quality-adjusted log-price index fit on every clean sale in the export: log price on the model features, location and quarter of the year, plus a time curve that may bend only on a calendar grid (Jan 1 and Jul 1 by default) where at least 20 sales sit on each side, with bends pruned by GCV. Prices in the adjustment pool are brought to the effective date with it before MARS prices the features, and each comp's time line is its price times the index change. In 32 synthetic markets with known trends (160 checks), the time line's half-sample range held the true change every time: treat it as a conservative range.</p>
       <p><b>Uncertainty.</b> Each line carries a half-sample range: the full procedure refit on 200 random halves of the sales, so the knots and the variable choices are allowed to move. In 10 synthetic markets with known true adjustments (285 lines) that range held the true amount 94% of the time; the textbook &plusmn;1.96 SE interval held it 56% of the time. Every line rated Supported or Size variable had the right sign.</p>
-      <p><b>Status rules.</b> Supported: same sign in at least 90% of the refits. Size variable: at least 60%. Unstable: under 60%. Lines are also flagged when the comp or subject sits outside the modeled sales (extrapolation) and when a segment runs against the normal market direction.</p>
+      <p><b>Status rules.</b> Supported: same sign in at least 90% of the refits. Size variable: at least 60%. Unstable: under 60%. Lines are also flagged when the comp or subject sits outside the modeled sales (extrapolation), when a segment runs against the normal market direction, when FHFA's index disagrees with this export's index over the same years, and when leaving your comps out of the fit moves a line outside its range.</p>
       <p><b>Limits.</b> The model only sees what the MLS records. Condition, quality, view and finish are not in the data, which is why the comp check shows how far each comp sold above or below the model. The degree-2 interaction check runs in the R reference script, not on this page. This page produces adjustment support only: no indicated, reconciled or opinion-of-value figure.</p>
     </div>
     <p class="scope" id="scope-text"></p>
@@ -831,6 +878,7 @@ DEMO100259,618 Meadow Bend Way,508900,2025-11-28,2026-01-09,"$7,175.32",2140,Fal
 DEMO100260,620 Quail Hill Ct,436600,2025-10-02,2025-10-26,$0.00,2080,True,410,240,1.88,1,1,,True,1,,,No Pool,"Deck(s), Porch(es)",1980,1,22556,Standard,CLS
 DEMO100261,622 Briar Gate Ct,434700,2025-07-09,2025-08-02,$0.00,1990,False,,,4.99,2,1,,True,1,,,Yes - Personal,Deck(s),1968,2,22556,Standard,CLS
 </script>
+<script type="application/json" id="fhfa-presets">[{"id":"ATNHPIUS11001A","name":"District of Columbia","label":"FHFA all-transactions HPI, District of Columbia (FRED ATNHPIUS11001A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS11001A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":220.88},{"date":"2011-01-01","value":223.16},{"date":"2012-01-01","value":230.23},{"date":"2013-01-01","value":246.38},{"date":"2014-01-01","value":269.11},{"date":"2015-01-01","value":284.33},{"date":"2016-01-01","value":303.42},{"date":"2017-01-01","value":318.48},{"date":"2018-01-01","value":333.83},{"date":"2019-01-01","value":346.66},{"date":"2020-01-01","value":353.9},{"date":"2021-01-01","value":378.32},{"date":"2022-01-01","value":406.69},{"date":"2023-01-01","value":395.15},{"date":"2024-01-01","value":396.76},{"date":"2025-01-01","value":398.36}],"match":["washington,dc","district of columbia,dc","district of columbia","dc"]},{"id":"ATNHPIUS51510A","name":"Alexandria city, VA","label":"FHFA all-transactions HPI, Alexandria city, VA (FRED ATNHPIUS51510A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51510A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":210.27},{"date":"2011-01-01","value":211.64},{"date":"2012-01-01","value":215.19},{"date":"2013-01-01","value":221.85},{"date":"2014-01-01","value":235.61},{"date":"2015-01-01","value":241.97},{"date":"2016-01-01","value":249.15},{"date":"2017-01-01","value":253.6},{"date":"2018-01-01","value":258.83},{"date":"2019-01-01","value":272.77},{"date":"2020-01-01","value":282.94},{"date":"2021-01-01","value":296.56},{"date":"2022-01-01","value":317.59},{"date":"2023-01-01","value":326.28},{"date":"2024-01-01","value":345.26},{"date":"2025-01-01","value":348.7}],"match":["alexandria city,va","alexandria,va"]},{"id":"ATNHPIUS51013A","name":"Arlington County, VA","label":"FHFA all-transactions HPI, Arlington County, VA (FRED ATNHPIUS51013A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51013A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":210.2},{"date":"2011-01-01","value":213.14},{"date":"2012-01-01","value":217.4},{"date":"2013-01-01","value":227.31},{"date":"2014-01-01","value":239.83},{"date":"2015-01-01","value":245.61},{"date":"2016-01-01","value":252.12},{"date":"2017-01-01","value":255.91},{"date":"2018-01-01","value":266.38},{"date":"2019-01-01","value":278.61},{"date":"2020-01-01","value":284.98},{"date":"2021-01-01","value":297.29},{"date":"2022-01-01","value":320.65},{"date":"2023-01-01","value":327.45},{"date":"2024-01-01","value":348.68},{"date":"2025-01-01","value":353.68}],"match":["arlington,va"]},{"id":"ATNHPIUS51059A","name":"Fairfax County, VA","label":"FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51059A.txt","updated":"2026-03-31","values":[{"date":"2010-01-01","value":179.32},{"date":"2011-01-01","value":180.87},{"date":"2012-01-01","value":184.21},{"date":"2013-01-01","value":192.44},{"date":"2014-01-01","value":203.52},{"date":"2015-01-01","value":207.0},{"date":"2016-01-01","value":210.3},{"date":"2017-01-01","value":215.03},{"date":"2018-01-01","value":220.22},{"date":"2019-01-01","value":228.66},{"date":"2020-01-01","value":236.38},{"date":"2021-01-01","value":253.55},{"date":"2022-01-01","value":278.66},{"date":"2023-01-01","value":293.45},{"date":"2024-01-01","value":313.13},{"date":"2025-01-01","value":319.72}],"match":["fairfax,va"]},{"id":"ATNHPIUS51061A","name":"Fauquier County, VA","label":"FHFA all-transactions HPI, Fauquier County, VA (FRED ATNHPIUS51061A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51061A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":142.92},{"date":"2011-01-01","value":141.87},{"date":"2012-01-01","value":142.12},{"date":"2013-01-01","value":150.92},{"date":"2014-01-01","value":159.32},{"date":"2015-01-01","value":163.11},{"date":"2016-01-01","value":167.24},{"date":"2017-01-01","value":174.28},{"date":"2018-01-01","value":179.59},{"date":"2019-01-01","value":187.35},{"date":"2020-01-01","value":192.73},{"date":"2021-01-01","value":216.12},{"date":"2022-01-01","value":239.07},{"date":"2023-01-01","value":252.82},{"date":"2024-01-01","value":269.29},{"date":"2025-01-01","value":287.0}],"match":["fauquier,va"]},{"id":"ATNHPIUS24031A","name":"Montgomery County, MD","label":"FHFA all-transactions HPI, Montgomery County, MD (FRED ATNHPIUS24031A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS24031A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":178.4},{"date":"2011-01-01","value":175.59},{"date":"2012-01-01","value":174.85},{"date":"2013-01-01","value":180.64},{"date":"2014-01-01","value":187.71},{"date":"2015-01-01","value":189.66},{"date":"2016-01-01","value":194.37},{"date":"2017-01-01","value":199.19},{"date":"2018-01-01","value":203.69},{"date":"2019-01-01","value":208.24},{"date":"2020-01-01","value":211.17},{"date":"2021-01-01","value":229.53},{"date":"2022-01-01","value":252.77},{"date":"2023-01-01","value":267.44},{"date":"2024-01-01","value":281.54},{"date":"2025-01-01","value":285.26}],"match":["montgomery,md"]},{"id":"ATNHPIUS24033A","name":"Prince George's County, MD","label":"FHFA all-transactions HPI, Prince George's County, MD (FRED ATNHPIUS24033A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS24033A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":152.43},{"date":"2011-01-01","value":140.3},{"date":"2012-01-01","value":135.86},{"date":"2013-01-01","value":141.97},{"date":"2014-01-01","value":155.61},{"date":"2015-01-01","value":165.84},{"date":"2016-01-01","value":174.6},{"date":"2017-01-01","value":186.29},{"date":"2018-01-01","value":194.64},{"date":"2019-01-01","value":203.12},{"date":"2020-01-01","value":212.83},{"date":"2021-01-01","value":236.95},{"date":"2022-01-01","value":261.3},{"date":"2023-01-01","value":273.3},{"date":"2024-01-01","value":284.82},{"date":"2025-01-01","value":292.86}],"match":["prince georges,md"]},{"id":"ATNHPIUS51153A","name":"Prince William County, VA","label":"FHFA all-transactions HPI, Prince William County, VA (FRED ATNHPIUS51153A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51153A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":148.31},{"date":"2011-01-01","value":148.72},{"date":"2012-01-01","value":153.38},{"date":"2013-01-01","value":163.18},{"date":"2014-01-01","value":174.05},{"date":"2015-01-01","value":178.8},{"date":"2016-01-01","value":184.0},{"date":"2017-01-01","value":193.06},{"date":"2018-01-01","value":200.07},{"date":"2019-01-01","value":206.37},{"date":"2020-01-01","value":214.38},{"date":"2021-01-01","value":239.7},{"date":"2022-01-01","value":266.83},{"date":"2023-01-01","value":282.68},{"date":"2024-01-01","value":307.02},{"date":"2025-01-01","value":316.05}],"match":["prince william,va"]},{"id":"ATNHPIUS51177A","name":"Spotsylvania County, VA","label":"FHFA all-transactions HPI, Spotsylvania County, VA (FRED ATNHPIUS51177A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51177A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":149.63},{"date":"2011-01-01","value":144.37},{"date":"2012-01-01","value":142.7},{"date":"2013-01-01","value":150.29},{"date":"2014-01-01","value":158.0},{"date":"2015-01-01","value":165.24},{"date":"2016-01-01","value":169.24},{"date":"2017-01-01","value":179.93},{"date":"2018-01-01","value":185.23},{"date":"2019-01-01","value":192.31},{"date":"2020-01-01","value":199.51},{"date":"2021-01-01","value":225.8},{"date":"2022-01-01","value":260.03},{"date":"2023-01-01","value":276.11},{"date":"2024-01-01","value":298.62},{"date":"2025-01-01","value":301.78}],"match":["spotsylvania,va"]},{"id":"ATNHPIUS51179A","name":"Stafford County, VA","label":"FHFA all-transactions HPI, Stafford County, VA (FRED ATNHPIUS51179A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51179A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":149.09},{"date":"2011-01-01","value":144.85},{"date":"2012-01-01","value":147.65},{"date":"2013-01-01","value":155.43},{"date":"2014-01-01","value":164.52},{"date":"2015-01-01","value":169.39},{"date":"2016-01-01","value":173.6},{"date":"2017-01-01","value":178.58},{"date":"2018-01-01","value":185.84},{"date":"2019-01-01","value":193.35},{"date":"2020-01-01","value":199.61},{"date":"2021-01-01","value":225.29},{"date":"2022-01-01","value":253.17},{"date":"2023-01-01","value":272.51},{"date":"2024-01-01","value":287.23},{"date":"2025-01-01","value":299.78}],"match":["stafford,va"]}]</script>
 <script id="mars-engine">
 /* MARS engine (degree 1, additive) - a line-for-line port of the forward pass,
    knot search and pruning rules of the R package earth (S. Milborrow, earth.c
@@ -1258,12 +1306,12 @@ if (typeof module !== "undefined") module.exports = MarsEngine;
 
 </script>
 <script id="mars-analysis">
-/* MARS adjustment-support analysis (browser port of mars_adjustment_support.R v2.1).
+/* MARS adjustment-support analysis (browser port of mars_adjustment_support.R v2.2).
    Requires MarsEngine. Produces adjustment SUPPORT only: no indicated, reconciled
    or opinion-of-value figure. */
 var MarsAnalysis = (function (M) {
   "use strict";
-  var VERSION = "2.1.0";
+  var VERSION = "2.2.0";
   var MONTH = 30.4375;
 
   // ------------------------------------------------------------------ parsing
@@ -1349,6 +1397,7 @@ var MarsAnalysis = (function (M) {
     ["levels", "Levels / stories", ["Levels/Stories", "Levels", "Stories", "levels"]],
     ["zip", "Zip code", ["Zip Code", "Postal Code", "Zip", "zip"]],
     ["subdivision", "Subdivision", ["Legal Subdivision", "Subdivision", "Subdivision Name", "Neighborhood", "subdivision"]],
+    ["county", "County", ["County", "County Or Parish", "county"]],
     ["sale_type", "Sale type", ["Sale Type", "Special Listing Conditions", "Sale Conditions", "sale_type"]],
     ["status", "Status", ["Status", "Standard Status", "status"]],
     ["arms_length", "Arm's length (1/0)", ["arms_length"]],
@@ -1365,7 +1414,7 @@ var MarsAnalysis = (function (M) {
     bg_fin_sf: ["bg_fin_sf", "bsmt_fin_sf"], bg_unf_sf: ["bg_unf_sf", "bsmt_unf_sf"], lot_ac: ["lot_ac"], lot_sf: ["lot_sf"], ag_baths: ["ag_baths"],
     baths_full: ["full_baths"], baths_half: ["half_baths"], ll_full: ["bg_full_baths", "bg_baths"], ll_half: ["bg_half_baths"],
     ll_beds: ["bg_bedrooms"], garage: ["garage"], carport: ["carport"], fireplaces: ["fireplaces"], pool: ["pool"], deck: ["deck"],
-    porch: ["porch"], year_built: ["year_built"], levels: ["levels"], zip: ["zip"], subdivision: ["subdivision"],
+    porch: ["porch"], year_built: ["year_built"], levels: ["levels"], zip: ["zip"], subdivision: ["subdivision"], county: ["county"],
     sale_type: ["sale_type"], status: ["status"], arms_length: ["arms_length"], new_construction: ["new_construction"],
     tax_id: ["tax_id"], list_date: ["list_date"] };
   function isStandard(header) {   // the engine's own lowercase snake_case schema (sales, comps or subject file)
@@ -1430,6 +1479,7 @@ var MarsAnalysis = (function (M) {
         year_built: num(g("year_built")), levels: num(g("levels")),
         zip: String(g("zip") == null ? "" : g("zip")).trim(),
         subdivision: String(g("subdivision") == null ? "" : g("subdivision")).trim().toUpperCase(),
+        county: String(g("county") == null ? "" : g("county")).trim(),
         sale_type: String(g("sale_type") == null ? "" : g("sale_type")).toUpperCase(),
         status: has("status") ? String(g("status") == null ? "" : g("status")).toUpperCase() : null,
         arms_length: has("arms_length") ? num(g("arms_length")) : NaN,
@@ -1549,8 +1599,15 @@ var MarsAnalysis = (function (M) {
     residualFeatures: ["fireplaces", "pool", "deck", "porch", "carport"],
     excludeSaleTypes: ["REO", "BANK OWNED", "SHORT SALE", "FORECLOSURE", "AUCTION"],
     penalty: 2, newvarPenalty: 0.1, thresh: 0.001, halfSamples: 200, glaBand: NaN, subjectIsNew: false,
-    timeGapDays: 91,   // newest modeled sale more than this many days before the effective date: time lines flagged (1004MC "current 3 months")
-    expectedPositive: ["gla", "bg_fin_sf", "bg_unf_sf", "lot_ac", "ag_baths", "bg_baths", "garage", "carport", "fireplaces", "pool", "deck", "porch", "year_built"]
+    timeGapDays: 91,   // newest clean sale more than this many days before the effective date: time lines flagged (1004MC "current 3 months")
+    expectedPositive: ["gla", "bg_fin_sf", "bg_unf_sf", "lot_ac", "ag_baths", "bg_baths", "garage", "carport", "fireplaces", "pool", "deck", "porch", "year_built"],
+    poolRanges: {},          // adjustment pool: { gla: [2200, 3200], year_built: [1985, 2015], lot_ac: [1, 10] }; NaN or null = open end
+    timeKnotMonths: 6,       // the time curve may bend only on this calendar grid (6 = Jan 1 and Jul 1)
+    timeMinSide: 20,         // a bend needs at least this many sales before it and after it
+    timeSeason: "auto",      // quarter-of-year control: "auto", "on", "off"
+    timeScreenRatio: 3,      // a sale more than 3x above or below the time model's estimate is left out (0 = off)
+    fhfa: null,              // { label, values: [{ date, value }] }
+    leaveCompsOut: true
   };
   function fmtMoney(v) { return isNaN(v) ? "NA" : (v < 0 ? "-" : "") + "$" + Math.abs(Math.round(v)).toLocaleString("en-US"); }
   function fmtRate(v) {
@@ -1559,7 +1616,7 @@ var MarsAnalysis = (function (M) {
     return (v < 0 ? "-" : "") + "$" + (a >= 100 ? Math.round(a).toLocaleString("en-US") : a.toFixed(2));
   }
   function fmtVal(f, v) { return (f === "year_built" || f === "levels") ? String(v) : Number(v).toLocaleString("en-US", { maximumFractionDigits: 6 }); }
-  var LABELS = { sale_age: "Date of sale / time", gla: "Gross living area", bg_fin_sf: "Basement finished sf", lot_ac: "Site (acres)",
+  var LABELS = { time: "Market conditions (time)", sale_age: "Date of sale / time", gla: "Gross living area", bg_fin_sf: "Basement finished sf", lot_ac: "Site (acres)",
     ag_baths: "Baths above grade", garage: "Garage spaces", year_built: "Year built", levels: "Levels", location: "Location",
     fireplaces: "Fireplaces", pool: "Pool", deck: "Deck / patio", porch: "Porch / enclosed", carport: "Carport spaces",
     bg_unf_sf: "Basement unfinished sf", bg_baths: "Baths below grade", bg_bedrooms: "Bedrooms below grade" };
@@ -1567,38 +1624,99 @@ var MarsAnalysis = (function (M) {
     fireplaces: "fireplace", pool: "pool", deck: "deck", porch: "porch", carport: "space", bg_unf_sf: "sf", bg_baths: "bath" };
   function unitOf(f) { return UNITS[f] || "unit"; }
 
+  // ------------------------------------------------------------------ dates
+  function ymd(dn) { var t = new Date(dn * 86400000); return [t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()]; }
+  function yearOf(dn) { return new Date(dn * 86400000).getUTCFullYear(); }
+  function dayOf(y, m, d) { return Math.round(Date.UTC(y, m, d) / 86400000); }   // m is 0-based and may overflow (Date.UTC normalizes)
+  function addMonths(dn, k) { var p = ymd(dn); return dayOf(p[0], p[1] + k, p[2]); }
+  function qtrOf(dn) { return Math.floor(ymd(dn)[1] / 3) + 1; }
+  function monthKey(dn) { return dayStr(dn).slice(0, 7); }
+  function fmtPct(v, digits) { if (!isFinite(v)) return "NA"; return (v >= 0 ? "+" : "-") + Math.abs(100 * v).toFixed(digits === undefined ? 1 : digits) + "%"; }
+  function gfmt(v) { return String(+v); }   // R %g for plain numbers like 3 or 2.5
+  function qOrNa(v, p) { var w = v.filter(function (x) { return isFinite(x); }); return w.length >= 20 ? quantile7(w, p) : NaN; }
+
+  // FHFA (or any price index) series from pasted text or a CSV: FRED downloads (observation_date,value),
+  // "2021 225.29", "2021Q3 330.13", "2021 3 330.13", "2021-07 123.4", "2021-01-01, 225.29". Header lines are skipped.
+  function parseIndexSeries(text) {
+    var rows = String(text == null ? "" : text).replace(/^﻿/, "").replace(/\r/g, "").split("\n");
+    var byDate = {}, skipped = 0;
+    rows.forEach(function (line) {
+      line = line.trim(); if (!line) return;
+      var tok = line.split(/\s*[,\t;]\s*|\s+/).map(function (x) { return x.replace(/^"+|"+$/g, "").trim(); }).filter(function (x) { return x !== ""; });
+      if (tok.length < 2) { skipped++; return; }
+      var date = NaN, used = -1, mm;
+      for (var i = 0; i < tok.length && !isFinite(date); i++) {
+        var s = tok[i];
+        if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(s) || /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(s)) { date = dayNum(s); used = i; }
+        else if ((mm = s.match(/^(\d{4})[-\s]?Q([1-4])$/i))) { date = dayOf(+mm[1], 3 * (+mm[2] - 1), 1); used = i; }
+        else if ((mm = s.match(/^(\d{4})-(\d{1,2})$/))) { date = dayOf(+mm[1], +mm[2] - 1, 1); used = i; }
+        else if (/^\d{4}$/.test(s) && +s >= 1950 && +s <= 2100) {
+          var mq = String(tok[i + 1] || "").match(/^Q?([1-4])$/i);
+          if (mq && tok.length >= i + 3) { date = dayOf(+s, 3 * (+mq[1] - 1), 1); used = i + 1; }
+          else { date = dayOf(+s, 0, 1); used = i; }
+        }
+      }
+      if (!isFinite(date)) { skipped++; return; }
+      var val = NaN;
+      for (var j = tok.length - 1; j > used; j--) { var v = num(tok[j]); if (isFinite(v)) { val = v; break; } }
+      if (!isFinite(val) || val <= 0) { skipped++; return; }
+      byDate[dayStr(date)] = val;
+    });
+    var values = Object.keys(byDate).sort().map(function (k) { return { date: k, value: byDate[k] }; });
+    return { values: values, skipped: skipped };
+  }
+
+  // Cholesky solve of the normal equations on a Gram submatrix (same steps as the R reference)
+  function gramSolve(G, Zy, yy, S) {
+    var k = S.length, dg = S.map(function (s) { return Math.sqrt(G[s][s]); });
+    if (dg.some(function (v) { return !(v > 0); })) return null;
+    var A = S.map(function (si, a) { return S.map(function (sj, b) { return G[si][sj] / (dg[a] * dg[b]); }); });
+    var inv = M.invSym(A); if (!inv) return null;
+    for (var a = 0; a < k; a++) for (var b = 0; b < k; b++) inv[a][b] /= dg[a] * dg[b];
+    var beta = new Array(k).fill(0), fit = 0;
+    for (a = 0; a < k; a++) { var s = 0; for (b = 0; b < k; b++) s += inv[a][b] * Zy[S[b]]; beta[a] = s; }
+    for (a = 0; a < k; a++) fit += beta[a] * Zy[S[a]];
+    return { b: beta, inv: inv, rss: Math.max(0, yy - fit) };
+  }
+
   // ------------------------------------------------------------------ run
   async function run(sales, subject, comps, opts, progress) {
     var cfg = Object.assign({}, DEFAULTS, opts || {});
+    cfg.poolRanges = cfg.poolRanges || {};
     progress = progress || function () {};
     var notes = [];
     var eff = typeof cfg.effectiveDate === "number" ? cfg.effectiveDate : dayNum(cfg.effectiveDate);
     if (!isFinite(eff)) throw new Error("Enter the effective date of the appraisal.");
-    var effYear = new Date(eff * 86400000).getUTCFullYear();
+    var effYear = yearOf(eff);
     var dateKey = cfg.dateBasis === "close" ? "sale_date" : "contract_date";
     if (!sales.some(function (r) { return isFinite(r[dateKey]); })) {
       notes.push("No " + (dateKey === "contract_date" ? "contract" : "close") + " dates found; sale age uses the closing date instead.");
       dateKey = "sale_date";
     }
+    var dateLabel = dateKey === "contract_date" ? "contract date" : "closing date";
     var features = cfg.features.filter(function (f) { return sales.some(function (r) { return r[f] !== undefined && !isNaN(r[f]); }); });
     cfg.features.forEach(function (f) { if (features.indexOf(f) < 0) notes.push("Feature not in this file and skipped: " + (LABELS[f] || f) + "."); });
     var locVar = cfg.location && sales.some(function (r) { return !blank(r[cfg.location]); }) ? cfg.location : "";
 
     // ---- cleaning: first reason wins, in the R engine's order
-    var excl = [], d = [];
     var ncColumn = sales.some(function (r) { return isFinite(r.new_construction); });
+    // new construction = built in the year it sold or the year before (each sale's own year)
+    var ncFlag = sales.map(function (r) {
+      if (ncColumn) return r.new_construction === 1;
+      var sd = isFinite(r.sale_date) ? r.sale_date : r[dateKey];
+      return isFinite(r.year_built) && isFinite(sd) && r.year_built >= yearOf(sd) - 1;
+    });
     var firstClose = Infinity;
     sales.forEach(function (r) { if (isFinite(r.sale_date) && r.sale_price > 1000 && r.sale_date < firstClose) firstClose = r.sale_date; });
     var trim = dateKey === "contract_date" && cfg.trimContractEdge && isFinite(firstClose);
-    var reasons = sales.map(function (r) {
+    var reasons = sales.map(function (r, i) {
       var reason = "";
       var mark = function (cond, why) { if (!reason && cond) reason = why; };
       if (r.status !== null && r.status !== undefined) mark(["CLS", "CLOSED", "SOLD", ""].indexOf(r.status) < 0, "not a closed sale");
       mark(isNaN(r.sale_price) || r.sale_price <= 1000, "no closed price");
       mark(r.arms_length === 0, "non-arm's-length (flag)");
       mark(cfg.excludeSaleTypes.some(function (k) { return String(r.sale_type || "").indexOf(k) >= 0; }), "distressed / non-market sale type");
-      var nc = ncColumn ? r.new_construction === 1 : (isFinite(r.year_built) && r.year_built >= effYear - 1);
-      if (!cfg.subjectIsNew) mark(nc, "new construction (subject is not new/newer)");
+      if (!cfg.subjectIsNew) mark(ncFlag[i], "new construction (subject is not new/newer)");
       var du = r[dateKey];
       mark(!isFinite(du), "unparseable sale date");
       mark(isFinite(du) && du > eff, (dateKey === "contract_date" ? "contract date" : "sale date") + " after effective date");
@@ -1621,7 +1739,9 @@ var MarsAnalysis = (function (M) {
     else if (cfg.excludeUnexposed) notes.push("No MLS entry date column: market-exposure check skipped.");
     // ---- repeat sales (same Tax ID, else same address); only resales closed by the effective date count
     function propKey(r) {
-      var t = String(r.tax_id || "").replace(/\s+/g, "").toUpperCase(); if (t) return "T:" + t;
+      var t = String(r.tax_id || "").replace(/\s+/g, "").toUpperCase();
+      if (t && !/[1-9]/.test(t)) t = "";   // placeholders (NOTAXRECORD, NONE, N/A, 0000) are not parcel numbers
+      if (t) return "T:" + t;
       var a2 = String(r.address || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); return a2 ? "A:" + a2 : "";
     }
     var groups = {}, repeatSales = [];
@@ -1646,20 +1766,154 @@ var MarsAnalysis = (function (M) {
     if (repeatSales.length) notes.push("Repeat sales: " + repeatSales.length + " pair(s) in the data; " + repeatSales.filter(function (x) { return x.likelyFlip; }).length +
       " meet the likely-flip rule (resold within " + cfg.flipDays + " days for " + Math.round(100 * (cfg.flipRatio - 1)) + "% or more)" +
       (cfg.excludeFlips ? "; the earlier sale of each is excluded." : "; none excluded (rule switched off)."));
-    sales.forEach(function (r, i) {
-      var du = r[dateKey];
-      if (reasons[i]) excl.push({ mls_id: r.mls_id, address: r.address, sale_price: r.sale_price, date: dayStr(du), reason: reasons[i] });
-      else d.push(Object.assign({}, r, { price_used: r.sale_price - cfg.concessionReaction * r.concessions, sale_age: eff - du, date_used: du }));
-    });
-    if (trim) notes.push("Contract-date clock: contracts dated before " + dayStr(firstClose) + " (the first closing in the file) were dropped. Recent weeks still hold only the contracts that closed by the effective date.");
-    var n = d.length;
-    if (n < 60) throw new Error("Only " + n + " usable sales after cleaning. Widen the market area or the time window (aim for 150 to 300).");
-    var dmin = Math.min.apply(null, d.map(function (r) { return r.date_used; })), dmax = Math.max.apply(null, d.map(function (r) { return r.date_used; }));
-    notes.push("Cleaning: " + sales.length + " sales in file, " + n + " modeled, " + excl.length + " excluded. Effective date " + dayStr(eff) +
-      ", sale age from " + (dateKey === "contract_date" ? "contract" : "closing") + " date, window " + dayStr(dmin) + " to " + dayStr(dmax) + ".");
-    if (n < 150) notes.push("NOTE: " + n + " usable sales; this workflow targets 150 to 300.");
 
-    // ---- location coding
+    // ---- time index machinery: log price on features + location + quarter + f(time), bends on a calendar grid
+    function tmTransform(f, v) { return f === "gla" ? Math.log(v) : f === "lot_ac" ? Math.log1p(v) : v; }
+    var excl, dm, nMarket, inPool, poolDesc, poolUsed, tmLoc, seasonOn;
+    function buildMarket() {
+      excl = []; dm = [];
+      sales.forEach(function (r, i) {
+        var du = r[dateKey];
+        if (reasons[i]) excl.push({ mls_id: r.mls_id, address: r.address, sale_price: r.sale_price, date: dayStr(du), reason: reasons[i] });
+        else dm.push(Object.assign({}, r, { price_used: r.sale_price - cfg.concessionReaction * r.concessions, sale_age: eff - du, date_used: du, _row: i }));
+      });
+      nMarket = dm.length;
+      if (nMarket < 60) throw new Error("Only " + nMarket + " usable sales after cleaning. Widen the market area or the time window (aim for 150 to 300).");
+      inPool = dm.map(function () { return true; }); poolDesc = []; poolUsed = {};
+      Object.keys(cfg.poolRanges).forEach(function (f) {
+        var rg = cfg.poolRanges[f]; if (!rg || rg.length !== 2) return;
+        var lo = num(rg[0]), hi = num(rg[1]); if (isNaN(lo) && isNaN(hi)) return;
+        if (!(f in sales[0])) return;
+        dm.forEach(function (r, k) { var v = num(r[f]); inPool[k] = inPool[k] && !isNaN(v) && (isNaN(lo) || v >= lo) && (isNaN(hi) || v <= hi); });
+        poolUsed[f] = [lo, hi];
+        poolDesc.push(f + " " + (isNaN(lo) ? "any" : fmtVal(f, lo)) + " to " + (isNaN(hi) ? "any" : fmtVal(f, hi)));
+      });
+      tmLoc = [];
+      if (locVar) {
+        var cnt = {};
+        dm.forEach(function (r) { var v = String(r[locVar]).trim().toUpperCase(); cnt[v] = (cnt[v] || 0) + 1; });
+        dm.forEach(function (r) { var v = String(r[locVar]).trim().toUpperCase(); r.tm_loc = cnt[v] < cfg.locationMinN ? "OTHER" : v; });
+        tmLoc = Array.from(new Set(dm.map(function (r) { return r.tm_loc; }))).sort().slice(1);
+      }
+      var qn = [0, 0, 0, 0]; dm.forEach(function (r) { qn[qtrOf(r.date_used) - 1]++; });
+      var dmin0 = Infinity, dmax0 = -Infinity; dm.forEach(function (r) { if (r.date_used < dmin0) dmin0 = r.date_used; if (r.date_used > dmax0) dmax0 = r.date_used; });
+      var ts = String(cfg.timeSeason);
+      seasonOn = ts === "on" ? qn.every(function (c) { return c > 0; }) : ts === "off" ? false : (dmax0 - dmin0 >= 730 && qn.every(function (c) { return c >= 10; }));
+    }
+    function tmCandidates(dates) {
+      var lo = Infinity, hi = -Infinity; dates.forEach(function (t) { if (t < lo) lo = t; if (t > hi) hi = t; });
+      var y0 = yearOf(lo), end = dayOf(yearOf(hi) + 1, 0, 1), out = [];
+      for (var i = 0; ; i++) {
+        var g = dayOf(y0, i * cfg.timeKnotMonths, 1); if (g > end) break;
+        var below = 0, above = 0; dates.forEach(function (t) { if (t < g) below++; else above++; });
+        if (below >= cfg.timeMinSide && above >= cfg.timeMinSide) out.push(g);
+      }
+      return out;
+    }
+    function tmPhi(fit, age) { return fit.terms.map(function (k) { return k === null ? age : Math.max(0, age - k) - Math.max(0, -k); }); }
+    function tmF(fit, age) { if (!isFinite(age)) return NaN; var s = 0; for (var j = 0; j < fit.terms.length; j++) { var k = fit.terms[j]; s += fit.coef[j] * (k === null ? age : Math.max(0, age - k) - Math.max(0, -k)); } return s; }
+    function tmFit(ix, full) {
+      var nn = ix.length, rows = ix.map(function (i) { return dm[i]; });
+      var age = rows.map(function (r) { return r.sale_age / MONTH; });
+      var yv = rows.map(function (r) { return Math.log(r.price_used); }), ym = mean(yv), yc = yv.map(function (v) { return v - ym; });
+      var F = [], fnames = [];
+      features.forEach(function (f) { F.push(rows.map(function (r) { return tmTransform(f, r[f]); })); fnames.push("f:" + f); });
+      tmLoc.forEach(function (l) { F.push(rows.map(function (r) { return r.tm_loc === l ? 1 : 0; })); fnames.push("loc:" + l); });
+      if (seasonOn) [2, 3, 4].forEach(function (q) { F.push(rows.map(function (r) { return qtrOf(r.date_used) === q ? 1 : 0; })); fnames.push("season:Q" + q); });
+      var Fk = [], fk = [];
+      F.forEach(function (c, j) { var lo = Infinity, hi = -Infinity; c.forEach(function (v) { if (v < lo) lo = v; if (v > hi) hi = v; }); if (hi > lo) { Fk.push(c); fk.push(fnames[j]); } });
+      Fk = Fk.map(function (c) { var m0 = mean(c); return c.map(function (v) { return v - m0; }); });
+      var kd = tmCandidates(rows.map(function (r) { return r.date_used; })), ka = kd.map(function (k) { return (eff - k) / MONTH; });
+      var T = [age].concat(ka.map(function (k) { return age.map(function (a) { return Math.max(0, a - k) - Math.max(0, -k); }); }));
+      var Z = [new Array(nn).fill(1)].concat(Fk).concat(T), p0 = 1 + Fk.length, P = Z.length;
+      var G = []; for (var a = 0; a < P; a++) G.push(new Array(P).fill(0));
+      for (a = 0; a < P; a++) for (var b = a; b < P; b++) { var s = 0, za = Z[a], zb = Z[b]; for (var i = 0; i < nn; i++) s += za[i] * zb[i]; G[a][b] = s; G[b][a] = s; }
+      var Zy = Z.map(function (c) { var s2 = 0; for (var i2 = 0; i2 < nn; i2++) s2 += c[i2] * yc[i2]; return s2; });
+      var yy = 0; for (i = 0; i < nn; i++) yy += yc[i] * yc[i];
+      var base = []; for (a = 0; a < p0; a++) base.push(a);
+      function gcvOf(keep) {
+        var S = base.concat(keep.map(function (t) { return p0 + t; })), sol = gramSolve(G, Zy, yy, S);
+        if (!sol) return Infinity;
+        var C = S.length + cfg.penalty * keep.filter(function (t) { return t > 0; }).length; if (C >= nn) return Infinity;
+        return (sol.rss / nn) / Math.pow(1 - C / nn, 2);
+      }
+      var keep = T.map(function (_, t) { return t; }), bestKeep = keep.slice(), bestGcv = gcvOf(keep);
+      while (keep.length) {
+        var tries = keep.map(function (_, j) { return gcvOf(keep.slice(0, j).concat(keep.slice(j + 1))); });
+        var bi = 0; for (var j2 = 1; j2 < tries.length; j2++) if (tries[j2] < tries[bi]) bi = j2;
+        keep = keep.slice(0, bi).concat(keep.slice(bi + 1));
+        if (tries[bi] < bestGcv) { bestGcv = tries[bi]; bestKeep = keep.slice(); }
+      }
+      var S = base.concat(bestKeep.map(function (t) { return p0 + t; })), sol = gramSolve(G, Zy, yy, S);
+      if (!sol) throw new Error("time index fit is singular");
+      var fit = { terms: bestKeep.map(function (t) { return t === 0 ? null : ka[t - 1]; }), dates: bestKeep.map(function (t) { return t === 0 ? null : kd[t - 1]; }),
+                  coef: sol.b.slice(p0), n: nn, nCandidates: ka.length, candidateDates: kd, gcv: bestGcv };
+      if (full) {
+        var k = S.length, e = new Array(nn), rss = 0;
+        for (i = 0; i < nn; i++) { var f0 = 0; for (a = 0; a < k; a++) f0 += sol.b[a] * Z[S[a]][i]; e[i] = yc[i] - f0; rss += e[i] * e[i]; }
+        fit.resid = e; fit.rss = rss; fit.r2 = 1 - rss / yy; fit.sigma = Math.sqrt(rss / (nn - k));
+        var meat = []; for (a = 0; a < k; a++) meat.push(new Array(k).fill(0));
+        for (i = 0; i < nn; i++) { var e2 = e[i] * e[i]; for (a = 0; a < k; a++) { var za2 = Z[S[a]][i] * e2; if (!za2) continue; for (b = a; b < k; b++) meat[a][b] += za2 * Z[S[b]][i]; } }
+        for (a = 0; a < k; a++) for (b = 0; b < a; b++) meat[a][b] = meat[b][a];
+        var tt = []; for (a = p0; a < k; a++) tt.push(a);
+        fit.vc = tt.map(function (r1) { return tt.map(function (r2) { return (rss / (nn - k)) * sol.inv[r1][r2]; }); });
+        var Vm = sol.inv.map(function (row) { return Array.from({ length: k }, function (_, c2) { var s3 = 0; for (var q = 0; q < k; q++) s3 += row[q] * meat[q][c2]; return s3; }); });
+        fit.vh = tt.map(function (r1) { return tt.map(function (r2) { var s4 = 0; for (var q = 0; q < k; q++) s4 += Vm[r1][q] * sol.inv[q][r2]; return s4 * nn / (nn - k); }); });
+        fit.season = null;
+        ["Q2", "Q3", "Q4"].forEach(function (q) { var at = fk.indexOf("season:" + q); if (at >= 0) { fit.season = fit.season || {}; fit.season[q] = Math.exp(sol.b[1 + at]) - 1; } });
+      }
+      return fit;
+    }
+    function allIdx() { return dm.map(function (_, i) { return i; }); }
+
+    progress("Fitting the time index", 0.02); await tick();
+    Object.keys(cfg.poolRanges).forEach(function (f) { if (sales.length && !(f in sales[0])) notes.push("Adjustment-pool range for " + f + " skipped: that field is not in the data."); });
+    buildMarket();
+    var tm = tmFit(allIdx(), true);
+    // Price screen: a sale more than timeScreenRatio times above or below the time model's estimate
+    // for its features, location and date is a data error or not a market sale (listed, left out).
+    if (cfg.timeScreenRatio > 1) {
+      var lim = Math.log(cfg.timeScreenRatio), badRows = [];
+      tm.resid.forEach(function (e, i) { if (Math.abs(e) > lim) badRows.push({ row: dm[i]._row, up: e > 0 }); });
+      if (badRows.length) {
+        badRows.forEach(function (b) { reasons[b.row] = "price " + (b.up ? "above" : "below") + " the time model's estimate by more than " + gfmt(cfg.timeScreenRatio) + "x (data error or not a market sale)"; });
+        notes.push("Price screen: " + badRows.length + " sale(s) sold for more than " + gfmt(cfg.timeScreenRatio) + "x above or below what the time model expects for their features, location and date; left out of both pools and listed in exclusions: " +
+          badRows.map(function (b) { return sales[b.row].mls_id; }).join(", ") + ".");
+        buildMarket(); tm = tmFit(allIdx(), true);
+      }
+    }
+    var dmin = Infinity, dmax = -Infinity; dm.forEach(function (r) { if (r.date_used < dmin) dmin = r.date_used; if (r.date_used > dmax) dmax = r.date_used; });
+    notes.push("Cleaning: " + sales.length + " sales in file, " + nMarket + " clean, " + excl.length + " excluded. Effective date " + dayStr(eff) +
+      ", sale age from " + (dateKey === "contract_date" ? "contract" : "closing") + " date, window " + dayStr(dmin) + " to " + dayStr(dmax) + ".");
+    if (trim) notes.push("Contract-date clock: contracts dated before " + dayStr(firstClose) + " (the first closing in the file) were dropped. Recent weeks still hold only the contracts that closed by the effective date.");
+    var ageMaxM = Math.max.apply(null, dm.map(function (r) { return r.sale_age; })) / MONTH;
+    var tmBends = [], bendAges = [];
+    tm.terms.forEach(function (k, j) { if (k !== null && k > 0 && k < ageMaxM) { tmBends.push(tm.dates[j]); bendAges.push(k); } });
+    var tmSegments = (function () {
+      var br = Array.from(new Set([0].concat(bendAges).concat([ageMaxM]))).sort(function (u, v) { return u - v; }), out = [];
+      for (var j = 0; j < br.length - 1; j++) { var a = br[j], b = br[j + 1];
+        out.push({ from: eff - Math.round(b * MONTH), to: eff - Math.round(a * MONTH), rate: Math.exp((tmF(tm, a) - tmF(tm, b)) / (b - a)) - 1, total: Math.exp(tmF(tm, a) - tmF(tm, b)) - 1 }); }
+      return out.reverse();   // oldest segment first
+    })();
+    var keptTxt = !tm.terms.length ? "no time trend (flat)" : [tm.terms.some(function (k) { return k === null; }) ? "overall slope" : null,
+      tmBends.length ? "bends at " + tmBends.map(dayStr).join(", ") : null].filter(Boolean).join("; ");
+    notes.push("Time index: " + nMarket + " clean sales, log-price model with the model features" + (tmLoc.length ? ", location" : "") + (seasonOn ? " and quarter of the year" : "") +
+      "; bends allowed every " + cfg.timeKnotMonths + " months with " + cfg.timeMinSide + " sales on each side (" + tm.nCandidates + " candidate dates). Kept: " + keptTxt + ". R-squared " + tm.r2.toFixed(3) + ".");
+    if (!seasonOn && String(cfg.timeSeason) === "auto") notes.push("Time index: quarter-of-year control off (needs 2 years of sales and 10 in every quarter).");
+    if (nMarket < 200) notes.push("NOTE: " + nMarket + " clean sales for the time index; its ranges will be wide. Several hundred over the window is better.");
+
+    // ---- adjustment pool, prices brought to the effective date by the time index
+    var d = [], poolOut = [];
+    dm.forEach(function (r, i) {
+      if (inPool[i]) { var tf = Math.exp(-tmF(tm, r.sale_age / MONTH)); d.push(Object.assign(r, { time_factor: tf, price_ta: r.price_used * tf })); }
+      else poolOut.push({ mls_id: r.mls_id, address: r.address, sale_price: r.sale_price, date: dayStr(r.date_used), reason: "outside the adjustment-pool ranges (used for the time index only)" });
+    });
+    var n = d.length;
+    notes.push(poolDesc.length ? "Adjustment pool: " + n + " of " + nMarket + " clean sales inside your ranges (" + poolDesc.join("; ") + ")." : "Adjustment pool: all " + n + " clean sales (no similarity ranges set).");
+    if (n < 60) throw new Error("Only " + n + " sales inside the adjustment-pool ranges. Widen the ranges (the time index still uses all " + nMarket + " clean sales).");
+    if (n < 150) notes.push("NOTE: " + n + " sales in the adjustment pool; earthUI and this workflow target 150 to 300.");
+
+    // ---- location coding (adjustment pool)
     var levels = [], ref = null, thin = [], subjLoc = null, locStatus = "not used", locKnown = true;
     if (locVar) {
       var counts = {};
@@ -1677,10 +1931,10 @@ var MarsAnalysis = (function (M) {
       if (!locKnown) notes.push("WARNING: " + locStatus + ".");
     }
     var dummies = levels.slice(1);
-    var colNames = ["sale_age"].concat(features).concat(dummies.map(function (l) { return "loc:" + l; }));
+    var colNames = features.concat(dummies.map(function (l) { return "loc:" + l; }));
     var groupOfCol = colNames.map(function (c) { return c.indexOf("loc:") === 0 ? "location" : c; });
     function xRow(r, locValue) {
-      var row = [r.sale_age];
+      var row = [];
       features.forEach(function (f) { row.push(r[f]); });
       var lv = locValue === undefined ? r.loc : locValue;
       dummies.forEach(function (l) { row.push(lv === l ? 1 : 0); });
@@ -1689,7 +1943,7 @@ var MarsAnalysis = (function (M) {
     var X = d.map(function (r) { return xRow(r); });
     var p = colNames.length;
     var cols = []; for (var j = 0; j < p; j++) cols.push(Float64Array.from(X, function (row) { return row[j]; }));
-    var y = Float64Array.from(d, function (r) { return r.price_used; });
+    var y = Float64Array.from(d, function (r) { return r.price_ta; });
     var linpreds = colNames.map(function (c, k) { return groupOfCol[k] === "location" || cfg.linearOnly.indexOf(c) >= 0; });
 
     // ---- earthUI recipe
@@ -1724,9 +1978,11 @@ var MarsAnalysis = (function (M) {
     var cvr = M.cv(cols, y, fitOpts, nfold, ncross, cfg.masterSeed + 1, function (i, tot) {
       if (i % 4 === 0) progress("Cross-validating: fold " + (i + 1) + " of " + tot, 0.12 + 0.18 * i / tot);
     });
+    if (cvr.cvrsq < 0.5 || cvr.sd > 0.3) notes.push("WARNING: cross-validated R-squared is " + cvr.cvrsq.toFixed(2) + " (sd " + cvr.sd.toFixed(2) + ") against " + m.rsq.toFixed(2) +
+      " in-sample: the model holds up poorly on sales it was not fit on. A few sales far from the rest (a very large lot, a very high price) usually drive this. Tighten the adjustment-pool ranges or review the largest residuals in the modeled sales.");
 
     // ---- subject & comps
-    var subjRow = { sale_age: 0 };
+    var subjRow = {};
     features.forEach(function (f) {
       var v = num(subject[f]);
       if (isNaN(v)) throw new Error("Enter the subject's " + (LABELS[f] || f).toLowerCase() + ". Every model feature needs a subject value.");
@@ -1734,8 +1990,8 @@ var MarsAnalysis = (function (M) {
     });
     var Xs = xRow(subjRow, locVar ? (locKnown ? subjLoc : ref) : undefined);
     var ranges = {};
-    ["sale_age"].concat(features).forEach(function (f) {
-      var vals = d.map(function (r) { return f === "sale_age" ? r.sale_age : r[f]; });
+    features.forEach(function (f) {
+      var vals = d.map(function (r) { return r[f]; });
       ranges[f] = [Math.min.apply(null, vals), Math.max.apply(null, vals)];
     });
     function knotsOf(f) {
@@ -1761,15 +2017,17 @@ var MarsAnalysis = (function (M) {
         return fmtVal(f, s.from) + " to " + fmtVal(f, s.to) + " at " + fmtRate(s.slope) + "/" + unitOf(f) + " (" + fmtMoney(s.slope * (s.to - s.from)) + ")";
       }).join("; ") + ". More of this feature normally adds value; check the segment and its g-function plot before relying on this line.";
     }
-    // Time: the subject sits at sale age 0 (the effective date). A gap up to cfg.timeGapDays
-    // between the newest modeled sale and the effective date counts as inside the modeled range.
-    var timeGap = ranges.sale_age[0];
-    if (timeGap > cfg.timeGapDays) notes.push("WARNING: the most recent modeled sale is " + Math.round(timeGap) + " days before the effective date (more than " +
-      cfg.timeGapDays + "). Time lines that reach the effective date extend the last modeled segment beyond the data and are flagged.");
-    function rangeLo(f) { return f === "sale_age" && timeGap <= cfg.timeGapDays ? 0 : ranges[f][0]; }
+    // Time: the subject sits at the effective date. A gap up to cfg.timeGapDays between the newest
+    // clean sale and the effective date counts as inside the indexed range.
+    var timeGap = Math.min.apply(null, dm.map(function (r) { return r.sale_age; })), timeHi = Math.max.apply(null, dm.map(function (r) { return r.sale_age; }));
+    if (timeGap > cfg.timeGapDays) notes.push("WARNING: the most recent clean sale is " + Math.round(timeGap) + " days before the effective date (more than " +
+      cfg.timeGapDays + "). Time lines extend the last index segment beyond the data and are flagged.");
+    var timeRangeLo = timeGap <= cfg.timeGapDays ? 0 : timeGap;
+    function rangeLo(f) { return ranges[f][0]; }
     var compRows = comps.map(function (cr) {
       var du = cr[dateKey];
-      var c2 = Object.assign({}, cr, { sale_age: isFinite(du) ? eff - du : NaN });
+      var c2 = Object.assign({}, cr, { sale_age: isFinite(du) ? eff - du : NaN, date_used: du });
+      c2.price_comp = cr.sale_price - cfg.concessionReaction * (isFinite(cr.concessions) ? cr.concessions : 0);
       var cl = { model: undefined, raw: null, known: true };
       if (locVar) {
         var v = String(cr[locVar] == null ? "" : cr[locVar]).trim().toUpperCase();
@@ -1780,23 +2038,60 @@ var MarsAnalysis = (function (M) {
       }
       c2._loc = cl; c2._X = xRow(c2, locVar ? cl.model : undefined);
       c2._inFit = d.some(function (r) { return r.mls_id && r.mls_id === cr.mls_id; });
+      c2._inMarket = dm.some(function (r) { return r.mls_id && r.mls_id === cr.mls_id; });
       return c2;
     });
-    var lost = compRows.filter(function (cr) { return cr.mls_id && !cr._inFit; }).map(function (cr) {
+    var lost = compRows.filter(function (cr) { return cr.mls_id && !cr._inMarket; }).map(function (cr) {
       var e = excl.filter(function (x) { return x.mls_id === cr.mls_id; })[0];
       return cr.mls_id + (e ? " (" + e.reason + ")" : " (not in the sales file)");
     });
     if (lost.length) notes.push("Comps not in the modeled data (still adjusted, flagged): " + lost.join("; ") + ".");
-    var lineKeys = ["sale_age"].concat(features).concat(locVar ? ["location"] : []);
-    var grid = [];
+    var outside = compRows.filter(function (cr) { return cr._inMarket && !cr._inFit; }).map(function (cr) { return cr.mls_id; });
+    if (outside.length) notes.push("Comps outside your adjustment-pool ranges (still adjusted; lines that fall outside the modeled sales are flagged): " + outside.join(", ") + ".");
+
+    function provisional(L) {
+      if (Math.abs(L.adj) < 0.5) { L.status = "NO MODEL DIFFERENCE (same value or flat segment)"; L.tone = "zero"; }
+      else if (L.lo > 0 || L.hi < 0) { L.status = "SUPPORTED (conditional interval only)"; L.tone = "ok"; }
+      else { L.status = "DIRECTION NOT RESOLVED (conditional interval crosses zero)"; L.tone = "warn"; }
+      if (L.extrap) { L.status += " | OUTSIDE MODELED DATA RANGE: extrapolated"; L.tone = "bad"; }
+    }
+    function timeSegText(aM) {   // index segments between a comp's sale (aM months back) and the effective date, oldest first
+      var ks = bendAges.filter(function (b) { return b < aM; });
+      if (!ks.length) return { text: "", list: [] };
+      var br = Array.from(new Set([0].concat(ks).concat([aM]))).sort(function (u, v) { return u - v; }), list = [];
+      for (var j3 = br.length - 2; j3 >= 0; j3--) { var lo = br[j3], hi = br[j3 + 1];
+        list.push({ from: eff - Math.round(hi * MONTH), to: eff - Math.round(lo * MONTH), rate: Math.exp((tmF(tm, lo) - tmF(tm, hi)) / (hi - lo)) - 1 }); }
+      return { text: list.map(function (s) { return dayStr(s.from) + " to " + dayStr(s.to) + " @ " + fmtPct(s.rate, 2) + "/mo"; }).join("; "), list: list };
+    }
+    var lineKeys = features.concat(locVar ? ["location"] : []);
+    var grid = [], timeLine = [];
     var bs = basis(Xs);
     compRows.forEach(function (cr, ci) {
+      // market conditions line: the comp's price times the index change from its sale date to the effective date
+      var T = { comp: ci, key: "time", label: LABELS.time, subject: eff, compValue: cr.date_used, adj: NaN, seC: NaN, seH: NaN, lo: NaN, hi: NaN, pct: NaN, price: cr.price_comp,
+                hsLo: NaN, hsHi: NaN, hsShare: NaN, hsSame: NaN, knot: false, extrap: false, segments: [], segmentText: "", status: "", tone: "", review: "" };
+      if (!isFinite(cr.sale_age) || !isFinite(cr.price_comp)) { T.status = "NOT EXTRACTABLE: comp sale date or price missing"; T.tone = "na"; }
+      else {
+        var aM = cr.sale_age / MONTH, fa = tmF(tm, aM);
+        T.pct = Math.exp(-fa) - 1; T.adj = cr.price_comp * T.pct;
+        var seFc = 0, seFh = 0;
+        if (tm.terms.length) { var g = tmPhi(tm, aM), qc = 0, qh = 0;
+          for (var r1 = 0; r1 < g.length; r1++) for (var r2 = 0; r2 < g.length; r2++) { qc += g[r1] * tm.vc[r1][r2] * g[r2]; qh += g[r1] * tm.vh[r1][r2] * g[r2]; }
+          seFc = Math.sqrt(Math.max(0, qc)); seFh = Math.sqrt(Math.max(0, qh)); }
+        T.seC = cr.price_comp * Math.exp(-fa) * seFc; T.seH = cr.price_comp * Math.exp(-fa) * seFh;
+        var se = Math.max(T.seC, T.seH); T.lo = T.adj - 1.96 * se; T.hi = T.adj + 1.96 * se;
+        T.knot = bendAges.some(function (b) { return b < aM; });
+        T.extrap = cr.sale_age < timeRangeLo || cr.sale_age > timeHi || 0 < timeRangeLo;
+        if (T.knot) { var st = timeSegText(aM); T.segmentText = st.text; T.segments = st.list; }
+        provisional(T);
+      }
+      grid.push(T); timeLine[ci] = T;
       var bc = basis(cr._X);   // a missing value only poisons the terms of its own variable
       lineKeys.forEach(function (grp) {
         var sv = grp === "location" ? subjLoc : Xs[colNames.indexOf(grp)];
         var cv = grp === "location" ? cr._loc.raw : cr._X[colNames.indexOf(grp)];
         var L = { comp: ci, key: grp, label: LABELS[grp] || grp, subject: sv, compValue: cv, adj: NaN, seC: NaN, seH: NaN, lo: NaN, hi: NaN,
-                  hsLo: NaN, hsHi: NaN, hsShare: NaN, hsSame: NaN, knot: false, extrap: false, segments: [], status: "", tone: "", review: "" };
+                  hsLo: NaN, hsHi: NaN, hsShare: NaN, hsSame: NaN, knot: false, extrap: false, segments: [], status: "", tone: "", review: "", loo: NaN };
         var naComp = grp === "location" ? !cr._loc.known : isNaN(cv);
         if (naComp) { L.status = grp === "location" ? "NOT EXTRACTABLE: comp location level not in the modeled data" : "NOT EXTRACTABLE: comp value missing (never imputed)"; L.tone = "na"; grid.push(L); return; }
         if (groupsIn.indexOf(grp) < 0) { L.adj = 0; L.seC = L.seH = L.lo = L.hi = 0; L.status = "NOT IN MODEL: below the GCV noise floor here (see battery / residual layer)"; L.tone = "out"; grid.push(L); return; }
@@ -1804,8 +2099,8 @@ var MarsAnalysis = (function (M) {
         var cvec = new Array(k).fill(0);
         for (var t = 0; t < k; t++) if (termGroup[t] === grp) cvec[t] = bs[t] - bc[t];
         var est = 0; for (t = 0; t < k; t++) est += cvec[t] * beta[t];
-        var seC = Math.sqrt(quadForm(cvec, Vc)), seH = Math.sqrt(quadForm(cvec, Vh)), se = Math.max(seC, seH);
-        L.adj = est; L.seC = seC; L.seH = seH; L.lo = est - 1.96 * se; L.hi = est + 1.96 * se;
+        var seC = Math.sqrt(quadForm(cvec, Vc)), seH = Math.sqrt(quadForm(cvec, Vh)), se2 = Math.max(seC, seH);
+        L.adj = est; L.seC = seC; L.seH = seH; L.lo = est - 1.96 * se2; L.hi = est + 1.96 * se2;
         if (grp !== "location") {
           var ks = knotsOf(grp);
           L.knot = ks.some(function (kn) { return kn > Math.min(sv, cv) && kn < Math.max(sv, cv); });
@@ -1813,24 +2108,35 @@ var MarsAnalysis = (function (M) {
           if (L.knot) L.segments = segmentsBetween(grp, sv, cv);
           L.review = reversalFlag(grp, sv, cv);
         }
-        // provisional status from the conditional interval; the half-sample rule below replaces it
-        if (Math.abs(est) < 0.5) { L.status = "NO MODEL DIFFERENCE (same value or flat segment)"; L.tone = "zero"; }
-        else if (L.lo > 0 || L.hi < 0) { L.status = "SUPPORTED (conditional interval only)"; L.tone = "ok"; }
-        else { L.status = "DIRECTION NOT RESOLVED (conditional interval crosses zero)"; L.tone = "warn"; }
-        if (L.extrap) { L.status += " | OUTSIDE MODELED DATA RANGE: extrapolated"; L.tone = "bad"; }
+        provisional(L);
         grid.push(L);
       });
     });
+    function hsApply(L, v) {   // half-sample range and status from refit amounts v
+      v = v.filter(function (x) { return isFinite(x); });
+      if (v.length >= 20 && isFinite(L.adj)) {
+        L.hsLo = quantile7(v, 0.025); L.hsHi = quantile7(v, 0.975);
+        var nh = v.length, nz = v.filter(function (x) { return Math.abs(x) > 0.5; }).length;
+        var ns = v.filter(function (x) { return Math.abs(x) > 0.5 && Math.sign(x) === Math.sign(L.adj); }).length;
+        L.hsN = nh; L.hsSameN = ns; L.hsShare = nz / nh; L.hsSame = ns / nh;
+        if (Math.abs(L.adj) >= 0.5) {   // integer thresholds: 90% and 60% of the half-samples
+          var sup = 10 * ns >= 9 * nh, mid = 10 * ns >= 6 * nh;
+          L.tone = sup ? "ok" : mid ? "mid" : "warn";
+          L.status = (sup ? "SUPPORTED" : mid ? "SUPPORTED, SIZE VARIABLE" : "UNSTABLE: same sign in only " + ns + " of " + nh + " half-samples") + (L.extrap ? " | OUTSIDE MODELED DATA RANGE: extrapolated" : "");
+          if (L.extrap) L.tone = "bad";
+        }
+      }
+    }
 
     // ---- half-sample stability (whole MARS procedure refit on n/2 without replacement)
     var hsFreq = {}, H = cfg.halfSamples | 0;
     lineKeys.forEach(function (g) { hsFreq[g] = 0; });
     if (H > 0) {
       var r = M.rRNG(cfg.masterSeed + 10000), half = Math.floor(n / 2), store = {};   // R: set.seed(master + 10000)
-      grid.forEach(function (L) { store[L.comp + "|" + L.key] = []; });
+      grid.forEach(function (L) { if (L.key !== "time") store[L.comp + "|" + L.key] = []; });
       var recH = recipe(half);
       for (var hsi = 0; hsi < H; hsi++) {
-        if (hsi % 5 === 0) { progress("Half-sample refits: " + hsi + " of " + H, 0.3 + 0.65 * hsi / H); if (hsi % 20 === 0) await tick(); }
+        if (hsi % 5 === 0) { progress("Half-sample refits: " + hsi + " of " + H, 0.3 + 0.5 * hsi / H); if (hsi % 20 === 0) await tick(); }
         var idx = r.sampleNoReplace(n, half);                                         // R: sample.int(n, half)
         var sub = M.subset(cols, y, idx);
         var mb;
@@ -1847,29 +2153,145 @@ var MarsAnalysis = (function (M) {
           });
         });
       }
-      grid.forEach(function (L) {
-        var v = store[L.comp + "|" + L.key];
-        if (v && v.length >= 20 && isFinite(L.adj)) {
-          L.hsLo = quantile7(v, 0.025); L.hsHi = quantile7(v, 0.975);
-          var nh = v.length, nz = v.filter(function (x) { return Math.abs(x) > 0.5; }).length;
-          var ns = v.filter(function (x) { return Math.abs(x) > 0.5 && Math.sign(x) === Math.sign(L.adj); }).length;
-          L.hsN = nh; L.hsSameN = ns; L.hsShare = nz / nh; L.hsSame = ns / nh;
-          if (Math.abs(L.adj) >= 0.5) {   // integer thresholds: 90% and 60% of the half-samples
-            var sup = 10 * ns >= 9 * nh, mid = 10 * ns >= 6 * nh;
-            var base = sup ? "SUPPORTED" : mid ? "SUPPORTED, SIZE VARIABLE" : "UNSTABLE: same sign in only " + ns + " of " + nh + " half-samples";
-            L.tone = sup ? "ok" : mid ? "mid" : "warn";
-            L.status = base + (L.extrap ? " | OUTSIDE MODELED DATA RANGE: extrapolated" : "");
-            if (L.extrap) L.tone = "bad";
-          }
-        }
-      });
+      grid.forEach(function (L) { if (L.key !== "time") hsApply(L, store[L.comp + "|" + L.key] || []); });
       Object.keys(hsFreq).forEach(function (g) { hsFreq[g] = Math.round(1000 * hsFreq[g] / H) / 1000; });
     }
 
-    progress("Segments, time and diagnostics", 0.96); await tick();
+    // ---- time index: half-sample refits of the whole time fit, monthly and yearly tables
+    progress("Time index refits", 0.82); await tick();
+    var tmMonths = [], p0d = ymd(dmin), p1d = ymd(eff);
+    for (var mi = 0; ; mi++) { var pt = dayOf(p0d[0], p0d[1] + mi, 15); if (pt > dayOf(p1d[0], p1d[1], 15)) break; tmMonths.push(Math.min(pt, eff)); }
+    var monthAge = tmMonths.map(function (t) { return (eff - t) / MONTH; });
+    var compAgeM = compRows.map(function (cr) { return cr.sale_age / MONTH; });
+    var hsMonthF = null, hsCompF = null, tmFreq = 0;
+    if (H > 0) {
+      var rt = M.rRNG(cfg.masterSeed + 20000), halfM = Math.floor(nMarket / 2);   // R: set.seed(master + 20000)
+      hsMonthF = []; hsCompF = [];
+      for (var b2 = 0; b2 < H; b2++) {
+        if (b2 % 20 === 0) { progress("Time index refits: " + b2 + " of " + H, 0.82 + 0.12 * b2 / H); await tick(); }
+        var ixm = rt.sampleNoReplace(nMarket, halfM), fb;
+        try { fb = tmFit(ixm, false); } catch (err2) { hsMonthF.push(null); hsCompF.push(null); continue; }
+        hsMonthF.push(monthAge.map(function (aa) { return tmF(fb, aa); }));
+        hsCompF.push(compAgeM.map(function (aa) { return tmF(fb, aa); }));
+        if (fb.terms.length) tmFreq++;
+      }
+      compRows.forEach(function (cr, ci) {
+        hsApply(timeLine[ci], hsCompF.filter(Boolean).map(function (row) { return cr.price_comp * (Math.exp(-row[ci]) - 1); }));
+      });
+      hsFreq = Object.assign({ time: Math.round(1000 * tmFreq / H) / 1000 }, hsFreq);
+    }
+    var curF = monthAge.map(function (aa) { return tmF(tm, aa); });
+    var monthCount = {}; dm.forEach(function (r) { var mk = monthKey(r.date_used); monthCount[mk] = (monthCount[mk] || 0) + 1; });
+    var timeMonths = tmMonths.map(function (t, mi2) {
+      var hsv = hsMonthF ? hsMonthF.filter(Boolean).map(function (row) { return Math.exp(-row[mi2]) - 1; }) : [];
+      return { month: monthKey(t), date: dayStr(t), monthsBack: monthAge[mi2], pct: Math.exp(-curF[mi2]) - 1, hsLo: qOrNa(hsv, 0.025), hsHi: qOrNa(hsv, 0.975), sales: monthCount[monthKey(t)] || 0 };
+    });
+    function spanPct(fv, idxs) { if (!idxs.length) return NaN; var s = 0; idxs.forEach(function (q) { s += Math.exp(fv[q]); }); return 1 / (s / idxs.length) - 1; }
+    // yearly table: the median-to-median method on the export as pulled, beside the index
+    var pulled = sales.map(function (r) {
+      var stOk = r.status === null || r.status === undefined || ["CLS", "CLOSED", "SOLD", ""].indexOf(r.status) >= 0;
+      return stOk && r.sale_price > 1000 && isFinite(r.sale_date) && (!cfg.excludeAfterEffective || r.sale_date <= eff);
+    });
+    function medOf(pred) { var v = []; sales.forEach(function (r, i) { if (pulled[i] && pred(r, i)) v.push(r.sale_price); }); return v.length ? median(v) : NaN; }
+    var medEff = medOf(function (r) { return yearOf(r.sale_date) === effYear; }), medEffRes = medOf(function (r, i) { return yearOf(r.sale_date) === effYear && !ncFlag[i]; });
+    var timeYears = [];
+    for (var yy0 = yearOf(dmin); yy0 <= effYear; yy0++) (function (yy) {
+      var nSel = 0, nNc = 0; sales.forEach(function (r, i) { if (pulled[i] && yearOf(r.sale_date) === yy) { nSel++; if (ncFlag[i]) nNc++; } });
+      var med = medOf(function (r) { return yearOf(r.sale_date) === yy; }), prev = medOf(function (r) { return yearOf(r.sale_date) === yy - 1; });
+      var res0 = medOf(function (r, i) { return yearOf(r.sale_date) === yy && !ncFlag[i]; });
+      var idxs = []; tmMonths.forEach(function (t, q) { if (yearOf(t) === yy) idxs.push(q); });
+      var hsv = hsMonthF ? hsMonthF.filter(Boolean).map(function (row) { return spanPct(row, idxs); }) : [];
+      timeYears.push({ year: yy, salesPulled: nSel, median: med, yoy: med / prev - 1, medianToEffYear: medEff / med - 1, ncShare: nSel ? nNc / nSel : NaN,
+        resaleMedian: res0, resaleToEffYear: medEffRes / res0 - 1, cleanSales: dm.filter(function (r) { return yearOf(r.date_used) === yy; }).length,
+        index: spanPct(curF, idxs), indexLo: qOrNa(hsv, 0.025), indexHi: qOrNa(hsv, 0.975) });
+    })(yy0);
+    var mixRows = timeYears.filter(function (t) { return t.salesPulled >= 20 && isFinite(t.ncShare); });
+    var mixShares = mixRows.map(function (t) { return Math.round(1000 * t.ncShare) / 10; });
+    var mixShift = mixRows.length >= 2 && Math.max.apply(null, mixShares) - Math.min.apply(null, mixShares) >= 10;
+    if (mixShift) notes.push("Mix shift: new construction was " + gfmt(Math.min.apply(null, mixShares)) + "% to " + gfmt(Math.max.apply(null, mixShares)) +
+      "% of the sales pulled each year. Year-to-year medians move with that mix; the index holds the mix constant.");
+
+    // ---- FHFA check: the same FHFA periods compared on both series
+    var fhfa = null;
+    if (cfg.fhfa && cfg.fhfa.values && cfg.fhfa.values.length) {
+      var fv = cfg.fhfa.values.map(function (pv) { return { date: typeof pv.date === "number" ? pv.date : dayNum(pv.date), value: num(pv.value) }; })
+        .filter(function (pv) { return isFinite(pv.date) && isFinite(pv.value) && pv.value > 0; }).sort(function (u, v) { return u.date - v.date; });
+      if (fv.length >= 2) {
+        var gaps = []; for (var gi = 1; gi < fv.length; gi++) gaps.push(fv[gi].date - fv[gi - 1].date);
+        var gap = median(gaps), lenM = gap >= 300 ? 12 : gap >= 80 ? 3 : 1;
+        fv.forEach(function (pv) { pv.end = addMonths(pv.date, lenM); });
+        var plab = function (q) { var t = fv[q].date; return lenM === 12 ? String(yearOf(t)) : lenM === 3 ? yearOf(t) + "Q" + qtrOf(t) : monthKey(t); };
+        var periodOf = function (t) { if (!isFinite(t)) return -1; for (var q = 0; q < fv.length; q++) if (fv[q].date <= t && t < fv[q].end) return q; return -1; };
+        var pe = periodOf(eff), endsEarly = false;
+        if (pe < 0 && eff >= fv[fv.length - 1].end) { pe = fv.length - 1; endsEarly = true; }
+        var flabel = cfg.fhfa.label ? String(cfg.fhfa.label) : "FHFA HPI";
+        var pidx = function (q) { var o = []; tmMonths.forEach(function (t, z) { if (t >= fv[q].date && t < fv[q].end) o.push(z); }); return o; };
+        // a period is compared only when the export covers at least half of its months (the end period is the reference)
+        var coverOf = function (q) { return pidx(q).length / lenM; };
+        var okPeriod = function (q) { return pe >= 0 && (q === pe || coverOf(q) >= 0.5); };
+        var avgExp = function (fvv, idxs) { var s = 0; idxs.forEach(function (z) { s += Math.exp(fvv[z]); }); return s / idxs.length; };
+        var sbFull = function (q) { if (!okPeriod(q)) return NaN; var a2 = pidx(q), b3 = pidx(pe); if (!a2.length || !b3.length) return NaN; return avgExp(curF, b3) / avgExp(curF, a2) - 1; };
+        var sbHs = function (q) { if (!hsMonthF || !okPeriod(q)) return []; var a2 = pidx(q), b3 = pidx(pe); if (!a2.length || !b3.length) return [];
+          return hsMonthF.filter(Boolean).map(function (row) { return avgExp(row, b3) / avgExp(row, a2) - 1; }); };
+        var table2 = [], peIdx = pe < 0 ? [] : pidx(pe), endToEff = peIdx.length ? 1 / avgExp(curF, peIdx) - 1 : NaN;
+        fv.forEach(function (pv, q) {
+          if (!(pv.end > dmin && pv.date <= eff)) return;
+          var fp = pe < 0 ? NaN : fv[pe].value / pv.value - 1, lp = sbFull(q), hsv = sbHs(q), lo = qOrNa(hsv, 0.025), hi = qOrNa(hsv, 0.975);
+          // chained: FHFA's change to its end period, then this index from that period to the effective date (for the chart)
+          table2.push({ period: plab(q), start: dayStr(pv.date), end: pv.end, mid: (pv.date + pv.end - 1) / 2, cover: Math.min(1, coverOf(q)), index: pv.value, fhfaPct: fp, localPct: lp, lo: lo, hi: hi,
+            outside: isFinite(fp) && isFinite(lo) ? (fp < lo || fp > hi) : null, chained: (1 + endToEff) * (1 + fp) - 1 });
+        });
+        compRows.forEach(function (cr, ci) {
+          var L = timeLine[ci], pc = periodOf(cr.date_used);
+          if (pc < 0 || pe < 0 || !isFinite(L.adj) || !okPeriod(pc)) return;
+          var fp = fv[pe].value / fv[pc].value - 1, lp = sbFull(pc), hsv = sbHs(pc), lo = qOrNa(hsv, 0.025), hi = qOrNa(hsv, 0.975);
+          L.fhfa = { pct: fp, from: plab(pc), to: plab(pe), localPct: lp, lo: lo, hi: hi };
+          if (isFinite(lo) && (fp < lo || fp > hi))
+            L.review = "FHFA CHECK: " + flabel + " shows " + fmtPct(fp) + " from " + plab(pc) + " to " + plab(pe) + "; these sales show " + fmtPct(lp) +
+              " over the same periods (half-sample range " + fmtPct(lo) + " to " + fmtPct(hi) + "). Find out why before relying on this time line.";
+        });
+        var freqName = lenM === 12 ? "annual" : lenM === 3 ? "quarterly" : "monthly";
+        fhfa = { label: flabel, frequency: freqName, firstPeriod: plab(0), lastPeriod: plab(fv.length - 1), endPeriod: pe < 0 ? null : plab(pe), endsEarly: endsEarly, endToEff: endToEff, table: table2 };
+        notes.push("FHFA check: " + flabel + ", " + freqName + ", " + fhfa.firstPeriod + " to " + fhfa.lastPeriod +
+          (endsEarly ? " (ends before the effective date, so its changes run to " + fhfa.lastPeriod + " only)" : "") + ". Compared with this index over the same " + freqName + " periods.");
+      } else notes.push("FHFA series has fewer than 2 usable values; FHFA check skipped.");
+    }
+
+    // ---- leave-comps-out: refit the adjustment model without the report comps
+    var influence = null;
+    if (cfg.leaveCompsOut) {
+      var compIds = compRows.map(function (cr) { return cr.mls_id; }).filter(Boolean);
+      var dropSet = {}; d.forEach(function (rw, ii) { if (rw.mls_id && compIds.indexOf(rw.mls_id) >= 0) dropSet[ii] = true; });
+      var nDrop = Object.keys(dropSet).length;
+      if (!nDrop) notes.push("Leave-comps-out check: none of the comps is in the adjustment pool, so none of them shaped the model.");
+      else if (n - nDrop < 60) notes.push("Leave-comps-out check skipped: fewer than 60 sales would remain.");
+      else {
+        var keepIdx = []; for (var ki = 0; ki < n; ki++) if (!dropSet[ki]) keepIdx.push(ki);
+        var subL = M.subset(cols, y, keepIdx), ml = null;
+        try { ml = M.fit(subL.cols, subL.y, fitOpts); } catch (err3) { ml = null; }
+        if (ml) {
+          var tgl = ml.terms.map(function (t) { return t.pred < 0 ? "(Intercept)" : groupOfCol[t.pred]; }), bsl = M.basisRow(ml, Xs);
+          influence = [];
+          grid.forEach(function (L) {
+            if (L.key === "time" || !isFinite(L.adj)) return;
+            var bcl = M.basisRow(ml, compRows[L.comp]._X), v = 0;
+            for (var t3 = 0; t3 < tgl.length; t3++) if (tgl[t3] === L.key) v += (bsl[t3] - bcl[t3]) * ml.terms[t3].coef;
+            if (!isFinite(v)) return;
+            L.loo = v;
+            var out = isFinite(L.hsLo) && (v < L.hsLo - 0.5 || v > L.hsHi + 0.5);
+            if (out) L.review = (L.review ? L.review + " | " : "") + "COMP INFLUENCE: with your comps left out of the fit this line is " + fmtMoney(v) +
+              ", outside its half-sample range (" + fmtMoney(L.hsLo) + " to " + fmtMoney(L.hsHi) + "). Your comps are steering their own adjustment; check them.";
+            influence.push({ comp: L.comp, key: L.key, label: L.label, withComps: L.adj, withoutComps: v, change: v - L.adj, hsLo: L.hsLo, hsHi: L.hsHi, outside: out });
+          });
+          notes.push("Leave-comps-out check: refit without the " + nDrop + " comp(s) in the adjustment pool; " + influence.filter(function (x) { return x.outside; }).length + " line(s) moved outside their half-sample range.");
+        }
+      }
+    }
+
+    progress("Segments and diagnostics", 0.96); await tick();
     // ---- per-segment slopes & curves
     var segments = [], curves = {};
-    ["sale_age"].concat(features).forEach(function (f) {
+    features.forEach(function (f) {
       var rg = ranges[f];
       if (groupsIn.indexOf(f) < 0) { segments.push({ feature: f, from: rg[0], to: rg[1], slope: 0, inModel: false }); return; }
       var ks = knotsOf(f).filter(function (t) { return t > rg[0] && t < rg[1]; });
@@ -1889,27 +2311,6 @@ var MarsAnalysis = (function (M) {
                  vsSubject: locKnown && groupsIn.indexOf("location") >= 0 ? gContrib(xl, "location") - gContrib(Xs, "location") : (locKnown ? 0 : NaN) };
       });
     }
-
-    // ---- time index + ln-price half-year cross-check
-    var maxAge = Math.max.apply(null, d.map(function (rw) { return rw.sale_age; }));
-    var timeIndex = [], effDate = new Date(eff * 86400000);
-    for (var mo = 0; mo <= Math.ceil(maxAge / MONTH); mo++) {
-      var age = mo * MONTH, xa = Xs.slice(); xa[0] = age;
-      var adj = groupsIn.indexOf("sale_age") >= 0 ? gContrib(Xs, "sale_age") - gContrib(xa, "sale_age") : 0;
-      var md = new Date(Date.UTC(effDate.getUTCFullYear(), effDate.getUTCMonth() - mo, 1));
-      timeIndex.push({ monthsBack: mo, month: md.toISOString().slice(0, 7), adj: adj, pct: adj / median(Array.from(y)) });
-    }
-    var halfCheck = null;
-    try {
-      var halves = d.map(function (rw) { return Math.floor(rw.sale_age / (6 * MONTH)); });
-      var hl = Array.from(new Set(halves)).sort(function (u, v) { return u - v; });
-      var locLv = locVar ? Array.from(new Set(d.map(function (rw) { return rw.loc; }))).sort() : [];
-      var Xh = hl.slice(1).map(function (h) { return halves.map(function (v) { return v === h ? 1 : 0; }); })
-        .concat(features.map(function (f) { return d.map(function (rw) { return rw[f]; }); }))
-        .concat(locLv.slice(1).map(function (l) { return d.map(function (rw) { return rw.loc === l ? 1 : 0; }); }));
-      var oh = ols(Xh, d.map(function (rw) { return Math.log(rw.price_used); }));
-      if (oh) halfCheck = hl.slice(1).map(function (h, ii) { return { halfYearBack: h, lnPrice: oh.beta[1 + ii] }; });
-    } catch (e) { halfCheck = null; }
 
     // ---- residual layer (earthUI residual-contribution method)
     var rf = cfg.residualFeatures.filter(function (f) {
@@ -1932,7 +2333,7 @@ var MarsAnalysis = (function (M) {
           if (isNaN(sv) || isNaN(cv)) return;
           var est3 = rt.estimate * (sv - cv), se3 = rt.se * Math.abs(sv - cv);
           grid.push({ comp: ci3, key: rt.feature, residual: true, label: rt.label + " (residual layer)", subject: sv, compValue: cv, adj: est3, seC: se3, seH: NaN,
-            lo: est3 - 1.96 * se3, hi: est3 + 1.96 * se3, hsLo: NaN, hsHi: NaN, hsShare: NaN, hsSame: NaN, knot: false, extrap: false, segments: [],
+            lo: est3 - 1.96 * se3, hi: est3 + 1.96 * se3, hsLo: NaN, hsHi: NaN, hsShare: NaN, hsSame: NaN, knot: false, extrap: false, segments: [], loo: NaN,
             status: sv === cv ? "NO DIFFERENCE" : rt.note, tone: sv === cv ? "zero" : (Math.abs(rt.t) >= 2 && rt.nNonzero >= 10 ? "ok" : "warn"),
             review: sv !== cv && cfg.expectedPositive.indexOf(rt.feature) >= 0 && rt.estimate < 0 ?
               "REVERSED SIGN: residual-layer estimate is " + fmtRate(rt.estimate) + " per " + unitOf(rt.feature) + ". More of this feature normally adds value." : "" });
@@ -1948,12 +2349,12 @@ var MarsAnalysis = (function (M) {
       concDiag = { n: withConc, perDollar: oc ? oc.beta[1] : NaN, se: oc ? oc.se[1] : NaN };
     } else concDiag = { n: withConc };
 
-    // ---- comp diagnostics: model estimate, residual, CQA rank
+    // ---- comp diagnostics: model estimate vs the comp's time-adjusted price, residual, CQA rank
     var compDiag = compRows.map(function (cr) {
       var pr = (cr._X.some(function (v) { return isNaN(v); }) || !cr._loc.known) ? NaN : M.predict(m, cr._X);
-      var price = cr.sale_price - cfg.concessionReaction * (isNaN(cr.concessions) ? 0 : cr.concessions);
+      var price = isFinite(cr.sale_age) ? cr.price_comp * Math.exp(-tmF(tm, cr.sale_age / MONTH)) : NaN;
       var rr = price - pr;
-      return { mls_id: cr.mls_id, address: cr.address, priceUsed: price, estimate: pr, residual: rr,
+      return { mls_id: cr.mls_id, address: cr.address, priceUsed: cr.price_comp, priceTimeAdjusted: price, estimate: pr, residual: rr,
                cqa: isNaN(rr) ? NaN : 10 * resid.filter(function (v) { return v < rr; }).length / n, inFit: cr._inFit };
     });
 
@@ -1962,7 +2363,7 @@ var MarsAnalysis = (function (M) {
     var battery = features.concat(rf).map(function (f) {
       var xs = d.map(function (rw) { return rw[f]; });
       if (new Set(xs).size < 2 || xs.some(function (v) { return isNaN(v); })) return null;
-      var inM = groupsIn.indexOf(f) >= 0, jj = colNames.indexOf(f);
+      var inM = groupsIn.indexOf(f) >= 0;
       var yv = d.map(function (rw, ii) { return resid[ii] + (inM ? gContrib(X[ii], f) : 0); });
       var o = ols([xs], yv);
       return { feature: f, label: LABELS[f] || f, inMars: inM, ols: o ? o.beta[1] : NaN, theilSen: theilSen(xs, yv, tsSeed), lad: lad(xs, yv), grouped: groupedQuintiles(xs, yv) };
@@ -1993,33 +2394,48 @@ var MarsAnalysis = (function (M) {
     });
 
     // ---- reproducibility
-    // same fingerprint string as the R reference script (numbers rounded to 6 decimals)
+    // same fingerprint string as the R reference script: one line per clean sale in the market pool
+    // (mls_id, price used, sale age, features, location as recorded, 1 if in the adjustment pool)
     var cn = function (v) { var x = Math.round(v * 1e6) / 1e6; return String(x === 0 ? 0 : x); };
-    var canon = d.map(function (rw) { return [rw.mls_id, cn(rw.price_used), cn(rw.sale_age)].concat(features.map(function (f) { return cn(rw[f]); })).concat(locVar ? [rw.loc] : []).join(","); }).join("\n");
+    var canon = dm.map(function (rw, ii) {
+      return [rw.mls_id, cn(rw.price_used), cn(rw.sale_age)].concat(features.map(function (f) { return cn(rw[f]); }))
+        .concat(locVar ? [String(rw[locVar]).trim().toUpperCase()] : []).concat([inPool[ii] ? "1" : "0"]).join(",");
+    }).join("\n");
     var settings = { effectiveDate: dayStr(eff), dateBasis: dateKey, trimContractEdge: trim, excludeAfterEffective: cfg.excludeAfterEffective, cutoffBasis: cfg.cutoffBasis,
       excludeUnexposed: cfg.excludeUnexposed, exposureChecked: hasListDate, excludeFlips: cfg.excludeFlips, flipDays: cfg.flipDays, flipRatio: cfg.flipRatio, excludeSaleTypes: cfg.excludeSaleTypes,
       concessionReaction: cfg.concessionReaction, features: features, location: locVar, locationMinN: cfg.locationMinN, residualFeatures: rf,
+      poolRanges: poolUsed, timeKnotMonths: cfg.timeKnotMonths, timeMinSide: cfg.timeMinSide, timeSeason: String(cfg.timeSeason), timeScreenRatio: cfg.timeScreenRatio,
+      fhfaLabel: fhfa ? fhfa.label : null, leaveCompsOut: !!cfg.leaveCompsOut,
       degree: 1, nk: fitOpts.nk, minspan: fitOpts.minspan, endspan: fitOpts.endspan, penalty: cfg.penalty, newvarPenalty: cfg.newvarPenalty,
       thresh: cfg.thresh, pmethod: "backward", nfold: nfold, ncross: ncross, halfSamples: H, masterSeed: cfg.masterSeed,
       timeGapDays: cfg.timeGapDays, expectedPositive: cfg.expectedPositive };
     var dataHash = await sha256(canon), cfgHash = await sha256(JSON.stringify(settings));
+    var timeMethod = "Quality-adjusted log-price index from " + nMarket + " clean sales: log price on " + features.join(", ") + (tmLoc.length ? ", location" : "") +
+      (seasonOn ? ", quarter of the year (reported, not applied)" : "") + ", plus a time curve that may bend only on a " + cfg.timeKnotMonths + "-month calendar grid with at least " +
+      cfg.timeMinSide + " sales on each side, bends pruned by GCV (penalty " + gfmt(cfg.penalty) + "). Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.";
     progress("Done", 1);
     return {
       version: VERSION, runDate: new Date().toISOString().slice(0, 10), settings: settings, notes: notes,
-      data: { nFile: sales.length, n: n, nExcluded: excl.length, window: [dayStr(dmin), dayStr(dmax)], exclusions: excl, timeGap: Math.round(timeGap) },
+      data: { nFile: sales.length, nMarket: nMarket, n: n, nExcluded: excl.length, nOutsidePool: poolOut.length, poolRanges: poolUsed, poolDesc: poolDesc,
+              window: [dayStr(dmin), dayStr(dmax)], exclusions: excl.concat(poolOut), timeGap: Math.round(timeGap) },
       model: { terms: m.terms.map(function (t) { return { pred: t.pred, name: t.pred < 0 ? "(Intercept)" : colNames[t.pred], dir: t.dir, cut: t.cut, coef: t.coef }; }),
                groups: groupsIn, rsq: m.rsq, grsq: m.grsq, cvrsq: cvr.cvrsq, cvsd: cvr.sd, rmse: Math.sqrt(m.rss / n),
                mae: resid.reduce(function (sm, v) { return sm + Math.abs(v); }, 0) / n, k: k,
                termcond: m.termcond, nForward: m.nForward, hsFreq: hsFreq },
+      time: { method: timeMethod, n: nMarket, knotMonths: cfg.timeKnotMonths, minSide: cfg.timeMinSide, seasonOn: seasonOn, season: tm.season,
+              candidates: tm.candidateDates.map(dayStr), overallSlope: tm.terms.some(function (k2) { return k2 === null; }), bends: tmBends.map(dayStr),
+              flat: !tm.terms.length, segments: tmSegments.map(function (s) { return { from: dayStr(s.from), to: dayStr(s.to), rate: s.rate, total: s.total }; }),
+              r2: tm.r2, halfSamples: H, trendShare: H > 0 ? tmFreq / H : NaN, months: timeMonths, years: timeYears, mixShift: mixShift, fhfa: fhfa },
       features: features, locVar: locVar, subjectLocation: subjLoc, locStatus: locStatus, subjectRow: subjRow,
-      comps: compRows.map(function (cr) { return { mls_id: cr.mls_id, address: cr.address, sale_price: cr.sale_price, concessions: cr.concessions,
-        sale_age: cr.sale_age, date: dayStr(cr[dateKey]), inFit: cr._inFit, location: cr._loc.raw }; }),
-      grid: grid, segments: segments, curves: curves, ranges: ranges, locEffects: locEffects, timeIndex: timeIndex, halfCheck: halfCheck,
+      comps: compRows.map(function (cr) { return { mls_id: cr.mls_id, address: cr.address, sale_price: cr.sale_price, concessions: cr.concessions, price: cr.price_comp,
+        sale_age: cr.sale_age, date: dayStr(cr[dateKey]), inFit: cr._inFit, inMarket: cr._inMarket, location: cr._loc.raw }; }),
+      grid: grid, segments: segments, curves: curves, ranges: ranges, locEffects: locEffects,
       residual: residTable, concession: concDiag, compDiag: compDiag, battery: battery, localVal: localVal, bracketing: bracketing,
-      repeatSales: repeatSales,
+      repeatSales: repeatSales, influence: influence,
       modelData: d.map(function (rw, ii) {
         var o = { mls_id: rw.mls_id, address: rw.address, sale_price: rw.sale_price, price_used: rw.price_used, date: dayStr(rw.date_used), sale_age: rw.sale_age };
         features.forEach(function (f) { o[f] = rw[f]; }); if (locVar) o.location = rw.loc;
+        o.time_factor = rw.time_factor; o.price_time_adjusted = rw.price_ta;
         o.model_estimate = fitted[ii]; o.residual = resid[ii]; return o;
       }),
       repro: { dataSha256: dataHash, configSha256: cfgHash, masterSeed: cfg.masterSeed, rng: "Mersenne-Twister, R set.seed() compatible (sample.kind Rejection)", engine: "MarsEngine " + VERSION + " (port of R earth 5.3 forward pass, knot search and leaps backward pruning)" }
@@ -2028,7 +2444,7 @@ var MarsAnalysis = (function (M) {
 
   return { VERSION: VERSION, ROLES: ROLES, LABELS: LABELS, UNITS: UNITS, DEFAULTS: DEFAULTS,
            parseCSV: parseCSV, autoMap: autoMap, isStandard: isStandard, mapRows: mapRows, num: num, dayNum: dayNum, dayStr: dayStr, run: run, quantile7: quantile7,
-           fmtMoney: fmtMoney, fmtRate: fmtRate, fmtVal: fmtVal, unitOf: unitOf, sha256js: sha256js };
+           fmtMoney: fmtMoney, fmtRate: fmtRate, fmtVal: fmtVal, fmtPct: fmtPct, unitOf: unitOf, sha256js: sha256js, parseIndexSeries: parseIndexSeries };
 })(typeof MarsEngine !== "undefined" ? MarsEngine : require("./mars_engine.js"));
 if (typeof module !== "undefined") module.exports = MarsAnalysis;
 
@@ -2066,7 +2482,9 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     zip: "22406", fireplaces: "1", pool: "0", deck: "1", porch: "1", carport: "0" };
   var DEMO_COMPS = ["DEMO100040", "DEMO100104", "DEMO100003"];
 
-  var S = { table: null, fileName: "", map: {}, rows: [], isDemo: false, subject: {}, comps: [], nextId: 1, result: null, mine: {}, worker: null, running: false };
+  var S = { table: null, fileName: "", map: {}, rows: [], isDemo: false, subject: {}, comps: [], nextId: 1, result: null, mine: {}, worker: null, running: false,
+    fhfaOwn: null, fhfaTouched: false };
+  var FHFA_PRESETS = (function () { try { return JSON.parse(document.getElementById("fhfa-presets").textContent); } catch (e) { return []; } })();
 
   // ------------------------------------------------------------- helpers
   function $(id) { return document.getElementById(id); }
@@ -2160,7 +2578,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
   function applyMapping() {
     S.rows = A.mapRows(S.table, S.map);
     S.comps.forEach(function (c) { if (c.source === "file") c.stale = !S.rows.some(function (r) { return r.mls_id === c.mls; }); });
-    renderFileSummary(); renderDataCheck(); renderLocOptions(); renderFeatureBoxes(); renderSubject(); renderComps(); updateChecklist();
+    renderFileSummary(); renderDataCheck(); renderLocOptions(); renderFeatureBoxes(); renderSubject(); renderComps(); suggestFhfa(); updatePoolCount(); updateChecklist();
   }
   function renderFileSummary() {
     var fs = clear($("file-summary")), rows = S.rows;
@@ -2241,6 +2659,70 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
   function usedFeatures() { return FEATURES.filter(function (f) { var b = document.getElementById("use-" + f); return b && b.checked && !b.disabled; }); }
   function usedAmen() { return AMEN.filter(function (f) { var b = document.getElementById("amen-" + f); return b && b.checked && !b.disabled; }); }
   function locVar() { return $("locvar").value; }
+
+  // ------------------------------------------------------------- 02b adjustment pool and FHFA
+  var POOL = [["gla", "pr-gla-lo", "pr-gla-hi", "GLA"], ["year_built", "pr-yb-lo", "pr-yb-hi", "year built"], ["lot_ac", "pr-lot-lo", "pr-lot-hi", "lot"]];
+  function poolRanges() {
+    var out = {};
+    POOL.forEach(function (p) { var lo = A.num($(p[1]).value), hi = A.num($(p[2]).value); if (fin(lo) || fin(hi)) out[p[0]] = [fin(lo) ? lo : null, fin(hi) ? hi : null]; });
+    return out;
+  }
+  function poolEstimate() {   // rows in the file inside the ranges, before the cleaning rules (the run reports the exact count)
+    var pr = poolRanges(), keys = Object.keys(pr), eff = A.dayNum($("eff").value);
+    var base = S.rows.filter(function (r) { return r.sale_price > 1000 && fin(r.sale_date) && (!fin(eff) || !$("r-after").checked || r.sale_date <= eff); });
+    var inside = base.filter(function (r) { return keys.every(function (f) { var v = r[f], b = pr[f]; return fin(v) && (b[0] === null || v >= b[0]) && (b[1] === null || v <= b[1]); }); });
+    return { keys: keys, base: base.length, inside: inside.length };
+  }
+  function updatePoolCount() {
+    var box = $("pool-count"); if (!box) return;
+    if (!S.rows.length) { box.textContent = ""; return; }
+    var e = poolEstimate();
+    box.textContent = e.keys.length ? "About " + int(e.inside) + " of " + int(e.base) + " closed sales in the file fall inside these ranges, before the cleaning rules. The run reports the exact count." :
+      "No ranges set: every clean sale also goes into the adjustment model.";
+    box.className = "small" + (e.keys.length && e.inside < 60 ? " warn-text" : "");
+  }
+  function normCounty(s) { return String(s || "").toLowerCase().replace(/\bcounty\b/g, "").replace(/['.]/g, "").replace(/\s*,\s*/g, ",").replace(/\s+/g, " ").trim(); }
+  function presetFor(county) {
+    var k = normCounty(county);
+    return FHFA_PRESETS.filter(function (p) { return (p.match || []).indexOf(k) >= 0; })[0] || null;
+  }
+  function renderFhfaOptions() {
+    var sel = $("fhfa-preset"), prev = sel.value; clear(sel);
+    sel.appendChild(h("option", { value: "", text: "No FHFA check" }));
+    FHFA_PRESETS.forEach(function (p) { sel.appendChild(h("option", { value: p.id, text: p.name + " (annual, " + p.values[0].date.slice(0, 4) + " to " + p.values[p.values.length - 1].date.slice(0, 4) + ")" })); });
+    sel.appendChild(h("option", { value: "own", text: "Paste or load my own series" }));
+    sel.value = prev || "";
+    updateFhfaStatus();
+  }
+  function selectedFhfa() {
+    var v = $("fhfa-preset").value;
+    if (!v) return null;
+    if (v === "own") { if (!S.fhfaOwn || S.fhfaOwn.values.length < 2) return null; return { label: $("fhfa-label").value.trim() || "FHFA HPI (pasted series)", values: S.fhfaOwn.values }; }
+    var p = FHFA_PRESETS.filter(function (x) { return x.id === v; })[0];
+    return p ? { label: p.label, values: p.values } : null;
+  }
+  function updateFhfaStatus() {
+    var v = $("fhfa-preset").value, st = $("fhfa-status");
+    $("fhfa-own").hidden = v !== "own";
+    if (!v) { st.textContent = "Off. Pick the subject's county, or paste a series from FRED or the FHFA site."; return; }
+    if (v === "own") {
+      var o = S.fhfaOwn;
+      st.textContent = !o ? "Paste values or load a file below." : o.values.length < 2 ? "Could not read two or more values from that." :
+        o.values.length + " values read, " + o.values[0].date + " to " + o.values[o.values.length - 1].date + (o.skipped ? " (" + o.skipped + " lines skipped)" : "") + ".";
+      return;
+    }
+    var p = FHFA_PRESETS.filter(function (x) { return x.id === v; })[0];
+    st.textContent = p ? "FRED " + p.id + ", FHFA all-transactions index, annual through " + p.values[p.values.length - 1].date.slice(0, 4) + " (FRED update " + p.updated + "). " + (S.fhfaAuto === v ? "Picked from the County column in your file." : "") : "";
+  }
+  function suggestFhfa() {
+    if (S.fhfaTouched || !S.rows.length) return;
+    var cnt = {}; S.rows.forEach(function (r) { if (r.county) cnt[r.county] = (cnt[r.county] || 0) + 1; });
+    var top = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a]; })[0];
+    var p = top && cnt[top] >= 0.6 * S.rows.length ? presetFor(top) : null;
+    $("fhfa-preset").value = p ? p.id : ""; S.fhfaAuto = p ? p.id : null;
+    updateFhfaStatus();
+  }
+  function readFhfaText(text) { var r = A.parseIndexSeries(text); S.fhfaOwn = r; updateFhfaStatus(); }
 
   // ------------------------------------------------------------- 03 subject
   function fieldInput(f, value, onchange, opts) {
@@ -2378,7 +2860,9 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
       [S.map.sale_price >= 0 && S.map.close_date >= 0 && S.map.gla >= 0, "Close price, closing date and GLA mapped"],
       [!!$("eff").value, $("eff").value ? "Effective date " + $("eff").value : "Enter the effective date"],
       [S.rows.length > 0 && subjMissing.length === 0, !S.rows.length ? "Subject: load the sales file first" : subjMissing.length ? "Subject still needs: " + subjMissing.join(", ") : "Subject complete"],
-      [S.comps.length > 0, S.comps.length ? S.comps.length + " comp" + (S.comps.length > 1 ? "s" : "") + " in the grid" : "Add at least one comp"]
+      [S.comps.length > 0, S.comps.length ? S.comps.length + " comp" + (S.comps.length > 1 ? "s" : "") + " in the grid" : "Add at least one comp"],
+      (function () { var e = S.rows.length ? poolEstimate() : null; return !e || !e.keys.length ? [true, "Adjustment pool: every clean sale (no similarity ranges)"] :
+        [e.inside >= 60, "Adjustment pool: about " + int(e.inside) + " sales inside your ranges" + (e.inside < 60 ? " (at least 60 needed; widen them)" : "")]; })()
     ];
   }
   function updateChecklist() {
@@ -2402,7 +2886,9 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
       excludeUnexposed: $("r-exposed").checked, subjectIsNew: $("r-new").checked,
       halfSamples: Math.max(0, Math.round(A.num($("a-hs").value) || 200)), masterSeed: Math.round(A.num($("a-seed").value) || 20260606),
       timeGapDays: fin(A.num($("a-gap").value)) ? A.num($("a-gap").value) : 91,
-      penalty: A.num($("a-pen").value) || 2, newvarPenalty: fin(A.num($("a-nvp").value)) ? A.num($("a-nvp").value) : 0.1, thresh: A.num($("a-thr").value) || 0.001
+      penalty: A.num($("a-pen").value) || 2, newvarPenalty: fin(A.num($("a-nvp").value)) ? A.num($("a-nvp").value) : 0.1, thresh: A.num($("a-thr").value) || 0.001,
+      poolRanges: poolRanges(), timeKnotMonths: +$("a-knot").value || 6, timeMinSide: Math.max(5, Math.round(A.num($("a-side").value) || 20)), timeSeason: $("a-season").value,
+      timeScreenRatio: fin(A.num($("a-screen").value)) ? A.num($("a-screen").value) : 3, leaveCompsOut: $("a-loo").checked, fhfa: selectedFhfa()
     };
   }
   function gatherSubject() {
@@ -2465,20 +2951,29 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
   }
   function chip(L) { var b = baseStatus(L); return h("span", { class: "chip " + b.cls, title: L.status }, icon(b.icon), b.label); }
   function flagsFor(L) {
-    var out = [];
+    var out = [], rv = L.review || "";
     if (L.extrap) out.push(h("span", { class: "flag bad", title: "The comp or subject value is outside the range of the modeled sales", text: "Outside data range" }));
-    if (L.review) out.push(h("span", { class: "flag serious", title: L.review, text: L.residual ? "Reversed sign" : "Reversed segment" }));
-    if (L.knot) out.push(h("span", { class: "flag", title: "The line crosses a knot; the amount is the sum of the segments", text: "Crosses knot" }));
+    rv.split(" | ").forEach(function (part) {
+      if (/^REVERSED/.test(part)) out.push(h("span", { class: "flag serious", title: part, text: L.residual ? "Reversed sign" : "Reversed segment" }));
+      else if (/^FHFA CHECK/.test(part)) out.push(h("span", { class: "flag serious", title: part, text: "FHFA disagrees" }));
+      else if (/^COMP INFLUENCE/.test(part)) out.push(h("span", { class: "flag serious", title: part, text: "Comp influence" }));
+    });
+    if (L.knot) out.push(h("span", { class: "flag", title: L.key === "time" ? "The comp's period crosses a bend in the index; the change is the product of the segments" : "The line crosses a knot; the amount is the sum of the segments", text: L.key === "time" ? "Crosses bend" : "Crosses knot" }));
     return out.length ? h("div", { class: "flags" }, out) : null;
   }
   function lineRange(L) {
     if (L.residual) return fin(L.lo) ? { lo: L.lo, hi: L.hi, kind: "interval" } : null;
     return fin(L.hsLo) ? { lo: L.hsLo, hi: L.hsHi, kind: "half-sample range" } : null;
   }
-  function featName(L) { return L.residual ? L.key + " (residual layer)" : L.key === "sale_age" ? "time (sale_age)" : L.key; }
-  function segText(L) { return (L.segments || []).map(function (s) { return A.fmtVal(L.key, s.from) + " to " + A.fmtVal(L.key, s.to) + " @ " + A.fmtRate(s.slope) + "/" + A.unitOf(L.key); }).join("; "); }
+  function featName(L) { return L.residual ? L.key + " (residual layer)" : L.key === "time" ? "time (market index)" : L.key; }
+  function segText(L) { if (L.key === "time") return L.segmentText || ""; return (L.segments || []).map(function (s) { return A.fmtVal(L.key, s.from) + " to " + A.fmtVal(L.key, s.to) + " @ " + A.fmtRate(s.slope) + "/" + A.unitOf(L.key); }).join("; "); }
   function compLabel(res, ci) { var c = res.comps[ci]; return c.address || c.mls_id || "Comp " + (ci + 1); }
   function mineKey(ci, key, residual) { var id = S.runCompIds && S.runCompIds[ci] !== undefined ? S.runCompIds[ci] : ci; return id + "|" + key + (residual ? "|r" : ""); }
+  function mineValue(L, raw) {   // a time line also takes a percent ("8%" = 8% of the comp's price)
+    var s = String(raw == null ? "" : raw).trim().replace(/^\+/, "");
+    if (/%$/.test(s)) { var pv = A.num(s.replace(/%$/, "")); return L.key === "time" && fin(pv) && fin(L.price) ? L.price * pv / 100 : NaN; }
+    return A.num(s);
+  }
   function checkMine(L, v) {
     if (!fin(v)) return null;
     var rg = lineRange(L);
@@ -2487,9 +2982,9 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     return { state: inside ? "in" : "out", text: inside ? "inside " + rg.kind : "outside " + rg.kind };
   }
   function lineValueText(res, L, which) {
-    if (L.key === "sale_age") {
+    if (L.key === "time") {
       if (which === "subject") return "Eff. " + res.settings.effectiveDate;
-      var c = res.comps[L.comp]; return (c.date || "n/a") + (fin(c.sale_age) ? " (" + int(c.sale_age) + " d)" : "");
+      var c = res.comps[L.comp]; return (c.date || "n/a") + (fin(L.pct) ? " \u00b7 " + pct(L.pct, 2) : "");
     }
     var v = which === "subject" ? L.subject : L.compValue;
     return fval(L.key, v);
@@ -2505,19 +3000,20 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     // header
     box.appendChild(h("div", { class: "rhead" },
       h("div", { class: "phead" }, h("h2", { id: "h-results", text: "Adjustment support" }),
-        h("p", { class: "hint", text: "Effective date " + res.settings.effectiveDate + " · " + res.data.n + " sales modeled · run " + res.runDate + " · engine " + res.version + (S.isDemo ? " · synthetic demo data" : "") })),
+        h("p", { class: "hint", text: "Effective date " + res.settings.effectiveDate + " · " + int(res.data.nMarket) + " clean sales in the time index · " + int(res.data.n) + " in the adjustment pool · run " + res.runDate + " · engine " + res.version + (S.isDemo ? " · synthetic demo data" : "") })),
       h("div", { class: "row noprint" },
         h("button", { type: "button", class: "btn small", text: "Copy grid for Excel", onclick: function (e) { copyText(toTSV(gridRows(res)), e.currentTarget, "Grid"); } }),
         h("button", { type: "button", class: "btn small", text: "Copy workfile note", onclick: function (e) { copyText(buildNote(res), e.currentTarget, "Workfile note"); } }))));
 
     // tiles
     var m = res.model;
+    var T = res.time;
     box.appendChild(h("div", { class: "tiles" },
-      tile("Sales modeled", int(res.data.n), "of " + int(res.data.nFile) + " in the file, " + int(res.data.nExcluded) + " excluded"),
-      tile("R² / GRSq", dec(m.rsq, 3) + " / " + dec(m.grsq, 3), "GRSq is R² penalized for model size"),
+      tile("Time index", int(res.data.nMarket) + " sales", T.flat ? "no trend cleared GCV" : (T.bends.length ? T.bends.length + " bend" + (T.bends.length > 1 ? "s" : "") : "straight trend") + ", R² " + dec(T.r2, 3)),
+      tile("Adjustment pool", int(res.data.n) + " sales", res.data.poolDesc.length ? "inside your ranges; " + int(res.data.nOutsidePool) + " outside" : "no ranges set; " + int(res.data.nExcluded) + " excluded in cleaning"),
+      tile("R² / GRSq", dec(m.rsq, 3) + " / " + dec(m.grsq, 3), m.k + " terms; GRSq is R² penalized for model size"),
       tile("Cross-validated R²", dec(m.cvrsq, 3), "sd " + dec(m.cvsd, 3) + " over " + res.settings.nfold + "-fold x " + res.settings.ncross),
-      tile("Typical miss", dollars(m.mae), "mean absolute error; RMSE " + dollars(m.rmse)),
-      tile("Model terms", String(m.k), m.groups.length + " variables kept by GCV"),
+      tile("Typical miss", dollars(m.mae), "mean absolute error, time-adjusted prices; RMSE " + dollars(m.rmse)),
       tile("Data window", res.data.window[0], "to " + res.data.window[1])));
 
     // notes
@@ -2527,9 +3023,9 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     box.appendChild(gridSection(res, keys, byKey));
     // per-comp detail
     box.appendChild(detailSection(res, keys, byKey));
+    box.appendChild(timeSection(res));
     // curves
     var cs = curvesSection(res); if (cs) box.appendChild(cs);
-    box.appendChild(timeSection(res));
     if (res.locEffects) box.appendChild(locSection(res));
     if (res.residual.length) box.appendChild(amenSection(res));
     box.appendChild(checksSection(res));
@@ -2564,7 +3060,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
       tbody.appendChild(tr);
     });
     var sec = h("div", { class: "section", id: "grid-sec" },
-      sectionHead("Adjustment support grid", "Model amount for each line, with its half-sample range: the full model refit on " + res.settings.halfSamples + " random halves of the sales. Enter your own grid adjustments in the boxes to see whether each falls inside the range."),
+      sectionHead("Adjustment support grid", "Model amount for each line, with its half-sample range: the full procedure refit on " + res.settings.halfSamples + " random halves of the sales. The time line is the comp's price times the index change to the effective date; the feature lines are priced on time-adjusted sales. Enter your own grid adjustments to see whether each falls inside the range (a time line also takes a percent, like 8%)."),
       h("div", { class: "legend" },
         legendItem("ok", "check", "Supported", "same sign in 90%+ of refits"), legendItem("mid", "tilde", "Size variable", "60% to 89%"), legendItem("warn", "alert", "Unstable", "under 60%"),
         legendItem("zero", "dash", "No difference", "same value or flat segment"), legendItem("out", "dot", "Not in model", "see cross-checks")),
@@ -2575,11 +3071,11 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
   function legendItem(cls, ic, label, sub) { return h("span", null, h("span", { class: "chip " + cls }, icon(ic), label), h("span", { class: "muted", text: sub })); }
   function cellFor(res, L, ci) {
     var rg = lineRange(L), mk = mineKey(ci, L.key, L.residual);
-    var inp = h("input", { type: "text", inputmode: "decimal", placeholder: "+0", value: S.mine[mk] !== undefined ? S.mine[mk] : "", "aria-label": "Your adjustment, " + L.label + ", comp " + (ci + 1) });
+    var inp = h("input", { type: "text", inputmode: "decimal", placeholder: L.key === "time" ? "$ or %" : "+0", value: S.mine[mk] !== undefined ? S.mine[mk] : "", "aria-label": "Your adjustment, " + L.label + ", comp " + (ci + 1) });
     var verdict = h("span", { class: "verdict none" });
     function upd() {
       var raw = inp.value.trim(); if (raw) S.mine[mk] = raw; else delete S.mine[mk];
-      var v = A.num(raw.replace(/^\+/, "")); var ck = checkMine(L, v); clear(verdict);
+      var v = mineValue(L, raw); var ck = checkMine(L, v); clear(verdict);
       if (!ck) { verdict.className = "verdict none"; } else { verdict.className = "verdict " + ck.state; verdict.appendChild(icon(ck.state === "in" ? "check" : ck.state === "out" ? "alert" : "dot")); verdict.appendChild(document.createTextNode(ck.text)); }
       updateMine(res);
     }
@@ -2587,7 +3083,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     var cell = h("div", { class: "cell" },
       h("div", { class: "cv", text: lineValueText(res, L, "comp") }),
       h("div", { class: "amt" + (fin(L.adj) && Math.abs(L.adj) < 0.5 ? " zero" : ""), text: fin(L.adj) ? money(L.adj) : "n/a" }),
-      rg ? h("div", { class: "rng", text: (L.residual ? "interval " : "range ") + rangeText(rg.lo, rg.hi) }) : null,
+      rg ? h("div", { class: "rng", text: (L.residual ? "interval " : "range ") + rangeText(rg.lo, rg.hi) + (L.key === "time" && fin(L.price) ? " (" + pctRange(rg.lo / L.price, rg.hi / L.price) + ")" : "") }) : null,
       h("div", { class: "flags" }, chip(L)), flagsFor(L),
       h("label", { class: "mine" }, h("span", { text: "Yours" }), inp), verdict);
     setTimeout(upd, 0);
@@ -2597,7 +3093,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     var entered = [], outside = [];
     res.grid.forEach(function (L) {
       var raw = S.mine[mineKey(L.comp, L.key, L.residual)]; if (raw === undefined) return;
-      var v = A.num(String(raw).replace(/^\+/, "")); if (!fin(v)) return;
+      var v = mineValue(L, raw); if (!fin(v)) return;
       var ck = checkMine(L, v); entered.push({ L: L, v: v, ck: ck });
       if (ck && ck.state === "out") outside.push({ L: L, v: v, rg: lineRange(L) });
     });
@@ -2753,61 +3249,142 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
         table(["Variable", "In full model", "Kept in refits"], fr, { num: [2] }))));
     return sec;
   }
-  function timeSection(res) {
-    var sec = h("div", { class: "section" }, sectionHead("Market conditions", "Dollars a sale from each month needs to reach the effective date, from the model's sale-age curve."));
-    var inModel = res.model.groups.indexOf("sale_age") >= 0, ti = res.timeIndex.slice().reverse();
-    if (!inModel) sec.appendChild(note("", "Time did not clear the GCV noise floor: the data show no time adjustment for this window. The log-price cross-check below tests the same question another way."));
-    else {
-      var avail = ($("results").clientWidth || 720) - 30, W = Math.max(320, Math.min(900, avail)), Hh = W < 480 ? 220 : 240, m = { l: 52, r: 14, t: 14, b: 34 }, n = ti.length;
-      var xlo = -(n - 1) - 0.5, xhi = 0.5, ys = ti.map(function (t) { return t.adj; });
-      var comps = res.grid.filter(function (L) { return !L.residual && L.key === "sale_age" && fin(L.adj) && fin(res.comps[L.comp].sale_age); })
-        .map(function (L) { return { ci: L.comp, x: -res.comps[L.comp].sale_age / 30.4375, y: L.adj }; });
-      var ylo = Math.min(0, Math.min.apply(null, ys.concat(comps.map(function (c) { return c.y; })))), yhi = Math.max(0, Math.max.apply(null, ys.concat(comps.map(function (c) { return c.y; }))));
-      var yp = (yhi - ylo) * 0.1 || 1000; ylo -= yp; yhi += yp;
-      var P = plotFrame(W, Hh, m, xlo, xhi, ylo, yhi);
-      var svg = sv("svg", { viewBox: "0 0 " + W + " " + Hh, role: "img", "aria-label": "Time adjustment to the effective date by month of sale" });
-      niceTicks(ylo, yhi, 4).forEach(function (t) {
-        svg.appendChild(sv("line", { x1: m.l, x2: W - m.r, y1: P.Y(t), y2: P.Y(t), stroke: t === 0 ? "var(--axis)" : "var(--grid)", "stroke-width": 1 }));
-        svg.appendChild(sv("text", { x: m.l - 6, y: P.Y(t) + 3.5, "text-anchor": "end" }, cmoney(t)));
-      });
-      svg.appendChild(sv("line", { x1: m.l, x2: W - m.r, y1: Hh - m.b, y2: Hh - m.b, stroke: "var(--axis)", "stroke-width": 1 }));
-      var every = Math.max(1, Math.ceil(n / Math.max(3, Math.floor(W / 95))));
-      ti.forEach(function (t, i) { var x = i - (n - 1); if ((n - 1 - i) % every === 0) svg.appendChild(sv("text", { x: P.X(x), y: Hh - m.b + 15, "text-anchor": "middle" }, t.month)); });
-      svg.appendChild(sv("path", { d: ti.map(function (t, i) { return (i ? "L" : "M") + P.X(i - (n - 1)).toFixed(1) + " " + P.Y(t.adj).toFixed(1); }).join(""), stroke: "var(--series-1)", "stroke-width": 2, fill: "none", "stroke-linejoin": "round" }));
-      var tm = [];
-      comps.forEach(function (c) {
-        var hit = tm.filter(function (k) { return Math.abs(P.X(k.x) - P.X(c.x)) < 12 && Math.abs(P.Y(k.y) - P.Y(c.y)) < 10; })[0];
-        if (hit) hit.ids.push(c.ci + 1); else tm.push({ x: c.x, y: c.y, ids: [c.ci + 1] });
-      });
-      tm.forEach(function (k) {
-        svg.appendChild(sv("circle", { cx: P.X(k.x), cy: P.Y(k.y), r: 5, fill: "var(--series-2)", stroke: "var(--surface)", "stroke-width": 2 }));
-        svg.appendChild(sv("text", { x: P.X(k.x), y: P.Y(k.y) - 9, "text-anchor": "middle", class: "lbl" }, k.ids.join(", ")));
-      });
-      var cross = sv("line", { y1: m.t, y2: Hh - m.b, stroke: "var(--ink-2)", "stroke-width": 1, opacity: 0, "pointer-events": "none" });
-      var hot = sv("circle", { r: 4, fill: "var(--series-1)", stroke: "var(--surface)", "stroke-width": 2, opacity: 0, "pointer-events": "none" });
-      var hit = sv("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: Hh - m.t - m.b, fill: "transparent", tabindex: 0 });
-      svg.appendChild(cross); svg.appendChild(hot); svg.appendChild(hit);
-      var tip = h("div", { class: "tip", hidden: true });
-      var showAt = function (i) {
-        i = Math.max(0, Math.min(n - 1, i)); var t = ti[i], x = i - (n - 1);
-        cross.setAttribute("x1", P.X(x)); cross.setAttribute("x2", P.X(x)); cross.setAttribute("opacity", 0.6);
-        hot.setAttribute("cx", P.X(x)); hot.setAttribute("cy", P.Y(t.adj)); hot.setAttribute("opacity", 1);
-        clear(tip); tip.hidden = false; tip.appendChild(h("b", { text: money(t.adj) })); tip.appendChild(document.createTextNode("sales from " + t.month + " to reach " + res.settings.effectiveDate));
-        placeTip(tip, svg, W, P.X(x), P.Y(t.adj));
-      };
-      hit.addEventListener("pointermove", function (e) { var b = svg.getBoundingClientRect(); showAt(Math.round(P.inv((e.clientX - b.left) * W / b.width) + (n - 1))); });
-      hit.addEventListener("pointerleave", function () { tip.hidden = true; cross.setAttribute("opacity", 0); hot.setAttribute("opacity", 0); });
-      hit.addEventListener("focus", function () { showAt(n - 1); });
-      hit.addEventListener("keydown", function (e) { if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); hit._i = (hit._i === undefined ? n - 1 : hit._i) + (e.key === "ArrowLeft" ? -1 : 1); hit._i = Math.max(0, Math.min(n - 1, hit._i)); showAt(hit._i); } });
-      hit.addEventListener("blur", function () { tip.hidden = true; });
-      sec.appendChild(h("div", { class: "chart" }, svg, tip, h("div", { class: "keys" }, h("span", null, h("i", { class: "keyline" }), "adjustment to the effective date"), h("span", null, h("i", { class: "keydot" }), "comps"))));
+  function pct(v, d) { return fin(v) ? (v >= 0 ? "+" : "-") + Math.abs(100 * v).toFixed(d === undefined ? 1 : d) + "%" : "n/a"; }
+  function pctRange(lo, hi) { return fin(lo) && fin(hi) ? pct(lo) + " to " + pct(hi) : "n/a"; }
+  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function monthLabel(dn) { var t = new Date(dn * 86400000); return MON[t.getUTCMonth()] + " " + t.getUTCFullYear(); }
+  function dayUTC(y, m, d) { return Math.round(Date.UTC(y, m, d) / 86400000); }
+  function trendSentence(T) {
+    if (T.flat) return "No time trend cleared the GCV penalty: prices in this export show no change a reviewer could support, so sales are not time-adjusted.";
+    var parts = T.segments.map(function (s) {
+      var r = s.rate, a = Math.abs(100 * r).toFixed(2);
+      var span = monthLabel(A.dayNum(s.from)) + " to " + monthLabel(A.dayNum(s.to));
+      return Math.abs(r) < 0.00005 ? "was flat from " + span : (r > 0 ? "rose " : "fell ") + a + "% a month from " + span;
+    });
+    return "The index " + parts.join(", then ") + ".";
+  }
+  function timeChart(res) {
+    var T = res.time, months = T.months; if (!months.length) return null;
+    var eff = A.dayNum(res.settings.effectiveDate);
+    var avail = ($("results").clientWidth || 720) - 30, W = Math.max(320, Math.min(940, avail)), Hh = W < 480 ? 236 : 268, m = { l: 50, r: 14, t: 22, b: 34 };
+    var xs = months.map(function (mo) { return A.dayNum(mo.date); });
+    var xlo = Math.min(xs[0], eff - 30), xhi = eff + 20;
+    // FHFA and the yearly medians are chained to this index at their last period so all read as % to the effective date
+    var fh = T.fhfa && T.fhfa.table ? T.fhfa.table.filter(function (r) { return fin(r.chained) && fin(r.mid) && r.cover >= 0.5 && r.mid >= xs[0] && r.mid <= eff; }) : [];
+    var effRow = T.years.filter(function (y) { return y.year === new Date(eff * 86400000).getUTCFullYear(); })[0];
+    // a yearly median is drawn only for years with at least six months inside the window (a two-month "year" is not a yearly median)
+    var med = T.years.map(function (y) {
+      var a = Math.max(dayUTC(y.year, 0, 1), xs[0]), b = Math.min(dayUTC(y.year, 11, 31), eff);
+      return { x: (a + b) / 2, span: b - a, y: effRow && fin(effRow.index) ? (1 + effRow.index) * (1 + y.medianToEffYear) - 1 : NaN, year: y.year, n: y.salesPulled };
+    }).filter(function (r) { return fin(r.y) && r.span >= 181 && r.n >= 5; });
+    var comps = res.grid.filter(function (L) { return L.key === "time" && fin(L.adj) && fin(L.pct); }).map(function (L) { return { ci: L.comp, x: L.compValue, y: L.pct }; });
+    var vals = [0];
+    months.forEach(function (mo) { vals.push(mo.pct); if (fin(mo.hsLo)) vals.push(mo.hsLo, mo.hsHi); });
+    fh.forEach(function (r) { vals.push(r.chained); }); med.forEach(function (r) { vals.push(r.y); }); comps.forEach(function (c) { vals.push(c.y); });
+    var ylo = Math.min.apply(null, vals), yhi = Math.max.apply(null, vals), yp = (yhi - ylo) * 0.08 || 0.02; ylo -= yp; yhi += yp;
+    var P = plotFrame(W, Hh, m, xlo, xhi, ylo, yhi);
+    var svg = sv("svg", { viewBox: "0 0 " + W + " " + Hh, role: "img", "aria-label": "Percent change from each month of sale to the effective date: this export's index with its half-sample range, FHFA and the yearly medians" });
+    niceTicks(ylo, yhi, 5).forEach(function (t) {
+      svg.appendChild(sv("line", { x1: m.l, x2: W - m.r, y1: P.Y(t), y2: P.Y(t), stroke: Math.abs(t) < 1e-9 ? "var(--axis)" : "var(--grid)", "stroke-width": 1 }));
+      svg.appendChild(sv("text", { x: m.l - 6, y: P.Y(t) + 3.5, "text-anchor": "end" }, (t > 0 ? "+" : "") + Math.round(100 * t) + "%"));
+    });
+    svg.appendChild(sv("line", { x1: m.l, x2: W - m.r, y1: Hh - m.b, y2: Hh - m.b, stroke: "var(--axis)", "stroke-width": 1 }));
+    var y0 = new Date(xlo * 86400000).getUTCFullYear(), y1 = new Date(xhi * 86400000).getUTCFullYear(), every = W < 520 ? 2 : 1;
+    for (var yy = y0 + 1; yy <= y1; yy++) { var tx = dayUTC(yy, 0, 1); if (tx <= xlo || tx >= xhi) continue;
+      svg.appendChild(sv("line", { x1: P.X(tx), x2: P.X(tx), y1: Hh - m.b, y2: Hh - m.b + 4, stroke: "var(--axis)", "stroke-width": 1 }));
+      if ((yy - y0) % every === 0) svg.appendChild(sv("text", { x: P.X(tx), y: Hh - m.b + 16, "text-anchor": "middle" }, String(yy))); }
+    (T.bends || []).forEach(function (b) { var bx = P.X(A.dayNum(b));
+      svg.appendChild(sv("line", { x1: bx, x2: bx, y1: m.t, y2: Hh - m.b, stroke: "var(--axis)", "stroke-width": 1, "stroke-dasharray": "3 3" })); });
+    var withBand = months.filter(function (mo) { return fin(mo.hsLo) && fin(mo.hsHi); });
+    if (withBand.length > 1) {
+      var up = withBand.map(function (mo) { return P.X(A.dayNum(mo.date)).toFixed(1) + " " + P.Y(mo.hsHi).toFixed(1); });
+      var dn = withBand.slice().reverse().map(function (mo) { return P.X(A.dayNum(mo.date)).toFixed(1) + " " + P.Y(mo.hsLo).toFixed(1); });
+      svg.appendChild(sv("path", { d: "M" + up.join("L") + "L" + dn.join("L") + "Z", fill: "var(--series-1)", "fill-opacity": 0.12, stroke: "none" }));
     }
-    sec.appendChild(h("details", { class: "more" }, h("summary", null, "Monthly time adjustments (table)"),
-      h("div", { class: "inner" }, table(["Month of sale", "Months back", "Adjustment to effective date", "% of median price"],
-        res.timeIndex.map(function (t) { return [t.month, String(t.monthsBack), money(t.adj), dec(100 * t.pct, 2) + "%"]; }), { num: [1, 2, 3] }))));
-    if (res.halfCheck && res.halfCheck.length) sec.appendChild(h("details", { class: "more" }, h("summary", null, "Log-price cross-check by half year"),
-      h("div", { class: "inner" }, h("p", { class: "hint", text: "A separate regression of log price on half-year dummies plus the same features. Each figure compares that half year with the most recent one." }),
-        table(["Half years back", "Log price difference", "About"], res.halfCheck.map(function (c) { return [String(c.halfYearBack), dec(c.lnPrice, 4), dec(100 * (Math.exp(c.lnPrice) - 1), 1) + "%"]; }), { num: [0, 1, 2] }))));
+    svg.appendChild(sv("path", { d: months.map(function (mo, i) { return (i ? "L" : "M") + P.X(A.dayNum(mo.date)).toFixed(1) + " " + P.Y(mo.pct).toFixed(1); }).join(""),
+      stroke: "var(--series-1)", "stroke-width": 2, fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" }));
+    // FHFA squares sit 5px left and median diamonds 5px right of the period middle, so a shared year never hides one behind the other
+    fh.forEach(function (r) { var cx = P.X(r.mid) - 5, cy = P.Y(r.chained);
+      svg.appendChild(sv("rect", { x: cx - 4.5, y: cy - 4.5, width: 9, height: 9, rx: 1.5, fill: "var(--series-3)", stroke: "var(--surface)", "stroke-width": 2 })); });
+    med.forEach(function (r) { var cx = P.X(r.x) + 5, cy = P.Y(r.y);
+      svg.appendChild(sv("rect", { x: cx - 4, y: cy - 4, width: 8, height: 8, transform: "rotate(45 " + cx + " " + cy + ")", fill: "var(--surface)", stroke: "var(--ink-2)", "stroke-width": 2 })); });
+    var tm = [];
+    comps.forEach(function (c) { var hit = tm.filter(function (k) { return Math.abs(P.X(k.x) - P.X(c.x)) < 12 && Math.abs(P.Y(k.y) - P.Y(c.y)) < 10; })[0]; if (hit) hit.ids.push(c.ci + 1); else tm.push({ x: c.x, y: c.y, ids: [c.ci + 1] }); });
+    tm.forEach(function (k) {
+      svg.appendChild(sv("circle", { cx: P.X(k.x), cy: P.Y(k.y), r: 5, fill: "var(--series-2)", stroke: "var(--surface)", "stroke-width": 2 }));
+      svg.appendChild(sv("text", { x: P.X(k.x), y: P.Y(k.y) - 9, "text-anchor": "middle", class: "lbl" }, k.ids.join(", ")));
+    });
+    svg.appendChild(sv("text", { x: P.X(eff), y: m.t - 8, "text-anchor": "end", class: "lbl" }, "Eff. " + res.settings.effectiveDate));
+    var cross = sv("line", { y1: m.t, y2: Hh - m.b, stroke: "var(--ink-2)", "stroke-width": 1, opacity: 0, "pointer-events": "none" });
+    var hot = sv("circle", { r: 4, fill: "var(--series-1)", stroke: "var(--surface)", "stroke-width": 2, opacity: 0, "pointer-events": "none" });
+    var hit = sv("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: Hh - m.t - m.b, fill: "transparent", tabindex: 0, "aria-label": "Move along the index with the arrow keys" });
+    svg.appendChild(cross); svg.appendChild(hot); svg.appendChild(hit);
+    var tip = h("div", { class: "tip", hidden: true });
+    function nearestMonth(px) { var x = P.inv(px), bi = 0; xs.forEach(function (v, i) { if (Math.abs(v - x) < Math.abs(xs[bi] - x)) bi = i; }); return bi; }
+    function showAt(i) {
+      i = Math.max(0, Math.min(months.length - 1, i)); var mo = months[i], x = xs[i];
+      cross.setAttribute("x1", P.X(x)); cross.setAttribute("x2", P.X(x)); cross.setAttribute("opacity", 0.6);
+      hot.setAttribute("cx", P.X(x)); hot.setAttribute("cy", P.Y(mo.pct)); hot.setAttribute("opacity", 1);
+      clear(tip); tip.hidden = false;
+      tip.appendChild(h("b", { text: pct(mo.pct) }));
+      tip.appendChild(h("div", { text: "a " + monthLabel(x) + " sale to the effective date" + (fin(mo.hsLo) ? "; range " + pctRange(mo.hsLo, mo.hsHi) : "") }));
+      var yr = new Date(x * 86400000).getUTCFullYear();
+      var f = fh.filter(function (r) { return x >= A.dayNum(r.start) && x < r.end; })[0];
+      if (f) tip.appendChild(h("div", { text: "FHFA " + f.period + ": " + pct(f.chained) + " (chained)" }));
+      var md = med.filter(function (r) { return r.year === yr; })[0];
+      if (md) tip.appendChild(h("div", { text: "Median " + yr + ": " + pct(md.y) + " (chained, " + md.n + " sales)" }));
+      comps.filter(function (c) { return Math.abs(c.x - x) < 16; }).forEach(function (c) { tip.appendChild(h("div", { text: "Comp " + (c.ci + 1) + " sold " + A.dayStr(c.x) + ": " + pct(c.y) })); });
+      placeTip(tip, svg, W, P.X(x), P.Y(mo.pct));
+      hit._i = i;
+    }
+    function hide() { tip.hidden = true; cross.setAttribute("opacity", 0); hot.setAttribute("opacity", 0); }
+    hit.addEventListener("pointermove", function (e) { var b = svg.getBoundingClientRect(); showAt(nearestMonth((e.clientX - b.left) * W / b.width)); });
+    hit.addEventListener("pointerleave", hide);
+    hit.addEventListener("focus", function () { showAt(months.length - 1); });
+    hit.addEventListener("blur", hide);
+    hit.addEventListener("keydown", function (e) { if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); showAt((hit._i === undefined ? months.length - 1 : hit._i) + (e.key === "ArrowLeft" ? -1 : 1)); } });
+    var keys = [h("span", null, h("i", { class: "keyline" }), "this export's index"), withBand.length ? h("span", null, h("i", { class: "keyband" }), "half-sample range") : null];
+    if (fh.length) keys.push(h("span", null, h("i", { class: "keysq" }), "FHFA" + (T.fhfa.endsEarly ? " (chained after " + T.fhfa.lastPeriod + ")" : "")));
+    if (med.length) keys.push(h("span", null, h("i", { class: "keydia" }), "yearly medians (chained)"));
+    if (comps.length) keys.push(h("span", null, h("i", { class: "keydot" }), "comps"));
+    if ((T.bends || []).length) keys.push(h("span", null, h("i", { class: "keydash" }), "bends"));
+    return h("div", { class: "chart" }, h("h4", { text: "Percent change from the month of sale to " + res.settings.effectiveDate }),
+      h("p", { class: "sub", text: "FHFA and the yearly medians are chained to this index at their last period, so all three read as the change to the effective date." }), svg, tip, h("div", { class: "keys" }, keys));
+  }
+  function timeSection(res) {
+    var T = res.time, st = res.settings;
+    var effYear = new Date(A.dayNum(st.effectiveDate) * 86400000).getUTCFullYear();
+    var sec = h("div", { class: "section", id: "time-sec" }, sectionHead("Market conditions (time)",
+      "A quality-adjusted log-price index from every clean sale in the export (" + int(T.n) + " sales). Each comp's time line is its price times the index change from its sale date to the effective date."));
+    sec.appendChild(h("p", { class: "lede-text" }, trendSentence(T) + " ",
+      h("span", { class: "muted", text: (T.flat ? "" : "Bends allowed every " + T.knotMonths + " months with " + T.minSide + " sales on each side; " + T.candidates.length + " candidate dates, " + T.bends.length + " kept. ") +
+        "R² " + dec(T.r2, 3) + (fin(T.trendShare) ? "; " + Math.round(100 * T.trendShare) + "% of the " + T.halfSamples + " half-sample refits kept a time trend." : ".") })));
+    if (T.season) sec.appendChild(note("", "Quarter of the year (reported, not applied): sales closing in Q2 ran " + pct(T.season.Q2) + ", Q3 " + pct(T.season.Q3) + " and Q4 " + pct(T.season.Q4) +
+      " against Q1 at the same point on the trend. The time lines use the trend only."));
+    if (T.fhfa && T.fhfa.endsEarly) sec.appendChild(note("", T.fhfa.label + " ends at " + T.fhfa.lastPeriod + ", so the FHFA comparison runs to " + T.fhfa.lastPeriod + " on both series."));
+    var ch = timeChart(res); if (ch) sec.appendChild(ch);
+    if (T.segments.length) sec.appendChild(table(["From", "To", "Per month", "Over the segment"], T.segments.map(function (s) { return [s.from, s.to, pct(s.rate, 2), pct(s.total)]; }), { num: [2, 3] }));
+    var yr = T.years.map(function (y) {
+      return [String(y.year), int(y.salesPulled), fin(y.median) ? dollars(y.median) : "n/a", y.year === T.years[0].year ? "" : pct(y.yoy), y.year === effYear ? "base" : pct(y.medianToEffYear),
+        fin(y.ncShare) ? Math.round(100 * y.ncShare) + "%" : "n/a", y.year === effYear ? "base" : pct(y.resaleToEffYear), pct(y.index), pctRange(y.indexLo, y.indexHi)];
+    });
+    sec.appendChild(h("div", { class: "shead" }, h("h4", { text: "Your median-to-median method beside the index" }),
+      h("p", { class: "hint", text: "Yearly medians of the export as pulled (every closed sale, closing year), the way the median method works. The index column is this export's quality-adjusted change from that year's average sale to the effective date." +
+        (T.mixShift ? " New construction moved 10 points or more between years here, so the medians mix different products." : "") })));
+    sec.appendChild(table(["Year", "Sales", "Median", "YoY", "Median to " + effYear, "New constr.", "Resales to " + effYear, "Index to eff. date", "Index range"], yr, { num: [1, 2, 3, 4, 5, 6, 7, 8] }));
+    if (T.fhfa) {
+      var fr = T.fhfa.table.map(function (r) {
+        var end = r.period === T.fhfa.endPeriod, part = !end && r.cover < 0.5;
+        return [r.period, dec(r.index, 2), end ? "end" : pct(r.fhfaPct), end ? "end" : part ? "partial period in your data" : pct(r.localPct), end || part ? "" : pctRange(r.lo, r.hi),
+          end || part || r.outside === null ? "" : r.outside ? "outside" : "inside"];
+      });
+      sec.appendChild(h("div", { class: "shead" }, h("h4", { text: "FHFA check: " + T.fhfa.label }),
+        h("p", { class: "hint", text: "Both series over the same " + T.fhfa.frequency + " periods, to " + T.fhfa.endPeriod + ". FHFA is a repeat-sales index on conforming mortgages (the all-transactions version also uses refinance appraisals), county-wide; this index is your export's segment. A gap is a question to answer in the report, not an error." })));
+      sec.appendChild(table(["Period", "FHFA index", "FHFA to " + T.fhfa.endPeriod, "This index, same periods", "Half-sample range", "FHFA is"], fr, { num: [1, 2, 3, 4] }));
+    }
+    sec.appendChild(h("details", { class: "more" }, h("summary", null, "Monthly index (table view of the chart)"),
+      h("div", { class: "inner" }, table(["Month", "Clean sales", "To the effective date", "Half-sample range"],
+        T.months.map(function (mo) { return [mo.month, int(mo.sales), pct(mo.pct, 2), pctRange(mo.hsLo, mo.hsHi)]; }).reverse(), { num: [1, 2, 3] }))));
     return sec;
   }
   function locSection(res) {
@@ -2834,17 +3411,27 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
         : h("p", { text: lv.verdict + (lv.n !== undefined ? " (" + int(lv.n) + " sales in a " + int(lv.band) + " sf band)" : "") + "." }))));
     var br = res.bracketing.map(function (b) { return [b.label, fval(b.feature, b.subject), fin(b.compMin) ? fval(b.feature, b.compMin) + " to " + fval(b.feature, b.compMax) : "n/a", b.bracketed === null ? "n/a" : b.bracketed ? "yes" : "no", fval(b.feature, b.dataMin) + " to " + fval(b.feature, b.dataMax)]; });
     sec.appendChild(h("details", { class: "more" }, h("summary", null, "Bracketing"), h("div", { class: "inner" }, table(["Feature", "Subject", "Comps", "Bracketed", "Modeled sales"], br))));
-    var cd = res.compDiag.map(function (c, i) { return ["C" + (i + 1) + " " + (c.address || c.mls_id), dollars(c.priceUsed), fin(c.estimate) ? dollars(c.estimate) : "n/a", fin(c.residual) ? money(c.residual) : "n/a", fin(c.cqa) ? dec(c.cqa, 1) : "n/a", c.inFit ? "yes" : "no"]; });
+    var cd = res.compDiag.map(function (c, i) { return ["C" + (i + 1) + " " + (c.address || c.mls_id), dollars(c.priceUsed), fin(c.priceTimeAdjusted) ? dollars(c.priceTimeAdjusted) : "n/a", fin(c.estimate) ? dollars(c.estimate) : "n/a", fin(c.residual) ? money(c.residual) : "n/a", fin(c.cqa) ? dec(c.cqa, 1) : "n/a", c.inFit ? "yes" : "no"]; });
     sec.appendChild(h("details", { class: "more" }, h("summary", null, "Comp check: how each comp sold against the model"),
-      h("div", { class: "inner" }, h("p", { class: "hint", text: "Residual is how far the comp sold above (+) or below (-) the model's price for its features. CQA ranks that residual among all modeled sales from 0 to 10 (5 is the median). Large residuals point to condition, quality, view or location the data don't carry." }),
-        table(["Comp", "Price used", "Model price", "Residual", "CQA", "In model data"], cd, { num: [1, 2, 3, 4] }))));
+      h("div", { class: "inner" }, h("p", { class: "hint", text: "Residual is how far the comp's time-adjusted price sits above (+) or below (-) the model's price for its features. CQA ranks that residual among all modeled sales from 0 to 10 (5 is the median). Large residuals point to condition, quality, view or location the data don't carry." }),
+        table(["Comp", "Price used", "Time-adjusted", "Model price", "Residual", "CQA", "In adjustment pool"], cd, { num: [1, 2, 3, 4, 5] }))));
+    if (res.influence && res.influence.length) {
+      var moved = res.influence.filter(function (x) { return x.outside; }).length;
+      var ir = res.influence.filter(function (x) { return Math.abs(x.withComps) >= 0.5 || Math.abs(x.withoutComps) >= 0.5; }).map(function (x) {
+        return ["C" + (x.comp + 1), x.label, money(x.withComps), money(x.withoutComps), money(x.change), rangeText(x.hsLo, x.hsHi), x.outside ? "outside" : "inside"]; });
+      sec.appendChild(h("details", { class: "more", open: moved > 0 }, h("summary", null, "Leave-your-comps-out check" + (moved ? ": " + moved + " line" + (moved > 1 ? "s" : "") + " moved" : ": no line moved outside its range")),
+        h("div", { class: "inner" }, h("p", { class: "hint", text: "The adjustment model refit without your comps' own sales. If your comps alone push a line outside its half-sample range, they are steering their own adjustment, and the line gets a review flag." }),
+          ir.length ? table(["Comp", "Line", "With comps", "Without", "Change", "Half-sample range", "Without is"], ir, { num: [2, 3, 4] }) : h("p", { class: "hint", text: "Every model line is zero both ways." }))));
+    } else sec.appendChild(h("p", { class: "hint small", text: "Leave-your-comps-out check: " + (res.settings.leaveCompsOut ? "none of the comps is in the adjustment pool, so none of them shaped the model." : "switched off.") }));
     var c = res.concession;
     sec.appendChild(h("details", { class: "more" }, h("summary", null, "Concession check"), h("div", { class: "inner" },
       h("p", { text: fin(c.perDollar) ? int(c.n) + " modeled sales had concessions. Price moved " + dec(c.perDollar, 2) + " per concession dollar (SE " + dec(c.se, 2) + "). Near 1 means concessions were added on top of price and should be netted; near 0 means they did not move price and gross prices are right." : "Only " + int(c.n) + " sales with concessions: too few to test." }))));
     return sec;
   }
   function dataSection(res) {
-    var sec = h("div", { class: "section" }, sectionHead("Data trail", "What was dropped and why, so the selection can be defended line by line."));
+    var sec = h("div", { class: "section" }, sectionHead("Data trail", "What was dropped and why, so the selection can be defended line by line."),
+      h("p", null, int(res.data.nFile) + " sales in the file; " + int(res.data.nExcluded) + " excluded by the cleaning rules; " + int(res.data.nMarket) + " clean sales build the time index; " +
+        int(res.data.n) + " of them sit inside your similarity ranges and price the features" + (res.data.nOutsidePool ? " (" + int(res.data.nOutsidePool) + " outside, used for the time index only)" : "") + "."));
     if (res.repeatSales && res.repeatSales.length) {
       var rr = res.repeatSales.map(function (p) {
         return [p.property, p.earlierClose + " " + dollars(p.earlierPrice), p.laterClose + " " + dollars(p.laterPrice), int(p.days), (p.pct >= 0 ? "+" : "") + dec(p.pct, 1) + "%",
@@ -2856,7 +3443,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     var counts = {}; res.data.exclusions.forEach(function (e) { counts[e.reason] = (counts[e.reason] || 0) + 1; });
     var cr = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).map(function (k) { return [k, String(counts[k])]; });
     var er = res.data.exclusions.map(function (e) { return [e.mls_id, e.address, fin(e.sale_price) ? dollars(e.sale_price) : "", e.date || "", e.reason]; });
-    sec.appendChild(h("details", { class: "more" }, h("summary", null, "Excluded sales (" + res.data.nExcluded + ")"), h("div", { class: "inner" },
+    sec.appendChild(h("details", { class: "more" }, h("summary", null, "Excluded and time-only sales (" + res.data.exclusions.length + ")"), h("div", { class: "inner" },
       cr.length ? table(["Reason", "Sales"], cr, { num: [1] }) : h("p", { class: "hint", text: "Nothing was excluded." }),
       er.length ? table(["MLS", "Address", "Price", "Date", "Reason"], er, { num: [2], wrap: [4] }) : null,
       h("div", { class: "row" }, h("button", { type: "button", class: "btn small", text: "Copy exclusions (CSV)", onclick: function (e) { copyText(toCSV([["mls_id", "address", "sale_price", "date", "reason"]].concat(er.map(function (r, i) { var x = res.data.exclusions[i]; return [x.mls_id, x.address, x.sale_price, x.date, x.reason]; }))), e.currentTarget, "Exclusions"); } }),
@@ -2875,6 +3462,11 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
       ["Model", "degree 1, nk " + st.nk + ", minspan " + st.minspan + ", endspan " + st.endspan + ", penalty " + st.penalty + ", new-variable penalty " + st.newvarPenalty + ", threshold " + st.thresh + ", backward pruning"],
       ["Cross-validation", st.nfold + "-fold x " + st.ncross + ", stratified as earth does it"], ["Half-sample refits", String(st.halfSamples)],
       ["Variables", st.features.map(function (f) { return A.LABELS[f] || f; }).join(", ") + (st.location ? "; location by " + st.location : "")],
+      ["Time index", res.time.method],
+      ["Adjustment pool", res.data.poolDesc.length ? res.data.poolDesc.join("; ") : "every clean sale (no ranges)"],
+      ["FHFA check", res.time.fhfa ? res.time.fhfa.label + ", " + res.time.fhfa.frequency + ", " + res.time.fhfa.firstPeriod + " to " + res.time.fhfa.lastPeriod : "none"],
+      ["Price screen", st.timeScreenRatio > 1 ? "sales more than " + st.timeScreenRatio + "x above or below the time model left out" : "off"],
+      ["Leave-comps-out", st.leaveCompsOut ? "on" : "off"],
       ["Residual layer", st.residualFeatures.length ? st.residualFeatures.map(function (f) { return A.LABELS[f] || f; }).join(", ") : "none"]];
     var terms = res.model.terms.map(function (t) { return [t.name === "(Intercept)" ? "(Intercept)" : t.dir === 2 ? t.name : (t.dir === 1 ? "h(" + t.name + " - " + A.fmtVal(t.name, t.cut) + ")" : "h(" + A.fmtVal(t.name, t.cut) + " - " + t.name + ")"), dec(t.coef, 4)]; });
     var noteText = buildNote(res);
@@ -2894,28 +3486,40 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
   var SCOPE = "Scope and use: statistical analysis supporting the appraiser's adjustment development. Per-unit figures and line amounts are model estimates with stated uncertainty, not confirmed market facts. The appraiser makes all final adjustment selections, within or outside the supported ranges. No indicated, reconciled or opinion-of-value figure is produced. Prepared with reference to USPAP Advisory Opinion 41 (Use of Technology in an Appraisal or Appraisal Review Assignment): the tool cannot comply with USPAP; the appraiser remains responsible for judging whether this output is accurate and relevant to the assignment.";
   function gridRows(res) {
     var head = ["comp_mls", "comp_address", "feature", "subject_value", "comp_value", "adjustment", "se_cond", "se_hc1", "cond_low", "cond_high", "half_sample_p2.5", "half_sample_p97.5",
-      "knot_crossed", "extrapolated", "segment_math", "status", "review_flag", "half_sample_share_nonzero", "half_sample_same_sign", "half_sample_n", "half_sample_same_sign_n", "your_adjustment", "your_check"];
+      "knot_crossed", "extrapolated", "segment_math", "status", "review_flag", "pct_of_price", "half_sample_share_nonzero", "half_sample_same_sign", "half_sample_n", "half_sample_same_sign_n", "leave_comps_out", "your_adjustment", "your_check"];
     return [head].concat(res.grid.map(function (L) {
-      var c = res.comps[L.comp], raw = S.mine[mineKey(L.comp, L.key, L.residual)], v = raw === undefined ? NaN : A.num(String(raw).replace(/^\+/, "")), ck = checkMine(L, v);
-      return [c.mls_id, c.address, featName(L), L.key === "sale_age" ? 0 : L.subject, L.key === "sale_age" ? c.sale_age : L.compValue, r2(L.adj), r2(L.seC), r2(L.seH), r2(L.lo), r2(L.hi), r2(L.hsLo), r2(L.hsHi),
-        L.knot ? "TRUE" : "FALSE", L.extrap ? "TRUE" : "FALSE", L.knot ? segText(L) : "", L.status, L.review || "", fin(L.hsShare) ? Math.round(1000 * L.hsShare) / 1000 : "", fin(L.hsSame) ? Math.round(1000 * L.hsSame) / 1000 : "",
-        fin(L.hsN) ? L.hsN : "", fin(L.hsSameN) ? L.hsSameN : "", fin(v) ? v : "", ck ? ck.text : ""];
+      var c = res.comps[L.comp], raw = S.mine[mineKey(L.comp, L.key, L.residual)], v = raw === undefined ? NaN : mineValue(L, raw), ck = checkMine(L, v);
+      var isT = L.key === "time";
+      return [c.mls_id, c.address, featName(L), isT ? res.settings.effectiveDate : L.subject, isT ? (c.date || "") : L.compValue, r2(L.adj), r2(L.seC), r2(L.seH), r2(L.lo), r2(L.hi), r2(L.hsLo), r2(L.hsHi),
+        L.knot ? "TRUE" : "FALSE", L.extrap ? "TRUE" : "FALSE", L.knot ? segText(L) : "", L.status, L.review || "", isT && fin(L.pct) ? r2(100 * L.pct) : "",
+        fin(L.hsShare) ? Math.round(1000 * L.hsShare) / 1000 : "", fin(L.hsSame) ? Math.round(1000 * L.hsSame) / 1000 : "",
+        fin(L.hsN) ? L.hsN : "", fin(L.hsSameN) ? L.hsSameN : "", fin(L.loo) ? r2(L.loo) : "", fin(v) ? r2(v) : "", ck ? ck.text : ""];
     }));
   }
   function buildNote(res) {
     var st = res.settings, m = res.model, d = res.data;
     var flags = res.grid.filter(function (L) { return L.review; }).length;
-    var s = mineSummary(res);
+    var flagN = function (re) { return res.grid.filter(function (L) { return re.test(L.review || ""); }).length; };
+    var s = mineSummary(res), T = res.time;
+    var effYear = new Date(A.dayNum(st.effectiveDate) * 86400000).getUTCFullYear();
+    var segTxt = T.segments.map(function (g) { return g.from + " to " + g.to + " " + pct(g.rate, 2) + "/mo"; }).join("; ");
     var lines = [
       "WORKFILE NOTE - MARS / Regression Adjustment Support v" + res.version + " (browser)",
       "Run date: " + res.runDate + "   Effective date: " + st.effectiveDate + "   Sale age basis: " + (st.dateBasis === "contract_date" ? "contract date" : "closing date"),
       "Subject: " + ((S.payload && S.payload.subject.address) || "(not entered)") + (S.isDemo ? "   DATA: SYNTHETIC DEMO, NOT REAL SALES" : ""),
-      "Data: " + d.n + " sales modeled of " + d.nFile + " in the file (" + d.nExcluded + " excluded, reasons listed). Window " + d.window[0] + " to " + d.window[1] + ".",
-      "Model: MARS (port of R earth), degree 1, " + m.k + " terms. RSq " + dec(m.rsq, 3) + ", GRSq " + dec(m.grsq, 3) + ", CVRSq " + dec(m.cvrsq, 3) + " (sd " + dec(m.cvsd, 3) + ", " + st.nfold + "-fold x " + st.ncross + "). RMSE " + dollars(m.rmse) + ", MAE " + dollars(m.mae) + ".",
+      "Data: " + d.nMarket + " clean sales of " + d.nFile + " in the file (" + d.nExcluded + " excluded, reasons listed). Window " + d.window[0] + " to " + d.window[1] + ".",
+      "Time index: " + T.method,
+      "Time index result: " + (T.flat ? "no time trend cleared the GCV penalty (flat)" : [T.overallSlope ? "overall slope kept" : null, T.bends.length ? "bends at " + T.bends.join(", ") : null].filter(Boolean).join("; ")) +
+        ". " + (segTxt ? "Segments: " + segTxt + ". " : "") + "R-squared " + dec(T.r2, 3) + "." + (T.season ? " Season vs Q1 (reported, not applied): Q2 " + pct(T.season.Q2) + ", Q3 " + pct(T.season.Q3) + ", Q4 " + pct(T.season.Q4) + "." : ""),
+      "Adjustment pool: " + d.n + " sales" + (d.poolDesc.length ? " inside the similarity ranges (" + d.poolDesc.join("; ") + ")" : " (no similarity ranges set)") + "; prices time-adjusted to the effective date, then MARS (port of R earth), degree 1, " + m.k + " terms. RSq " + dec(m.rsq, 3) + ", GRSq " + dec(m.grsq, 3) + ", CVRSq " + dec(m.cvrsq, 3) + " (sd " + dec(m.cvsd, 3) + ", " + st.nfold + "-fold x " + st.ncross + "). RMSE " + dollars(m.rmse) + ", MAE " + dollars(m.mae) + ".",
+      "Median-to-median as pulled (yearly medians, " + effYear + " year to date as the base): " + T.years.filter(function (y) { return y.year < effYear; }).map(function (y) { return y.year + " " + pct(y.medianToEffYear); }).join(", ") + "." +
+        (T.mixShift ? " New-construction share moved by 10 points or more between years, so these medians mix different products." : ""),
+      T.fhfa ? "FHFA check: " + T.fhfa.label + " (" + T.fhfa.frequency + ", " + T.fhfa.firstPeriod + " to " + T.fhfa.lastPeriod + "), compared over the same periods; " + flagN(/FHFA CHECK/) + " time line(s) flagged." : "FHFA check: no FHFA series supplied.",
+      res.influence ? "Leave-comps-out check: " + res.influence.filter(function (x) { return x.outside; }).length + " line(s) moved outside their half-sample range when the comps were left out of the fit." : "Leave-comps-out check: not run (no comp in the adjustment pool, or switched off).",
       "Data rules: " + (st.concessionReaction > 0 ? "prices net of " + Math.round(100 * st.concessionReaction) + "% of concessions" : "gross prices (concessions not deducted)") + "; sales after the effective date " + (st.excludeAfterEffective ? "excluded" : "kept") +
         "; likely flip purchases " + (st.excludeFlips ? "excluded" : "kept") + "; sales with no MLS exposure " + (st.excludeUnexposed ? (st.exposureChecked ? "excluded" : "not checked (no MLS entry date in the file)") : "kept") + (st.trimContractEdge ? "; contracts before the first closing excluded" : "") + ".",
       "Data SHA-256: " + res.repro.dataSha256 + "   Settings SHA-256: " + res.repro.configSha256 + "   Master seed: " + res.repro.masterSeed,
-      "Review flags: " + flags + " grid line(s) carry a REVERSED SEGMENT or REVERSED SIGN flag."
+      "Review flags: " + flags + " grid line(s) flagged (REVERSED SEGMENT or SIGN " + flagN(/REVERSED/) + ", FHFA CHECK " + flagN(/FHFA CHECK/) + ", COMP INFLUENCE " + flagN(/COMP INFLUENCE/) + ")."
     ];
     if (s.entered.length) {
       lines.push("Appraiser grid check: " + s.inside + " of " + s.entered.length + " entered adjustments fall inside the model range" + (s.noRange ? " (" + s.noRange + " with no model range)" : "") + ".");
@@ -2952,7 +3556,23 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     ["dragleave", "drop"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("over"); }); });
     drop.addEventListener("drop", function (e) { var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; readFile(f, function (t, n) { loadText(t, n, false); }); });
     $("demo").addEventListener("click", function () { loadDemo(false); });
-    ["eff", "clock", "conc", "locmin", "r-after", "r-trim", "r-flip", "r-exposed", "r-new", "r-types", "r-flip-days", "r-flip-pct"].forEach(function (id) { $(id).addEventListener("change", updateChecklist); });
+    ["eff", "clock", "conc", "locmin", "r-after", "r-trim", "r-flip", "r-exposed", "r-new", "r-types", "r-flip-days", "r-flip-pct"].forEach(function (id) { $(id).addEventListener("change", function () { updatePoolCount(); updateChecklist(); }); });
+    POOL.forEach(function (p) { [p[1], p[2]].forEach(function (id) { $(id).addEventListener("input", function () { updatePoolCount(); updateChecklist(); }); }); });
+    $("pr-subject").addEventListener("click", function () {
+      var g = A.num(S.subject.gla), yb = A.num(S.subject.year_built);
+      if (!fin(g) && !fin(yb)) { toast("Enter the subject's GLA and year built first (step 03)"); return; }
+      if (fin(g)) { $("pr-gla-lo").value = Math.max(0, Math.round(g - 500)); $("pr-gla-hi").value = Math.round(g + 500); }
+      if (fin(yb)) { $("pr-yb-lo").value = Math.round(yb - 15); $("pr-yb-hi").value = Math.round(yb + 15); }
+      updatePoolCount(); updateChecklist(); toast("Ranges set from the subject; adjust them to your market");
+    });
+    $("pr-clear").addEventListener("click", function () { POOL.forEach(function (p) { $(p[1]).value = ""; $(p[2]).value = ""; }); updatePoolCount(); updateChecklist(); });
+    $("fhfa-preset").addEventListener("change", function () { S.fhfaTouched = true; S.fhfaAuto = null; updateFhfaStatus(); });
+    $("fhfa-text").addEventListener("input", function () { readFhfaText($("fhfa-text").value); });
+    $("fhfa-file-btn").addEventListener("click", function () { $("fhfa-file").click(); });
+    $("fhfa-file").addEventListener("change", function (e) {
+      readFile(e.target.files[0], function (text, name) { $("fhfa-text").value = text; readFhfaText(text); if (!$("fhfa-label").value.trim()) $("fhfa-label").value = name.replace(/\.(csv|txt)$/i, ""); });
+      e.target.value = "";
+    });
     $("eff").addEventListener("input", updateChecklist);
     $("locvar").addEventListener("change", function () { renderSubject(); renderComps(); updateChecklist(); });
     $("subj-fill").addEventListener("click", function () {
@@ -2996,7 +3616,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     $("run").addEventListener("click", function () { run(false); });
     $("cancel").addEventListener("click", cancel);
     Array.prototype.forEach.call(document.querySelectorAll(".rail button"), function (b) { b.addEventListener("click", function () { var t = $(b.getAttribute("data-go")); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); }); });
-    renderLocOptions(); renderFeatureBoxes(); renderSubject(); renderComps(); updateChecklist();
+    renderLocOptions(); renderFeatureBoxes(); renderFhfaOptions(); renderSubject(); renderComps(); updateChecklist();
     // open in a working state: the synthetic demo market, loaded and run, clearly marked as a demo
     loadDemo(true); run(true);
   }

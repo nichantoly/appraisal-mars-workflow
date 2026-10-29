@@ -1,0 +1,4 @@
+"year","sales_as_pulled","median_price","median_yoy_pct","median_to_effective_year_pct","new_construction_share_pct","resale_median","resale_median_to_effective_year_pct","clean_sales","index_pct_to_effective_date","index_half_sample_p2.5","index_half_sample_p97.5"
+2024,59,400600,NA,5.29,0,400600,5.29,56,6.59,0,10.28
+2025,125,423300,5.67,-0.35,0,423300,-0.35,123,3.59,-2.35,5.56
+2026,65,421800,-0.35,0,0,421800,0,62,0.71,-0.88,1.09

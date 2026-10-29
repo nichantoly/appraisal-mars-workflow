@@ -2,10 +2,10 @@
   "scope_notice": "Scope and use: statistical analysis supporting the appraiser's adjustment development. Per-unit figures and line amounts are model estimates with stated uncertainty, not confirmed market facts. The appraiser makes all final adjustment selections, within or outside the supported ranges. No indicated, reconciled or opinion-of-value figure is produced. Prepared with reference to USPAP Advisory Opinion 41 (Use of Technology in an Appraisal or Appraisal Review Assignment): the tool cannot comply with USPAP; the appraiser remains responsible for judging whether this output is accurate and relevant to the assignment.",
   "engine": {
     "name": "MARS / Regression Adjustment Support",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "earth_version": "5.3.3",
     "r_version": "R version 4.3.3 (2024-02-29)",
-    "run_date": "2026-10-28"
+    "run_date": "2026-10-29"
   },
   "assignment": {
     "effective_date": "2026-06-06",
@@ -19,8 +19,11 @@
   },
   "data": {
     "n_raw": 262,
+    "n_market": 241,
     "n_modeled": 241,
     "n_excluded": 21,
+    "n_outside_pool": 0,
+    "pool_ranges": [],
     "window": ["2024-07-09", "2026-06-03"],
     "days_from_most_recent_sale_to_effective_date": 3,
     "time_gap_days_allowed": 91,
@@ -28,46 +31,114 @@
       "distressed / non-market sale type": 8,
       "sale date after effective date": 13
     },
-    "notes": ["Raw Bright MLS export detected; mapped to standard schema (blank garage/half bath/fireplace/carport = 0).", "No MLS entry date column: market-exposure check skipped.", "Cleaning: 262 raw -> 241 modeled (21 excluded). Effective date 2026-06-06, sale age from closing date, window 2024-07-09 to 2026-06-03."]
+    "notes": ["Raw Bright MLS export detected; mapped to standard schema (blank garage/half bath/fireplace/carport = 0).", "No MLS entry date column: market-exposure check skipped.", "Cleaning: 262 raw -> 241 clean sales (21 excluded). Effective date 2026-06-06, sale age from closing date, window 2024-07-09 to 2026-06-03.", "Time index: 241 clean sales, log-price model with the model features, location; bends allowed every 6 months with 20 sales on each side (3 candidate dates). Kept: overall slope. R-squared 0.794.", "Time index: quarter-of-year control off (needs 2 years of sales and 10 in every quarter).", "Adjustment pool: all 241 clean sales (no similarity ranges set).", "Leave-comps-out check: refit without the 3 comp(s) in the adjustment pool; 0 line(s) moved outside their half-sample range."]
   },
   "review_flags": [
     {
       "comp_mls": "DEMO100003",
       "feature": "deck (residual layer)",
-      "review_flag": "REVERSED SIGN: residual-layer estimate is -$2,183 per deck. More of this feature normally adds value."
+      "review_flag": "REVERSED SIGN: residual-layer estimate is -$3,246 per deck. More of this feature normally adds value."
     },
     {
       "comp_mls": "DEMO100003",
       "feature": "porch (residual layer)",
-      "review_flag": "REVERSED SIGN: residual-layer estimate is -$573 per porch. More of this feature normally adds value."
+      "review_flag": "REVERSED SIGN: residual-layer estimate is -$285 per porch. More of this feature normally adds value."
     },
     {
       "comp_mls": "DEMO100040",
       "feature": "deck (residual layer)",
-      "review_flag": "REVERSED SIGN: residual-layer estimate is -$2,183 per deck. More of this feature normally adds value."
+      "review_flag": "REVERSED SIGN: residual-layer estimate is -$3,246 per deck. More of this feature normally adds value."
     },
     {
       "comp_mls": "DEMO100040",
       "feature": "porch (residual layer)",
-      "review_flag": "REVERSED SIGN: residual-layer estimate is -$573 per porch. More of this feature normally adds value."
+      "review_flag": "REVERSED SIGN: residual-layer estimate is -$285 per porch. More of this feature normally adds value."
     },
     {
       "comp_mls": "DEMO100104",
       "feature": "porch (residual layer)",
-      "review_flag": "REVERSED SIGN: residual-layer estimate is -$573 per porch. More of this feature normally adds value."
+      "review_flag": "REVERSED SIGN: residual-layer estimate is -$285 per porch. More of this feature normally adds value."
     }
   ],
+  "time_index": {
+    "method": "Quality-adjusted log-price index from 241 clean sales: log price on gla, bg_fin_sf, lot_ac, ag_baths, garage, year_built, levels, location, plus a time curve that may bend only on a 6-month calendar grid with at least 20 sales on each side, bends pruned by GCV (penalty 2). Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.",
+    "n_sales": 241,
+    "knot_months": 6,
+    "min_side": 20,
+    "season_control": false,
+    "season_effects_vs_q1_pct": {},
+    "candidate_dates": ["2025-01-01", "2025-07-01", "2026-01-01"],
+    "overall_slope_kept": true,
+    "bends": [],
+    "flat": false,
+    "segments": [
+      {
+        "from": "2024-07-09",
+        "to": "2026-06-06",
+        "pct_per_month": 0.00316628651034545,
+        "pct_over_segment": 0.0750761162927081
+      }
+    ],
+    "r2": 0.7939,
+    "half_sample_refits": 200,
+    "years": [
+      {
+        "year": 2024,
+        "sales_as_pulled": 59,
+        "median_price": 400600,
+        "median_yoy_pct": null,
+        "median_to_effective_year_pct": 5.29,
+        "new_construction_share_pct": 0,
+        "resale_median": 400600,
+        "resale_median_to_effective_year_pct": 5.29,
+        "clean_sales": 56,
+        "index_pct_to_effective_date": 6.59,
+        "index_half_sample_p2.5": 0,
+        "index_half_sample_p97.5": 10.28
+      },
+      {
+        "year": 2025,
+        "sales_as_pulled": 125,
+        "median_price": 423300,
+        "median_yoy_pct": 5.67,
+        "median_to_effective_year_pct": -0.35,
+        "new_construction_share_pct": 0,
+        "resale_median": 423300,
+        "resale_median_to_effective_year_pct": -0.35,
+        "clean_sales": 123,
+        "index_pct_to_effective_date": 3.59,
+        "index_half_sample_p2.5": -2.35,
+        "index_half_sample_p97.5": 5.56
+      },
+      {
+        "year": 2026,
+        "sales_as_pulled": 65,
+        "median_price": 421800,
+        "median_yoy_pct": -0.35,
+        "median_to_effective_year_pct": 0,
+        "new_construction_share_pct": 0,
+        "resale_median": 421800,
+        "resale_median_to_effective_year_pct": 0,
+        "clean_sales": 62,
+        "index_pct_to_effective_date": 0.71,
+        "index_half_sample_p2.5": -0.88,
+        "index_half_sample_p97.5": 1.09
+      }
+    ],
+    "mix_shift": false,
+    "fhfa": {}
+  },
   "model": {
-    "terms": ["(Intercept)", "h(2510-gla)", "h(lot_ac-3.7)", "h(3.7-lot_ac)", "h(1260-bg_fin_sf)", "h(2-garage)", "loc_X22556", "h(year_built-1994)", "loc_X22554", "h(sale_age-175)", "loc_X22406", "h(year_built-2010)", "h(gla-1700)"],
-    "coefficients": [475750.0922, -73.4966, 6775.9782, -18160.3636, -30.9888, -9872.106, 39985.6272, 1992.5485, 33937.5485, -48.8374, 17695.7941, -6803.5142, 52.9207],
-    "groups": ["gla", "lot_ac", "bg_fin_sf", "garage", "location", "year_built", "sale_age"],
-    "rsq": 0.8215,
-    "grsq": 0.7796,
-    "cvrsq": 0.7512,
-    "cvrsq_sd": 0.0537,
-    "rmse": 28834,
-    "mae": 23477,
-    "n_terms": 13,
+    "terms": ["(Intercept)", "h(2510-gla)", "h(lot_ac-2.62)", "h(2.62-lot_ac)", "h(1260-bg_fin_sf)", "h(2-garage)", "h(year_built-1994)", "loc_X22556", "loc_X22554", "loc_X22406", "h(ag_baths-1.5)"],
+    "coefficients": [491311.7776, -100.2362, 9834.2992, -20886.4289, -32.7114, -10814.5372, 1403.9464, 42959.6259, 32539.5469, 20339.7346, 12070.4306],
+    "groups": ["gla", "lot_ac", "bg_fin_sf", "garage", "year_built", "location", "ag_baths"],
+    "rsq": 0.8057,
+    "grsq": 0.7688,
+    "cvrsq": 0.7524,
+    "cvrsq_sd": 0.0585,
+    "rmse": 31027,
+    "mae": 24839,
+    "n_terms": 11,
     "params": {
       "degree": 1,
       "nk": 24,
@@ -82,22 +153,22 @@
       "stratify": true
     },
     "bootstrap_selection_frequency": {
-      "sale_age": 0.76,
+      "time": 0.965,
       "gla": 1,
       "bg_fin_sf": 1,
       "lot_ac": 1,
-      "ag_baths": 0.23,
-      "garage": 0.91,
-      "year_built": 0.775,
-      "levels": 0.07,
-      "location": 0.93
+      "ag_baths": 0.22,
+      "garage": 0.885,
+      "year_built": 0.81,
+      "levels": 0.095,
+      "location": 0.975
     }
   },
   "location_effects": [
     {
       "level": "22405",
       "n_sales": 53,
-      "vs_subject": -17696
+      "vs_subject": -20340
     },
     {
       "level": "22406",
@@ -107,60 +178,36 @@
     {
       "level": "22554",
       "n_sales": 67,
-      "vs_subject": 16242
+      "vs_subject": 12200
     },
     {
       "level": "22556",
       "n_sales": 37,
-      "vs_subject": 22290
+      "vs_subject": 22620
     }
   ],
   "per_segment_slopes": [
     {
-      "feature": "sale_age",
-      "from": 3,
-      "to": 175,
-      "slope_per_unit": 0,
-      "in_model": true,
-      "_row": "sale_age.1"
-    },
-    {
-      "feature": "sale_age",
-      "from": 175,
-      "to": 697,
-      "slope_per_unit": -48.84,
-      "in_model": true,
-      "_row": "sale_age.2"
-    },
-    {
       "feature": "gla",
       "from": 1100,
-      "to": 1700,
-      "slope_per_unit": 73.5,
+      "to": 2510,
+      "slope_per_unit": 100.24,
       "in_model": true,
       "_row": "gla.1"
     },
     {
       "feature": "gla",
-      "from": 1700,
-      "to": 2510,
-      "slope_per_unit": 126.42,
-      "in_model": true,
-      "_row": "gla.2"
-    },
-    {
-      "feature": "gla",
       "from": 2510,
       "to": 2780,
-      "slope_per_unit": 52.92,
+      "slope_per_unit": 0,
       "in_model": true,
-      "_row": "gla.3"
+      "_row": "gla.2"
     },
     {
       "feature": "bg_fin_sf",
       "from": 0,
       "to": 1260,
-      "slope_per_unit": 30.99,
+      "slope_per_unit": 32.71,
       "in_model": true,
       "_row": "bg_fin_sf.1"
     },
@@ -175,32 +222,40 @@
     {
       "feature": "lot_ac",
       "from": 0.9,
-      "to": 3.7,
-      "slope_per_unit": 18160.36,
+      "to": 2.62,
+      "slope_per_unit": 20886.43,
       "in_model": true,
       "_row": "lot_ac.1"
     },
     {
       "feature": "lot_ac",
-      "from": 3.7,
+      "from": 2.62,
       "to": 8,
-      "slope_per_unit": 6775.98,
+      "slope_per_unit": 9834.3,
       "in_model": true,
       "_row": "lot_ac.2"
     },
     {
       "feature": "ag_baths",
       "from": 1,
-      "to": 3.5,
+      "to": 1.5,
       "slope_per_unit": 0,
-      "in_model": false,
-      "_row": "ag_baths"
+      "in_model": true,
+      "_row": "ag_baths.1"
+    },
+    {
+      "feature": "ag_baths",
+      "from": 1.5,
+      "to": 3.5,
+      "slope_per_unit": 12070.43,
+      "in_model": true,
+      "_row": "ag_baths.2"
     },
     {
       "feature": "garage",
       "from": 0,
       "to": 2,
-      "slope_per_unit": 9872.11,
+      "slope_per_unit": 10814.54,
       "in_model": true,
       "_row": "garage.1"
     },
@@ -223,18 +278,10 @@
     {
       "feature": "year_built",
       "from": 1994,
-      "to": 2010,
-      "slope_per_unit": 1992.55,
+      "to": 2015,
+      "slope_per_unit": 1403.95,
       "in_model": true,
       "_row": "year_built.2"
-    },
-    {
-      "feature": "year_built",
-      "from": 2010,
-      "to": 2015,
-      "slope_per_unit": -4810.97,
-      "in_model": true,
-      "_row": "year_built.3"
     },
     {
       "feature": "levels",
@@ -245,62 +292,48 @@
       "_row": "levels"
     }
   ],
-  "time_ln_price_cross_check": [
-    {
-      "half_year_back": "1",
-      "ln_price_vs_latest_half": -0.0048
-    },
-    {
-      "half_year_back": "2",
-      "ln_price_vs_latest_half": -0.0391
-    },
-    {
-      "half_year_back": "3",
-      "ln_price_vs_latest_half": -0.0628
-    }
-  ],
   "residual_layer": [
     {
       "feature": "fireplaces",
-      "estimate": 4191,
-      "std_error": 2981,
-      "t_value": 1.41,
+      "estimate": 3687,
+      "std_error": 3203,
+      "t_value": 1.15,
       "n_nonzero": 116,
       "note": "weak (|t| < 2): direction not resolved",
       "_row": "fireplaces"
     },
     {
       "feature": "pool",
-      "estimate": 13483,
-      "std_error": 6361,
-      "t_value": 2.12,
+      "estimate": 16354,
+      "std_error": 6834,
+      "t_value": 2.39,
       "n_nonzero": 23,
       "note": "residual-layer estimate",
       "_row": "pool"
     },
     {
       "feature": "deck",
-      "estimate": -2183,
-      "std_error": 3750,
-      "t_value": -0.58,
+      "estimate": -3246,
+      "std_error": 4030,
+      "t_value": -0.81,
       "n_nonzero": 130,
       "note": "weak (|t| < 2): direction not resolved",
       "_row": "deck"
     },
     {
       "feature": "porch",
-      "estimate": -573,
-      "std_error": 4178,
-      "t_value": -0.14,
+      "estimate": -285,
+      "std_error": 4489,
+      "t_value": -0.06,
       "n_nonzero": 65,
       "note": "weak (|t| < 2): direction not resolved",
       "_row": "porch"
     },
     {
       "feature": "carport",
-      "estimate": -1617,
-      "std_error": 6602,
-      "t_value": -0.24,
+      "estimate": -342,
+      "std_error": 7093,
+      "t_value": -0.05,
       "n_nonzero": 21,
       "note": "weak (|t| < 2): direction not resolved",
       "_row": "carport"
@@ -308,8 +341,8 @@
   ],
   "concession_diagnostic": {
     "n_with_concessions": 89,
-    "price_change_per_concession_dollar": 0.55,
-    "std_error": 0.455,
+    "price_change_per_concession_dollar": 0.724,
+    "std_error": 0.489,
     "reading": "A value near +1 means concessions were added on top of price (net them). Near 0 means they did not move price (gross is right)."
   },
   "comp_diagnostics": [
@@ -317,41 +350,286 @@
       "mls_id": "DEMO100003",
       "address": "106 Oak Ridge Dr",
       "price_used": 443200,
-      "model_estimate": 423444,
-      "residual": 19756,
-      "cqa": 7.39,
+      "price_time_adjusted": 448712,
+      "model_estimate": 430077,
+      "residual": 18634,
+      "cqa": 7.18,
       "in_fit": true,
-      "reading": "Residual = sold above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+      "reading": "Residual = time-adjusted price above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
     },
     {
       "mls_id": "DEMO100040",
       "address": "180 Stony Brook Way",
       "price_used": 404200,
-      "model_estimate": 367917,
-      "residual": 36283,
-      "cqa": 9.05,
+      "price_time_adjusted": 408420,
+      "model_estimate": 362077,
+      "residual": 46343,
+      "cqa": 9.34,
       "in_fit": true,
-      "reading": "Residual = sold above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+      "reading": "Residual = time-adjusted price above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
     },
     {
       "mls_id": "DEMO100104",
       "address": "308 Meadow Bend Rd",
       "price_used": 488000,
-      "model_estimate": 463559,
-      "residual": 24441,
-      "cqa": 7.88,
+      "price_time_adjusted": 508754,
+      "model_estimate": 488271,
+      "residual": 20483,
+      "cqa": 7.39,
       "in_fit": true,
-      "reading": "Residual = sold above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+      "reading": "Residual = time-adjusted price above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
     }
   ],
   "repeat_sales": {},
+  "comp_influence": [
+    {
+      "comp_mls": "DEMO100003",
+      "feature": "gla",
+      "with_comps": -30070.8647628024,
+      "without_comps": -35820.2255640298,
+      "change": -5749.36080122741,
+      "half_sample_p2.5": -40552.9461115394,
+      "half_sample_p97.5": -24490.6245505821,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100003",
+      "feature": "bg_fin_sf",
+      "with_comps": 22897.9610829803,
+      "without_comps": 22841.9416111823,
+      "change": -56.0194717979284,
+      "half_sample_p2.5": 7590.68813057165,
+      "half_sample_p97.5": 37762.5933318598,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100003",
+      "feature": "lot_ac",
+      "with_comps": -11899.5019865666,
+      "without_comps": -14029.5838051763,
+      "change": -2130.08181860976,
+      "half_sample_p2.5": -30975.9577641031,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100003",
+      "feature": "ag_baths",
+      "with_comps": 0,
+      "without_comps": 0,
+      "change": 0,
+      "half_sample_p2.5": 0,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100003",
+      "feature": "garage",
+      "with_comps": 10814.5371947719,
+      "without_comps": 8943.94295133924,
+      "change": -1870.59424343271,
+      "half_sample_p2.5": 0,
+      "half_sample_p97.5": 22015.1397796153,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100003",
+      "feature": "year_built",
+      "with_comps": 1403.9463743302,
+      "without_comps": -14098.3899944165,
+      "change": -15502.3363687466,
+      "half_sample_p2.5": -27015.5890547499,
+      "half_sample_p97.5": 6057.5577012373,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100003",
+      "feature": "levels",
+      "with_comps": 0,
+      "without_comps": 0,
+      "change": 0,
+      "half_sample_p2.5": 0,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100003",
+      "feature": "location",
+      "with_comps": 0,
+      "without_comps": 0,
+      "change": 0,
+      "half_sample_p2.5": 0,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100040",
+      "feature": "gla",
+      "with_comps": 32075.5890803225,
+      "without_comps": 32238.2030076268,
+      "change": 162.613927304275,
+      "half_sample_p2.5": 3788.37886638937,
+      "half_sample_p97.5": 40309.8851384559,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100040",
+      "feature": "bg_fin_sf",
+      "with_comps": -18318.3688663842,
+      "without_comps": 3573.27400279225,
+      "change": 21891.6428691765,
+      "half_sample_p2.5": -36703.671059673,
+      "half_sample_p97.5": 14139.2157382289,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100040",
+      "feature": "lot_ac",
+      "with_comps": 44578.8410224144,
+      "without_comps": 46679.4425721267,
+      "change": 2100.60154971232,
+      "half_sample_p2.5": 19160.2485258883,
+      "half_sample_p97.5": 71661.7910746345,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100040",
+      "feature": "ag_baths",
+      "with_comps": 6035.21528849597,
+      "without_comps": 0,
+      "change": -6035.21528849597,
+      "half_sample_p2.5": -12642.74770277,
+      "half_sample_p97.5": 9794.23441224552,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100040",
+      "feature": "garage",
+      "with_comps": 10814.5371947719,
+      "without_comps": 8943.94295133924,
+      "change": -1870.59424343271,
+      "half_sample_p2.5": 0,
+      "half_sample_p97.5": 22015.1397796153,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100040",
+      "feature": "year_built",
+      "with_comps": -14039.463743302,
+      "without_comps": -30404.9749082224,
+      "change": -16365.5111649204,
+      "half_sample_p2.5": -47120.2317678297,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100040",
+      "feature": "levels",
+      "with_comps": 0,
+      "without_comps": 0,
+      "change": 0,
+      "half_sample_p2.5": -16399.2017046768,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100040",
+      "feature": "location",
+      "with_comps": 0,
+      "without_comps": 0,
+      "change": 0,
+      "half_sample_p2.5": 0,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100104",
+      "feature": "gla",
+      "with_comps": -53125.1944142842,
+      "without_comps": -63282.3984964526,
+      "change": -10157.2040821684,
+      "half_sample_p2.5": -78169.0590064365,
+      "half_sample_p97.5": -45030.0076958649,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100104",
+      "feature": "bg_fin_sf",
+      "with_comps": -13084.5491902744,
+      "without_comps": -13052.5380635328,
+      "change": 32.0111267416723,
+      "half_sample_p2.5": -22736.5356471962,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100104",
+      "feature": "lot_ac",
+      "with_comps": 42699.0624187219,
+      "without_comps": 45173.8744886181,
+      "change": 2474.81206989618,
+      "half_sample_p2.5": 19160.2485258883,
+      "half_sample_p97.5": 67849.9965518141,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100104",
+      "feature": "ag_baths",
+      "with_comps": -18105.6458654879,
+      "without_comps": 0,
+      "change": 18105.6458654879,
+      "half_sample_p2.5": -37759.885047404,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100104",
+      "feature": "garage",
+      "with_comps": 0,
+      "without_comps": 0,
+      "change": 0,
+      "half_sample_p2.5": 0,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100104",
+      "feature": "year_built",
+      "with_comps": -11231.5709946416,
+      "without_comps": -24323.9799265779,
+      "change": -13092.4089319363,
+      "half_sample_p2.5": -37862.9844744465,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100104",
+      "feature": "levels",
+      "with_comps": 0,
+      "without_comps": 0,
+      "change": 0,
+      "half_sample_p2.5": 0,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    },
+    {
+      "comp_mls": "DEMO100104",
+      "feature": "location",
+      "with_comps": -12199.8123028259,
+      "without_comps": -16849.892480244,
+      "change": -4650.08017741801,
+      "half_sample_p2.5": -30651.7221506802,
+      "half_sample_p97.5": 0,
+      "outside_range": false
+    }
+  ],
   "local_validation": {
     "gla_band_sf": 250,
     "batch_n": 29,
     "batch_gla_range": [1400, 1890],
-    "batch_slope_per_sf": 55.23,
-    "batch_slope_se": 48.12,
-    "mars_avg_slope_over_band": 94.02,
+    "batch_slope_per_sf": 32.97,
+    "batch_slope_se": 51.59,
+    "mars_avg_slope_over_band": 100.24,
     "verdict": "LOCALLY VALIDATED"
   },
   "bracketing": [
@@ -420,22 +698,22 @@
     }
   ],
   "interaction_diagnostic": {
-    "terms": ["h(1260-bg_fin_sf)*h(garage-1)", "h(1260-bg_fin_sf)*loc_X22556", "h(sale_age-362)*h(2510-gla)", "h(3.7-lot_ac)*h(year_built-1993)", "h(2510-gla)*loc_X22406", "h(ag_baths-1.5)*loc_X22554", "h(1.5-ag_baths)*loc_X22554", "h(gla-1810)*h(lot_ac-3.7)"],
+    "terms": ["h(1260-bg_fin_sf)*h(garage-1)", "h(1260-bg_fin_sf)*loc_X22556", "h(2510-gla)*loc_X22406", "h(2510-gla)*loc_X22556", "h(1610-gla)*h(1994-year_built)"],
     "any_retained": true,
-    "sale_age_interaction": true,
-    "reading": "Headline model stays additive. A retained GLA x levels or GLA x year_built term means $/sf differs by cohort; a sale_age term means time trends differ by segment."
+    "reading": "Headline model stays additive. A retained GLA x levels or GLA x year_built term means $/sf differs by cohort."
   },
   "reproducibility": {
     "master_seed": 20260606,
     "derived_seeds": {
       "cv": 20260607,
       "boot": 20270606,
+      "time": 20280606,
       "theilsen": 20290606,
       "lms": 20300606
     },
-    "data_sha256": "12187094becabda07f5f3a008b53c3dccb6578f17d02088864fc682e4d2e1357",
-    "config_sha256": "26efd0ae255bebeac4b535ea8c34a51a911ba76d20d0166276b3968df0ccec17",
-    "deterministic": ["MARS fit (GCV backward pruning)", "segments", "conditional and HC1 SEs", "residual layer"],
-    "seed_dependent": ["CVRSq (fold assignment)", "bootstrap ranges", "Theil-Sen pair sampling", "LMS"]
+    "data_sha256": "a9c2463d0e6f9ee1b8223353d91a0048b53434124b0295c953ce5dbdf1c4b224",
+    "config_sha256": "eecf02661f50c9fa7c6a31fe21c6b7dc335878468b43e3775ee0afdcd3e966bc",
+    "deterministic": ["time index fit (GCV pruning of the bends)", "MARS fit (GCV backward pruning)", "segments", "conditional and HC1 SEs", "residual layer", "leave-comps-out refit"],
+    "seed_dependent": ["CVRSq (fold assignment)", "half-sample ranges (MARS and time index)", "Theil-Sen pair sampling", "LMS"]
   }
 }
