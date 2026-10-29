@@ -1,55 +1,55 @@
 "comp_mls","comp_address","feature","subject_value","comp_value","adjustment","se_cond","se_hc1","cond_low","cond_high","half_sample_p2.5","half_sample_p97.5","knot_crossed","extrapolated","segment_math","status","review_flag","pct_of_price","half_sample_share_nonzero","half_sample_same_sign","half_sample_n","half_sample_same_sign_n","leave_comps_out"
-"DEMO200008","4024 Winter Park Rd","time (market index)","2026-09-15","2022-07-31",78879,6664.71,6300.58,65816.18,91941.82,47904.83,96720.76,FALSE,FALSE,"","SUPPORTED","",16.99,1,1,200,200,NA
-"DEMO200008","4024 Winter Park Rd","lot_sf","15000","47503",-49575.64,4389.83,4363.62,-58179.72,-40971.57,-75926.39,-31148.81,TRUE,FALSE,"15,000 to 20,941 @ $4.01/sf; 20,941 to 47,503 @ $0.97/sf","SUPPORTED","",NA,1,1,200,200,-49406.01
-"DEMO200008","4024 Winter Park Rd","beds_ag","4","5",-2417.29,2734.16,2548.98,-7776.24,2941.66,-8928.94,4212.44,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.96,0.66,200,133,-1977.39
-"DEMO200008","4024 Winter Park Rd","fb_ag","2","3",-20950.09,3498.02,3305.57,-27806.22,-14093.96,-31956.21,0,FALSE,FALSE,"","SUPPORTED","",NA,0.92,0.92,200,185,-20586.23
-"DEMO200008","4024 Winter Park Rd","hb_ag","1","0",5407.79,3015.43,2959.71,-502.45,11318.03,-2233.64,19144.07,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.94,0.88,200,175,6071.05
-"DEMO200008","4024 Winter Park Rd","gla","2100","2290",-16561.73,1242.61,1246.22,-19004.32,-14119.14,-21941.57,-13158.94,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,-16889.53
+"DEMO200008","4024 Winter Park Rd","time (market index)","2026-09-15","2022-07-31",79303.09,6673.82,6345.79,66222.41,92383.77,48958.05,100324.11,FALSE,FALSE,"","SUPPORTED","",17.08,1,1,200,200,NA
+"DEMO200008","4024 Winter Park Rd","lot_sf","15000","47503",-49537.52,4394.92,4343.69,-58151.58,-40923.47,-75899.23,-30353.9,TRUE,FALSE,"15,000 to 20,941 @ $4.01/sf; 20,941 to 47,503 @ $0.97/sf","SUPPORTED","",NA,1,1,200,200,-49372.3
+"DEMO200008","4024 Winter Park Rd","beds_ag","4","5",-2395.63,2738.57,2546.05,-7763.22,2971.95,-8801.85,4126.63,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.96,0.68,200,135,-1964.23
+"DEMO200008","4024 Winter Park Rd","fb_ag","2","3",-20766.14,3517.57,3342.76,-27660.57,-13871.71,-32289.87,0,FALSE,FALSE,"","SUPPORTED","",NA,0.94,0.94,200,187,-20415.2
+"DEMO200008","4024 Winter Park Rd","hb_ag","1","0",5324.59,3017.56,2960.28,-589.83,11239.02,-2260.03,18723.25,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.94,0.86,200,173,5978.7
+"DEMO200008","4024 Winter Park Rd","gla","2100","2290",-16578.44,1245.06,1248.57,-19025.64,-14131.24,-21944.34,-13200.98,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,-16906.52
 "DEMO200008","4024 Winter Park Rd","garage","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
 "DEMO200008","4024 Winter Park Rd","carport","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
 "DEMO200008","4024 Winter Park Rd","pool","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"DEMO200022","4066 Briar Gate Pl","time (market index)","2026-09-15","2024-12-12",32235.05,2605.89,2463.51,27127.51,37342.59,1319.86,49017.73,FALSE,FALSE,"","SUPPORTED","FHFA CHECK: FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A) shows +2.1% from 2024 to 2025; these sales show +3.9% over the same periods (half-sample range +3.0% to +9.2%). Find out why before relying on this time line.",6.91,0.98,0.98,200,195,NA
-"DEMO200022","4066 Briar Gate Pl","lot_sf","15000","10873",16558.33,1616.73,1588.08,13389.53,19727.13,8627.49,25753.48,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,16344.51
-"DEMO200022","4066 Briar Gate Pl","beds_ag","4","6",-4834.58,5468.32,5097.96,-15552.48,5883.32,-17857.88,10293.3,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.98,0.67,200,134,-3954.78
-"DEMO200022","4066 Briar Gate Pl","fb_ag","2","3",-20950.09,3498.02,3305.57,-27806.22,-14093.96,-31956.21,0,FALSE,FALSE,"","SUPPORTED","",NA,0.92,0.92,200,185,-20586.23
-"DEMO200022","4066 Briar Gate Pl","hb_ag","1","1",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"DEMO200022","4066 Briar Gate Pl","gla","2100","3020",-80193.63,6016.87,6034.33,-92020.91,-68366.35,-101484.54,-58674.68,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,-81780.89
-"DEMO200022","4066 Briar Gate Pl","garage","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"DEMO200022","4066 Briar Gate Pl","carport","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"DEMO200022","4066 Briar Gate Pl","pool","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"DEMO200033","4099 Fox Hollow Dr","time (market index)","2026-09-15","2024-08-23",25225.67,2050.92,1938.87,21205.87,29245.48,5780.72,40858.72,FALSE,FALSE,"","SUPPORTED","FHFA CHECK: FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A) shows +2.1% from 2024 to 2025; these sales show +3.9% over the same periods (half-sample range +3.0% to +9.2%). Find out why before relying on this time line.",8.16,0.98,0.98,200,195,NA
-"DEMO200033","4099 Fox Hollow Dr","lot_sf","15000","4698",41333.64,4035.77,3964.24,33423.54,49243.74,28084.63,70681.89,FALSE,TRUE,"","SUPPORTED | OUTSIDE MODELED DATA RANGE: extrapolated","",NA,1,1,200,200,40799.9
-"DEMO200033","4099 Fox Hollow Dr","beds_ag","4","3",2417.29,2734.16,2548.98,-2941.66,7776.24,-3860.05,8928.94,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.95,0.66,200,133,1977.39
-"DEMO200033","4099 Fox Hollow Dr","fb_ag","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"DEMO200033","4099 Fox Hollow Dr","hb_ag","1","1",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"DEMO200033","4099 Fox Hollow Dr","gla","2100","1810",27443.32,1421.82,1354.57,24656.56,30230.07,11810.24,34739.18,TRUE,FALSE,"1,810 to 1,890 @ $114/sf; 1,890 to 2,100 @ $87.17/sf","SUPPORTED","",NA,1,1,200,199,27070.59
-"DEMO200033","4099 Fox Hollow Dr","garage","2","6",5285.58,13818.99,10744.97,-21799.63,32370.79,-28854.88,75732.61,TRUE,FALSE,"2 to 3 @ $7,626/space; 3 to 6 @ -$4,304/space","UNSTABLE: same sign in only 93 of 200 half-samples","REVERSED SEGMENT: 3 to 6 at -$4,304/space (-$12,911). More of this feature normally adds value; check the segment and its value curve before relying on this line.",NA,0.93,0.47,200,93,5307.51
-"DEMO200033","4099 Fox Hollow Dr","carport","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"DEMO200033","4099 Fox Hollow Dr","pool","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"DEMO200092","4276 Bakersville Rd","time (market index)","2026-09-15","2022-06-15",62725.35,5312.21,5021.98,52313.42,73137.28,38539.4,76413.86,FALSE,FALSE,"","SUPPORTED","",17.55,1,1,200,200,NA
-"DEMO200092","4276 Bakersville Rd","lot_sf","15000","7689",29333.16,2864.05,2813.29,23719.62,34946.71,19833.99,45619.3,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,199,28954.39
+"DEMO200092","4276 Bakersville Rd","time (market index)","2026-09-15","2022-06-15",63063.38,5319.6,5058.14,52636.97,73489.79,37412.58,78526.16,FALSE,FALSE,"","SUPPORTED","",17.65,1,1,200,200,NA
+"DEMO200092","4276 Bakersville Rd","lot_sf","15000","7689",29284.1,2870.21,2818.24,23658.49,34909.72,19476.17,45462.42,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,199,28909.62
 "DEMO200092","4276 Bakersville Rd","beds_ag","4","4",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"DEMO200092","4276 Bakersville Rd","fb_ag","2","3",-20950.09,3498.02,3305.57,-27806.22,-14093.96,-31956.21,0,FALSE,FALSE,"","SUPPORTED","",NA,0.92,0.92,200,185,-20586.23
-"DEMO200092","4276 Bakersville Rd","hb_ag","1","0",5407.79,3015.43,2959.71,-502.45,11318.03,-2233.64,19144.07,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.94,0.88,200,175,6071.05
-"DEMO200092","4276 Bakersville Rd","gla","2100","2200",-8716.7,654.01,655.9,-10002.27,-7431.13,-11692.03,-6925.76,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,-8889.23
+"DEMO200092","4276 Bakersville Rd","fb_ag","2","3",-20766.14,3517.57,3342.76,-27660.57,-13871.71,-32289.87,0,FALSE,FALSE,"","SUPPORTED","",NA,0.94,0.94,200,187,-20415.2
+"DEMO200092","4276 Bakersville Rd","hb_ag","1","0",5324.59,3017.56,2960.28,-589.83,11239.02,-2260.03,18723.25,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.94,0.86,200,173,5978.7
+"DEMO200092","4276 Bakersville Rd","gla","2100","2200",-8725.49,655.3,657.14,-10013.49,-7437.49,-11898.34,-6648.34,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,-8898.17
 "DEMO200092","4276 Bakersville Rd","garage","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
 "DEMO200092","4276 Bakersville Rd","carport","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
 "DEMO200092","4276 Bakersville Rd","pool","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"MANUAL001","77 Hand Entered Ct","time (market index)","2026-09-15","2026-06-20",4531.57,355.97,336.52,3833.88,5229.26,0,6658.84,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",0.91,0.77,0.76,200,153,NA
-"MANUAL001","77 Hand Entered Ct","lot_sf","15000","14800",802.44,78.35,76.96,648.87,956,304.74,1272.16,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,199,792.08
+"DEMO200022","4066 Briar Gate Pl","time (market index)","2026-09-15","2024-12-12",32400.83,2608.28,2480.08,27288.6,37513.06,0,59802.04,FALSE,FALSE,"","SUPPORTED","FHFA CHECK: FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A) shows +2.1% from 2024 to 2025; these sales show +3.9% over the same periods (half-sample range +3.0% to +9.1%). Find out why before relying on this time line.",6.95,0.97,0.96,200,193,NA
+"DEMO200022","4066 Briar Gate Pl","lot_sf","15000","10873",16530.64,1620.21,1590.87,13355.02,19706.25,7570.25,25669.27,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,16319.24
+"DEMO200022","4066 Briar Gate Pl","beds_ag","4","6",-4791.27,5477.13,5092.1,-15526.44,5943.91,-17603.69,9341.39,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.98,0.68,200,136,-3928.46
+"DEMO200022","4066 Briar Gate Pl","fb_ag","2","3",-20766.14,3517.57,3342.76,-27660.57,-13871.71,-32289.87,0,FALSE,FALSE,"","SUPPORTED","",NA,0.94,0.94,200,187,-20415.2
+"DEMO200022","4066 Briar Gate Pl","hb_ag","1","1",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
+"DEMO200022","4066 Briar Gate Pl","gla","2100","3020",-80274.55,6028.72,6045.71,-92124.15,-68424.95,-103596.54,-60554.31,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,-81863.14
+"DEMO200022","4066 Briar Gate Pl","garage","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
+"DEMO200022","4066 Briar Gate Pl","carport","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
+"DEMO200022","4066 Briar Gate Pl","pool","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
+"DEMO200033","4099 Fox Hollow Dr","time (market index)","2026-09-15","2024-08-23",25356.15,2052.92,1952.02,21332.42,29379.88,0,47024.06,FALSE,FALSE,"","SUPPORTED","FHFA CHECK: FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A) shows +2.1% from 2024 to 2025; these sales show +3.9% over the same periods (half-sample range +3.0% to +9.1%). Find out why before relying on this time line.",8.2,0.97,0.97,200,194,NA
+"DEMO200033","4099 Fox Hollow Dr","lot_sf","15000","4698",41264.51,4044.44,3971.21,33337.4,49191.62,27463.14,73068.45,FALSE,TRUE,"","SUPPORTED | OUTSIDE MODELED DATA RANGE: extrapolated","",NA,1,1,200,200,40736.82
+"DEMO200033","4099 Fox Hollow Dr","beds_ag","4","3",2395.63,2738.57,2546.05,-2971.95,7763.22,-3862.93,8801.85,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.95,0.68,200,135,1964.23
+"DEMO200033","4099 Fox Hollow Dr","fb_ag","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
+"DEMO200033","4099 Fox Hollow Dr","hb_ag","1","1",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
+"DEMO200033","4099 Fox Hollow Dr","gla","2100","1810",27523.45,1432.65,1376.71,24715.45,30331.45,11830.81,34864.83,TRUE,FALSE,"1,810 to 1,890 @ $115/sf; 1,890 to 2,100 @ $87.25/sf","SUPPORTED","",NA,1,0.99,200,198,27129.69
+"DEMO200033","4099 Fox Hollow Dr","garage","2","6",5049.19,13866.22,10841.15,-22128.61,32226.99,-29198.82,76553.81,TRUE,FALSE,"2 to 3 @ $7,709/space; 3 to 6 @ -$4,253/space","UNSTABLE: same sign in only 92 of 200 half-samples","REVERSED SEGMENT: 3 to 6 at -$4,253/space (-$12,758). More of this feature normally adds value; check the segment and its value curve before relying on this line.",NA,0.94,0.46,200,92,5041.31
+"DEMO200033","4099 Fox Hollow Dr","carport","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
+"DEMO200033","4099 Fox Hollow Dr","pool","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
+"MANUAL001","77 Hand Entered Ct","time (market index)","2026-09-15","2026-06-20",4554.22,356.19,338.68,3856.08,5252.35,0,8210.17,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",0.91,0.76,0.76,200,151,NA
+"MANUAL001","77 Hand Entered Ct","lot_sf","15000","14800",801.1,78.52,77.1,647.2,954.99,293.86,1358.01,FALSE,FALSE,"","SUPPORTED","",NA,0.99,0.99,200,198,790.85
 "MANUAL001","77 Hand Entered Ct","beds_ag","4",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"","NOT EXTRACTABLE: comp value missing (never imputed)","",NA,NA,NA,NA,NA,NA
 "MANUAL001","77 Hand Entered Ct","fb_ag","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
 "MANUAL001","77 Hand Entered Ct","hb_ag","1","1",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"MANUAL001","77 Hand Entered Ct","gla","2100","2250",-13075.05,981.01,983.86,-15003.41,-11146.69,-17538.05,-10388.64,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,-13333.84
+"MANUAL001","77 Hand Entered Ct","gla","2100","2250",-13088.24,982.94,985.71,-15020.24,-11156.24,-17324.48,-10421.82,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,-13347.25
 "MANUAL001","77 Hand Entered Ct","garage","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
 "MANUAL001","77 Hand Entered Ct","carport","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
 "MANUAL001","77 Hand Entered Ct","pool","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"MANUAL002","81 Hand Entered Ct","time (market index)","2026-09-15","2025-11-03",15219.29,1209.8,1143.7,12848.09,17590.49,0,22489.54,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",3.34,0.77,0.76,200,153,NA
-"MANUAL002","81 Hand Entered Ct","lot_sf","15000","9100",23671.96,2311.3,2270.34,19141.81,28202.1,15870.01,36817.42,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,23366.28
-"MANUAL002","81 Hand Entered Ct","beds_ag","4","3",2417.29,2734.16,2548.98,-2941.66,7776.24,-3860.05,8928.94,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.95,0.66,200,133,1977.39
+"MANUAL002","81 Hand Entered Ct","time (market index)","2026-09-15","2025-11-03",15296.25,1210.7,1151.2,12923.27,17669.23,0,27842.49,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",3.36,0.76,0.76,200,151,NA
+"MANUAL002","81 Hand Entered Ct","lot_sf","15000","9100",23632.36,2316.27,2274.33,19092.47,28172.25,15046.62,36670.19,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,200,23330.15
+"MANUAL002","81 Hand Entered Ct","beds_ag","4","3",2395.63,2738.57,2546.05,-2971.95,7763.22,-3862.93,8801.85,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.95,0.68,200,135,1964.23
 "MANUAL002","81 Hand Entered Ct","fb_ag","2","2",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0
-"MANUAL002","81 Hand Entered Ct","hb_ag","1","0",5407.79,3015.43,2959.71,-502.45,11318.03,-2233.64,19144.07,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.94,0.88,200,175,6071.05
-"MANUAL002","81 Hand Entered Ct","gla","2100","1960",12203.38,915.61,918.27,10403.58,14003.18,4265.62,16368.84,FALSE,FALSE,"","SUPPORTED","",NA,1,1,200,199,12444.92
-"MANUAL002","81 Hand Entered Ct","garage","2","1",7625.85,2038.51,1891.53,3630.38,11621.32,0,13589.41,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.78,0.78,200,157,7280.84
-"MANUAL002","81 Hand Entered Ct","carport","0","1",4705.09,4710.07,4705.79,-4526.64,13936.82,-9588.4,14899.06,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","REVERSED SEGMENT: 0 to 1 at -$4,705/space (-$4,705). More of this feature normally adds value; check the segment and its value curve before relying on this line.",NA,1,0.78,200,157,4659.59
+"MANUAL002","81 Hand Entered Ct","hb_ag","1","0",5324.59,3017.56,2960.28,-589.83,11239.02,-2260.03,18723.25,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.94,0.86,200,173,5978.7
+"MANUAL002","81 Hand Entered Ct","gla","2100","1960",12215.69,917.41,920,10412.49,14018.89,3669.49,16657.67,FALSE,FALSE,"","SUPPORTED","",NA,1,0.98,200,197,12457.43
+"MANUAL002","81 Hand Entered Ct","garage","2","1",7708.64,2044.94,1889.32,3700.55,11716.73,0,13295.02,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","",NA,0.8,0.8,200,159,7360.98
+"MANUAL002","81 Hand Entered Ct","carport","0","1",4764.24,4710.87,4699.25,-4469.06,13997.55,-9961.55,15160.66,FALSE,FALSE,"","SUPPORTED, SIZE VARIABLE","REVERSED SEGMENT: 0 to 1 at -$4,764/space (-$4,764). More of this feature normally adds value; check the segment and its value curve before relying on this line.",NA,1,0.77,200,154,4718.33
 "MANUAL002","81 Hand Entered Ct","pool","0","0",0,0,0,0,0,0,0,FALSE,FALSE,"","NO MODEL DIFFERENCE (same value or flat segment)","",NA,0,0,200,0,0

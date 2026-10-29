@@ -213,6 +213,8 @@ input.missing { border-color: var(--bad-icon); background: var(--chip-bad); }
 .drop input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .filecard { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; padding: 12px 14px; border-radius: 8px; background: var(--gold-wash); border: 1px solid var(--gold); border-color: color-mix(in srgb, var(--gold) 45%, transparent); }
 .filecard b { font-family: "Archivo", system-ui, sans-serif; }
+.demo-banner { display: flex; gap: 10px 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 12px 14px; border-radius: 8px; background: var(--gold-wash); border: 1px solid var(--gold); border-color: color-mix(in srgb, var(--gold) 45%, transparent); font-size: 0.9rem; }
+.demo-banner span { min-width: 0; flex: 1 1 320px; }
 .tag { font: 600 0.7rem/1 "Archivo", system-ui, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 7px; border-radius: 4px; background: var(--band); color: var(--on-band); }
 
 /* ---------- tables ---------- */
@@ -395,18 +397,18 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
     <p class="lede">Pull adjustment support for the lines you actually adjust out of your own MLS export: site, bedrooms, full and half baths, GLA, garage, carport, pool, and a percent market-conditions line for older comps. Each line comes with how well it holds up and the paper trail to defend it, and the whole workup prints as a report for your file. Built for litigation work, including divorce assignments with retrospective effective dates.</p>
     <div class="proof">
       <div><span class="figure">0 uploads</span><b>Your data stays here</b><span>The MLS file is read right here in the browser and never sent anywhere. Close the tab and it is gone.</span></div>
-      <div><span class="figure">9 / 9</span><b>Test cases match R</b><span>The engine reproduces the R earth package model for model (71 of 71 fits) and the open R reference script line for line, weights included.</span></div>
-      <div><span class="figure">96%</span><b>Coverage on known answers</b><span>On 316 test adjustments in 16 synthetic markets salted with realtor-style listing errors, the stability range held the true amount 96% of the time.</span></div>
+      <div><span class="figure">10 / 10</span><b>Test cases match R</b><span>The engine reproduces the R earth package model for model (71 of 71 fits) and the open R reference script line for line, weights included.</span></div>
+      <div><span class="figure">96%</span><b>Coverage on known answers</b><span>On 320 test adjustments in 16 synthetic markets salted with realtor-style listing errors, the stability range held the true amount 96% of the time.</span></div>
     </div>
   </div>
 </header>
 
 <nav class="rail noprint" aria-label="Steps">
   <div class="wrap">
-    <button type="button" data-go="p-data" id="rail-data"><span class="n">01</span>Sales data</button>
-    <button type="button" data-go="p-assign" id="rail-assign"><span class="n">02</span>Assignment</button>
-    <button type="button" data-go="p-subject" id="rail-subject"><span class="n">03</span>Subject</button>
-    <button type="button" data-go="p-comps" id="rail-comps"><span class="n">04</span>Comparables</button>
+    <button type="button" data-go="p-subject" id="rail-subject"><span class="n">01</span>Subject</button>
+    <button type="button" data-go="p-comps" id="rail-comps"><span class="n">02</span>Comparables</button>
+    <button type="button" data-go="p-data" id="rail-data"><span class="n">03</span>Market</button>
+    <button type="button" data-go="p-assign" id="rail-assign"><span class="n">04</span>Pool and rules</button>
     <button type="button" data-go="p-run" id="rail-run"><span class="n">05</span>Run</button>
     <button type="button" data-go="p-results" id="rail-results" hidden><span class="n">06</span>Results</button>
   </div>
@@ -414,21 +416,74 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
 
 <main class="wrap">
 
-  <!-- 01 SALES DATA -->
-  <section class="panel" id="p-data" aria-labelledby="h-data">
-    <div class="strip" aria-hidden="true"><span class="n">01</span><span class="lbl">Sales data</span></div>
+  <!-- 01 SUBJECT AND ASSIGNMENT -->
+  <section class="panel" id="p-subject" aria-labelledby="h-subject">
+    <div class="strip" aria-hidden="true"><span class="n">01</span><span class="lbl">Subject</span></div>
     <div class="pbody">
       <div class="phead">
-        <h2 id="h-data">Load the market</h2>
-        <p class="hint">One CSV export: every closed sale of the subject's property type in its market, over the whole window you need (up to six years is fine). Every clean sale in it builds the time index; the similarity ranges in step 02 pick which of them price the other lines. Bright MLS (Spark) column names map on their own. Bedrooms and baths are read above grade: the MLS total minus the lower-level count. Blank garage, half bath and carport fields are read as none, the way the MLS means them.</p>
+        <h2 id="h-subject">Subject and effective date</h2>
+        <p class="hint">Start here. The effective date drives sale age, the time adjustment and which sales were knowable: for a retrospective date (date of separation, filing or trial) enter that date, and every sale that closed after it drops out. Bedrooms and baths are above grade. Every priced line needs a value; year built, levels and finished basement are background controls and optional.</p>
+      </div>
+      <div class="demo-banner" id="demo-banner" hidden>
+        <span><b>Demo loaded.</b> The subject, comps and market below are made up, so you can see a finished run. Load your own subject, comps or market file and the demo clears out.</span>
+        <button type="button" class="btn small" id="new-assign">Start my own assignment</button>
+      </div>
+      <div class="fields">
+        <label class="field"><span class="l">Effective date<em>*</em></span><input type="date" id="eff"><small>Required. No default on purpose.</small></label>
+        <label class="field"><span class="l">Prepared by (for the report)</span><input type="text" id="rep-by" placeholder="Name, certification"><small>Printed on the report. Remembered in this browser only.</small></label>
+        <label class="field"><span class="l">File or case number</span><input type="text" id="rep-file" placeholder="Optional"></label>
+      </div>
+      <div class="row">
+        <input type="file" id="subj-file" accept=".csv,text/csv" hidden>
+        <button type="button" class="btn primary" id="subj-file-btn">Load subject from a CSV</button>
+        <span class="hint small">A Spark export with the subject's MLS record works. If the file has several rows, pick the subject below.</span>
+      </div>
+      <div class="search-results" id="subj-hits"></div>
+      <div class="row">
+        <label class="field" style="flex:1 1 260px"><span class="l">Or fill from a sale in the market file (MLS number or street)</span><input type="search" id="subj-find" placeholder="e.g. VAFX2223764"></label>
+        <button type="button" class="btn" id="subj-fill" style="align-self:end">Fill subject</button>
+      </div>
+      <p class="hint small">After filling, check every value against your own measurements and records: the grid uses what is in these boxes.</p>
+      <div class="fields" id="subj-fields"></div>
+    </div>
+  </section>
+
+  <!-- 02 COMPS IN THE REPORT -->
+  <section class="panel" id="p-comps" aria-labelledby="h-comps">
+    <div class="strip" aria-hidden="true"><span class="n">02</span><span class="lbl">Comparables</span></div>
+    <div class="pbody">
+      <div class="phead">
+        <h2 id="h-comps">The comps in your report</h2>
+        <p class="hint">Load them from a CSV (a Spark export of the comps in your grid; the subject's row is skipped if it is in the same file) or type one in. Once the market file is loaded you can also pick them from it. Values you edit are treated as verified data: the grid uses your numbers and the model keeps the MLS record.</p>
+      </div>
+      <div class="row">
+        <input type="file" id="comp-file" accept=".csv,text/csv" hidden>
+        <button type="button" class="btn primary" id="comp-file-btn">Load comps from a CSV</button>
+        <button type="button" class="btn" id="comp-manual">Type in a comp</button>
+      </div>
+      <div class="row">
+        <label class="field" style="flex:1 1 300px"><span class="l">Or find one in the market file</span><input type="search" id="comp-find" placeholder="MLS number or street name"></label>
+      </div>
+      <div class="search-results" id="comp-hits"></div>
+      <div class="complist" id="comp-list"></div>
+    </div>
+  </section>
+
+  <!-- 03 MARKET SALES (THE POOL) -->
+  <section class="panel" id="p-data" aria-labelledby="h-data">
+    <div class="strip" aria-hidden="true"><span class="n">03</span><span class="lbl">Market</span></div>
+    <div class="pbody">
+      <div class="phead">
+        <h2 id="h-data">Market sales (the pool)</h2>
+        <p class="hint">One CSV export: every closed sale of the subject's property type in its market, over the whole window you need (up to six years is fine). Every clean sale in it builds the time index; the similarity ranges in step 04 pick which of them price the other lines. Bright MLS (Spark) column names map on their own. Bedrooms and baths are read above grade: the MLS total minus the lower-level count. Blank garage, half bath and carport fields are read as none, the way the MLS means them.</p>
       </div>
       <div class="drop" id="drop">
         <input type="file" id="file" accept=".csv,text/csv">
-        <label for="file" class="btn primary" id="file-btn">Choose MLS export (CSV)</label>
+        <label for="file" class="btn primary" id="file-btn">Choose the MLS export (CSV)</label>
         <span class="or">or drop the file here</span>
         <button type="button" class="btn" id="demo">Try the demo market</button>
       </div>
-      <p class="hint small" id="demo-note">The page opens with a synthetic demo market already loaded and run: 320 made-up sales built with known adjustment values, salted with the listing errors realtors make (basement rooms on the main line, driveway spots counted as garage spaces). Load your own export and the demo subject and comps clear out.</p>
+      <p class="hint small" id="demo-note">The page opens with a synthetic demo market already loaded and run: 320 made-up sales built with known adjustment values, salted with the listing errors realtors make (basement rooms on the main line, driveway spots counted as garage spaces). Your own subject, comps and market file replace it.</p>
       <div id="file-summary"></div>
       <details class="more" id="mapping-box" hidden>
         <summary><span id="mapping-title">Column mapping</span></summary>
@@ -441,21 +496,18 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
     </div>
   </section>
 
-  <!-- 02 ASSIGNMENT -->
+  <!-- 04 POOL, LINES AND DATA RULES -->
   <section class="panel" id="p-assign" aria-labelledby="h-assign">
-    <div class="strip" aria-hidden="true"><span class="n">02</span><span class="lbl">Assignment</span></div>
+    <div class="strip" aria-hidden="true"><span class="n">04</span><span class="lbl">Pool and rules</span></div>
     <div class="pbody">
       <div class="phead">
-        <h2 id="h-assign">Effective date and data rules</h2>
-        <p class="hint">The effective date drives sale age, the time adjustment, and which sales were knowable. For a retrospective date (date of separation, filing or trial) enter that date: every sale that closed after it drops out, and so does anything you could only have learned later.</p>
+        <h2 id="h-assign">Pool, lines and data rules</h2>
+        <p class="hint">Which sales price the lines, which lines get priced, and the cleaning rules. The defaults are the tested settings; the similarity ranges are the one thing to set on every assignment.</p>
       </div>
       <div class="fields">
-        <label class="field"><span class="l">Effective date<em>*</em></span><input type="date" id="eff"><small>Required. No default on purpose.</small></label>
         <label class="field"><span class="l">Time clock</span>
           <select id="clock"><option value="close">Closing date</option><option value="contract">Contract date</option></select>
           <small>Closing date is recommended: exports are pulled by closing date, so it is the only clock with a complete sample at both ends. Contract date is the earthUI convention.</small></label>
-        <label class="field"><span class="l">Prepared by (for the report)</span><input type="text" id="rep-by" placeholder="Name, certification"><small>Printed on the report. Remembered in this browser only.</small></label>
-        <label class="field"><span class="l">File or case number</span><input type="text" id="rep-file" placeholder="Optional"></label>
       </div>
       <div class="cols-2">
         <div class="group">
@@ -474,7 +526,7 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
           <h4>Priced on the grid</h4>
           <div id="feat-boxes" class="fields"></div>
           <h4>Background controls (never on the grid)</h4>
-          <p class="hint small">They stay in the model so newer houses or a different style cannot leak into the priced lines. They never print as adjustments.</p>
+          <p class="hint small">They stay in the model so newer houses, a different style or a finished basement cannot leak into the priced lines. They never print as adjustments; you adjust basements by room and utility yourself.</p>
           <div id="ctrl-boxes" class="fields"></div>
         </div>
       </div>
@@ -534,50 +586,6 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
     </div>
   </section>
 
-  <!-- 03 SUBJECT -->
-  <section class="panel" id="p-subject" aria-labelledby="h-subject">
-    <div class="strip" aria-hidden="true"><span class="n">03</span><span class="lbl">Subject</span></div>
-    <div class="pbody">
-      <div class="phead">
-        <h2 id="h-subject">Subject as of the effective date</h2>
-        <p class="hint">Every priced line needs a value. Bedrooms and baths are above grade. Year built and levels are optional; year built fills the similarity range button.</p>
-      </div>
-      <div class="row">
-        <input type="file" id="subj-file" accept=".csv,text/csv" hidden>
-        <button type="button" class="btn" id="subj-file-btn">Load subject from a CSV</button>
-        <span class="hint small">A Spark export with the subject's MLS record works. If the file has several rows, pick the subject below.</span>
-      </div>
-      <div class="search-results" id="subj-hits"></div>
-      <div class="row">
-        <label class="field" style="flex:1 1 260px"><span class="l">Or fill from a sale in the sales file (MLS number or street)</span><input type="search" id="subj-find" placeholder="e.g. VAFX2223764"></label>
-        <button type="button" class="btn" id="subj-fill" style="align-self:end">Fill subject</button>
-      </div>
-      <p class="hint small">After filling, check every value against your own measurements and records: the grid uses what is in these boxes.</p>
-      <div class="fields" id="subj-fields"></div>
-    </div>
-  </section>
-
-  <!-- 04 COMPS -->
-  <section class="panel" id="p-comps" aria-labelledby="h-comps">
-    <div class="strip" aria-hidden="true"><span class="n">04</span><span class="lbl">Comparables</span></div>
-    <div class="pbody">
-      <div class="phead">
-        <h2 id="h-comps">The comps in your grid</h2>
-        <p class="hint">Load them from a CSV (a Spark export of your comps; the subject's row is skipped if it is in the same file), pick them from the sales file, or type in a sale the export doesn't have. Values you edit are treated as verified data: the grid uses your numbers and the model keeps the MLS record.</p>
-      </div>
-      <div class="row">
-        <label class="field" style="flex:1 1 300px"><span class="l">Find in the sales file</span><input type="search" id="comp-find" placeholder="MLS number or street name"></label>
-      </div>
-      <div class="search-results" id="comp-hits"></div>
-      <div class="row">
-        <input type="file" id="comp-file" accept=".csv,text/csv" hidden>
-        <button type="button" class="btn" id="comp-file-btn">Load comps from a CSV</button>
-        <button type="button" class="btn" id="comp-manual">Add a sale that isn't in the file</button>
-      </div>
-      <div class="complist" id="comp-list"></div>
-    </div>
-  </section>
-
   <!-- 05 RUN -->
   <section class="panel" id="p-run" aria-labelledby="h-run">
     <div class="strip" aria-hidden="true"><span class="n">05</span><span class="lbl">Run</span></div>
@@ -608,12 +616,12 @@ footer.site .cols-2 p { font-size: 0.86rem; color: var(--ink-2); }
   <div class="wrap">
     <h3>Method, validation and limits</h3>
     <div class="cols-2">
-      <p><b>Lines.</b> The grid prices site (in dollars per square foot of lot), bedrooms, full baths and half baths (all above grade: the MLS total minus the lower-level count), GLA, garage spaces, carport spaces and pool, plus a percent time line. Year built and levels stay in the model only as background controls. A line needs at least 10 pool sales that differ from the most common value; with fewer it reads Not enough data. Basement area, decks, porches, fireplaces, concessions and location are left to the appraiser.</p>
+      <p><b>Lines.</b> The grid prices site (in dollars per square foot of lot), bedrooms, full baths and half baths (all above grade: the MLS total minus the lower-level count), GLA, garage spaces, carport spaces and pool, plus a percent time line. Year built, levels and finished basement (yes or no) stay in the model only as background controls, so they cannot leak into the priced lines. A line needs at least 10 pool sales that differ from the most common value; with fewer it reads Not enough data. Basement area and rooms, decks, porches, fireplaces, concessions and location are left to the appraiser.</p>
       <p><b>Model.</b> Multivariate adaptive regression splines (Friedman, 1991), reimplemented in JavaScript from the source of the R earth package by Stephen Milborrow: forward pass, knot search, GCV backward pruning. The browser engine matches R earth on all 71 test fits. MARS finds where each curve bends; any priced variable it leaves out goes back in as a straight line, so every line gets a number and a range. Settings and the adjustment convention (value contribution of the subject minus the comp, per variable) follow W. Craytor's open-source earthUI.</p>
       <p><b>Weights.</b> A bedroom, bath, garage or carport count more than 2 from what is typical for the sale's size (the median count among the nearest 20% of the sales by GLA, at least 30 sales) counts for less: weight 2 divided by the distance, so a recorded 36-car garage on a 2-car street counts about 6%. A finished basement with its lower-level rooms left blank and more rooms than typical on the main line gets half weight on top. Sales priced far from what the model expects get Huber weights. The dollar amounts come from the weighted refit; nothing is dropped for any of this, and every listing that lost weight is listed.</p>
-      <p><b>Time.</b> Market conditions come from a separate quality-adjusted log-price index fit on every clean sale in the export: log price on the model variables and quarter of the year, plus a time curve that may bend only on a calendar grid (Jan 1 and Jul 1 by default) where at least 20 sales sit on each side, with bends pruned by GCV and the same weights. Prices in the adjustment pool are brought to the effective date with it before the feature lines are priced, and each comp's time line is its price times the index change.</p>
-      <p><b>Uncertainty and validation.</b> Each line carries a half-sample range: the full procedure refit on 200 random halves of the sales, so knots, variable choices and weights are allowed to move. In 16 synthetic markets with known true values, four price paths and realtor-style listing errors mixed in (316 lines), that range held the true amount 96% of the time and every line rated Supported had the right sign; the textbook &plusmn;1.96 SE interval held it 65% of the time. With the weights switched off the typical miss grew on 8 of the 9 line types. The R reference script matches this page line for line on 9 test cases, weights, folds and half-samples included.</p>
-      <p><b>Status rules and limits.</b> Supported: same sign in at least 90% of the refits. Size variable: at least 60%. Unstable: under 60%. Lines are also flagged when the comp or subject sits outside the modeled sales, when a segment runs against the normal market direction, when FHFA's index disagrees with this export's index over the same years, and when leaving your comps out moves a line outside its range. The model only sees what the MLS records: condition, quality, view and finish are not in the data. This page produces adjustment support only: no indicated, reconciled or opinion-of-value figure.</p>
+      <p><b>Time.</b> Market conditions come from a separate quality-adjusted log-price index fit on every clean sale in the export: log price on the model variables and quarter of the year, plus a time curve that may bend only on a calendar grid (Jan 1 and Jul 1 by default) where at least 20 sales sit on each side (10 in the half-sample refits, which use half the sales), with bends pruned by GCV and the same weights. Prices in the adjustment pool are brought to the effective date with it before the feature lines are priced, and each comp's time line is its price times the index change.</p>
+      <p><b>Uncertainty and validation.</b> Each line carries a half-sample range: the full procedure refit on 200 random halves of the sales, so knots, variable choices and weights are allowed to move. In 16 synthetic markets with known true values, four price paths and realtor-style listing errors mixed in (320 lines), that range held the true amount 96% of the time and every line rated Supported had the right sign; the textbook &plusmn;1.96 SE interval held it 64% of the time. With the weights switched off the typical miss grew on 8 of the 9 line types. The R reference script matches this page line for line on 10 test cases, weights, folds, half-samples and every run note included.</p>
+      <p><b>Status rules and limits.</b> Supported: same sign in at least 90% of the refits. Size variable: at least 60%. Unstable: under 60%. Lines are also flagged when the comp or subject sits outside the modeled sales, when a segment runs against the normal market direction, when FHFA's index disagrees with this export's index over the same years, when leaving your comps out moves a line outside its range, and when the full-data amount falls outside its own half-sample range. The model only sees what the MLS records: condition, quality, view and finish are not in the data. This page produces adjustment support only: no indicated, reconciled or opinion-of-value figure.</p>
     </div>
     <p class="scope" id="scope-text"></p>
   </div>
@@ -944,7 +952,7 @@ DEMO200317,4951 Hartley Pl,384100,2022-10-20,2022-11-26,2022-09-22,2230,5,4,,0,1
 DEMO200318,4954 Indian Hill Pl,278500,2025-03-06,2025-04-07,2025-02-14,1680,2,3,,0,1,,True,Fully Finished,710,True,1,,Yes - Personal,8589,0.1972,1990,2,22015,"Fairfax, VA",Standard,CLS,084-27-1318
 DEMO200319,4957 Bakersville Ln,455300,2025-07-06,2025-08-26,2025-06-18,2710,5,4,1,,,,True,Full,,True,2,,No Pool,6451,0.1481,2008,2,22039,"Fairfax, VA",Standard,CLS,084-28-1319
 </script>
-<script type="application/json" id="fhfa-presets">[{"id":"ATNHPIUS11001A","name":"District of Columbia","label":"FHFA all-transactions HPI, District of Columbia (FRED ATNHPIUS11001A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS11001A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":220.88},{"date":"2011-01-01","value":223.16},{"date":"2012-01-01","value":230.23},{"date":"2013-01-01","value":246.38},{"date":"2014-01-01","value":269.11},{"date":"2015-01-01","value":284.33},{"date":"2016-01-01","value":303.42},{"date":"2017-01-01","value":318.48},{"date":"2018-01-01","value":333.83},{"date":"2019-01-01","value":346.66},{"date":"2020-01-01","value":353.9},{"date":"2021-01-01","value":378.32},{"date":"2022-01-01","value":406.69},{"date":"2023-01-01","value":395.15},{"date":"2024-01-01","value":396.76},{"date":"2025-01-01","value":398.36}],"match":["washington,dc","district of columbia,dc","district of columbia","dc"]},{"id":"ATNHPIUS51510A","name":"Alexandria city, VA","label":"FHFA all-transactions HPI, Alexandria city, VA (FRED ATNHPIUS51510A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51510A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":210.27},{"date":"2011-01-01","value":211.64},{"date":"2012-01-01","value":215.19},{"date":"2013-01-01","value":221.85},{"date":"2014-01-01","value":235.61},{"date":"2015-01-01","value":241.97},{"date":"2016-01-01","value":249.15},{"date":"2017-01-01","value":253.6},{"date":"2018-01-01","value":258.83},{"date":"2019-01-01","value":272.77},{"date":"2020-01-01","value":282.94},{"date":"2021-01-01","value":296.56},{"date":"2022-01-01","value":317.59},{"date":"2023-01-01","value":326.28},{"date":"2024-01-01","value":345.26},{"date":"2025-01-01","value":348.7}],"match":["alexandria city,va","alexandria,va"]},{"id":"ATNHPIUS51013A","name":"Arlington County, VA","label":"FHFA all-transactions HPI, Arlington County, VA (FRED ATNHPIUS51013A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51013A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":210.2},{"date":"2011-01-01","value":213.14},{"date":"2012-01-01","value":217.4},{"date":"2013-01-01","value":227.31},{"date":"2014-01-01","value":239.83},{"date":"2015-01-01","value":245.61},{"date":"2016-01-01","value":252.12},{"date":"2017-01-01","value":255.91},{"date":"2018-01-01","value":266.38},{"date":"2019-01-01","value":278.61},{"date":"2020-01-01","value":284.98},{"date":"2021-01-01","value":297.29},{"date":"2022-01-01","value":320.65},{"date":"2023-01-01","value":327.45},{"date":"2024-01-01","value":348.68},{"date":"2025-01-01","value":353.68}],"match":["arlington,va"]},{"id":"ATNHPIUS51059A","name":"Fairfax County, VA","label":"FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51059A.txt","updated":"2026-03-31","values":[{"date":"2010-01-01","value":179.32},{"date":"2011-01-01","value":180.87},{"date":"2012-01-01","value":184.21},{"date":"2013-01-01","value":192.44},{"date":"2014-01-01","value":203.52},{"date":"2015-01-01","value":207.0},{"date":"2016-01-01","value":210.3},{"date":"2017-01-01","value":215.03},{"date":"2018-01-01","value":220.22},{"date":"2019-01-01","value":228.66},{"date":"2020-01-01","value":236.38},{"date":"2021-01-01","value":253.55},{"date":"2022-01-01","value":278.66},{"date":"2023-01-01","value":293.45},{"date":"2024-01-01","value":313.13},{"date":"2025-01-01","value":319.72}],"match":["fairfax,va"]},{"id":"ATNHPIUS51061A","name":"Fauquier County, VA","label":"FHFA all-transactions HPI, Fauquier County, VA (FRED ATNHPIUS51061A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51061A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":142.92},{"date":"2011-01-01","value":141.87},{"date":"2012-01-01","value":142.12},{"date":"2013-01-01","value":150.92},{"date":"2014-01-01","value":159.32},{"date":"2015-01-01","value":163.11},{"date":"2016-01-01","value":167.24},{"date":"2017-01-01","value":174.28},{"date":"2018-01-01","value":179.59},{"date":"2019-01-01","value":187.35},{"date":"2020-01-01","value":192.73},{"date":"2021-01-01","value":216.12},{"date":"2022-01-01","value":239.07},{"date":"2023-01-01","value":252.82},{"date":"2024-01-01","value":269.29},{"date":"2025-01-01","value":287.0}],"match":["fauquier,va"]},{"id":"ATNHPIUS24031A","name":"Montgomery County, MD","label":"FHFA all-transactions HPI, Montgomery County, MD (FRED ATNHPIUS24031A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS24031A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":178.4},{"date":"2011-01-01","value":175.59},{"date":"2012-01-01","value":174.85},{"date":"2013-01-01","value":180.64},{"date":"2014-01-01","value":187.71},{"date":"2015-01-01","value":189.66},{"date":"2016-01-01","value":194.37},{"date":"2017-01-01","value":199.19},{"date":"2018-01-01","value":203.69},{"date":"2019-01-01","value":208.24},{"date":"2020-01-01","value":211.17},{"date":"2021-01-01","value":229.53},{"date":"2022-01-01","value":252.77},{"date":"2023-01-01","value":267.44},{"date":"2024-01-01","value":281.54},{"date":"2025-01-01","value":285.26}],"match":["montgomery,md"]},{"id":"ATNHPIUS24033A","name":"Prince George's County, MD","label":"FHFA all-transactions HPI, Prince George's County, MD (FRED ATNHPIUS24033A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS24033A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":152.43},{"date":"2011-01-01","value":140.3},{"date":"2012-01-01","value":135.86},{"date":"2013-01-01","value":141.97},{"date":"2014-01-01","value":155.61},{"date":"2015-01-01","value":165.84},{"date":"2016-01-01","value":174.6},{"date":"2017-01-01","value":186.29},{"date":"2018-01-01","value":194.64},{"date":"2019-01-01","value":203.12},{"date":"2020-01-01","value":212.83},{"date":"2021-01-01","value":236.95},{"date":"2022-01-01","value":261.3},{"date":"2023-01-01","value":273.3},{"date":"2024-01-01","value":284.82},{"date":"2025-01-01","value":292.86}],"match":["prince georges,md"]},{"id":"ATNHPIUS51153A","name":"Prince William County, VA","label":"FHFA all-transactions HPI, Prince William County, VA (FRED ATNHPIUS51153A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51153A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":148.31},{"date":"2011-01-01","value":148.72},{"date":"2012-01-01","value":153.38},{"date":"2013-01-01","value":163.18},{"date":"2014-01-01","value":174.05},{"date":"2015-01-01","value":178.8},{"date":"2016-01-01","value":184.0},{"date":"2017-01-01","value":193.06},{"date":"2018-01-01","value":200.07},{"date":"2019-01-01","value":206.37},{"date":"2020-01-01","value":214.38},{"date":"2021-01-01","value":239.7},{"date":"2022-01-01","value":266.83},{"date":"2023-01-01","value":282.68},{"date":"2024-01-01","value":307.02},{"date":"2025-01-01","value":316.05}],"match":["prince william,va"]},{"id":"ATNHPIUS51177A","name":"Spotsylvania County, VA","label":"FHFA all-transactions HPI, Spotsylvania County, VA (FRED ATNHPIUS51177A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51177A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":149.63},{"date":"2011-01-01","value":144.37},{"date":"2012-01-01","value":142.7},{"date":"2013-01-01","value":150.29},{"date":"2014-01-01","value":158.0},{"date":"2015-01-01","value":165.24},{"date":"2016-01-01","value":169.24},{"date":"2017-01-01","value":179.93},{"date":"2018-01-01","value":185.23},{"date":"2019-01-01","value":192.31},{"date":"2020-01-01","value":199.51},{"date":"2021-01-01","value":225.8},{"date":"2022-01-01","value":260.03},{"date":"2023-01-01","value":276.11},{"date":"2024-01-01","value":298.62},{"date":"2025-01-01","value":301.78}],"match":["spotsylvania,va"]},{"id":"ATNHPIUS51179A","name":"Stafford County, VA","label":"FHFA all-transactions HPI, Stafford County, VA (FRED ATNHPIUS51179A)","source":"https://fred.stlouisfed.org/data/ATNHPIUS51179A","updated":"2026-03-31","values":[{"date":"2010-01-01","value":149.09},{"date":"2011-01-01","value":144.85},{"date":"2012-01-01","value":147.65},{"date":"2013-01-01","value":155.43},{"date":"2014-01-01","value":164.52},{"date":"2015-01-01","value":169.39},{"date":"2016-01-01","value":173.6},{"date":"2017-01-01","value":178.58},{"date":"2018-01-01","value":185.84},{"date":"2019-01-01","value":193.35},{"date":"2020-01-01","value":199.61},{"date":"2021-01-01","value":225.29},{"date":"2022-01-01","value":253.17},{"date":"2023-01-01","value":272.51},{"date":"2024-01-01","value":287.23},{"date":"2025-01-01","value":299.78}],"match":["stafford,va"]}]</script>
+<script type="application/json" id="fhfa-presets">[{"id": "ATNHPIUS11001A", "name": "District of Columbia", "label": "FHFA all-transactions HPI, District of Columbia (FRED ATNHPIUS11001A)", "source": "https://fred.stlouisfed.org/data/ATNHPIUS11001A", "updated": "2026-03-31", "values": [{"date": "2010-01-01", "value": 220.88}, {"date": "2011-01-01", "value": 223.16}, {"date": "2012-01-01", "value": 230.23}, {"date": "2013-01-01", "value": 246.38}, {"date": "2014-01-01", "value": 269.11}, {"date": "2015-01-01", "value": 284.33}, {"date": "2016-01-01", "value": 303.42}, {"date": "2017-01-01", "value": 318.48}, {"date": "2018-01-01", "value": 333.83}, {"date": "2019-01-01", "value": 346.66}, {"date": "2020-01-01", "value": 353.9}, {"date": "2021-01-01", "value": 378.32}, {"date": "2022-01-01", "value": 406.69}, {"date": "2023-01-01", "value": 395.15}, {"date": "2024-01-01", "value": 396.76}, {"date": "2025-01-01", "value": 398.36}], "match": ["washington,dc", "district of columbia,dc", "district of columbia", "dc"]}, {"id": "ATNHPIUS51510A", "name": "Alexandria city, VA", "label": "FHFA all-transactions HPI, Alexandria city, VA (FRED ATNHPIUS51510A)", "source": "https://fred.stlouisfed.org/data/ATNHPIUS51510A", "updated": "2026-03-31", "values": [{"date": "2010-01-01", "value": 210.27}, {"date": "2011-01-01", "value": 211.64}, {"date": "2012-01-01", "value": 215.19}, {"date": "2013-01-01", "value": 221.85}, {"date": "2014-01-01", "value": 235.61}, {"date": "2015-01-01", "value": 241.97}, {"date": "2016-01-01", "value": 249.15}, {"date": "2017-01-01", "value": 253.6}, {"date": "2018-01-01", "value": 258.83}, {"date": "2019-01-01", "value": 272.77}, {"date": "2020-01-01", "value": 282.94}, {"date": "2021-01-01", "value": 296.56}, {"date": "2022-01-01", "value": 317.59}, {"date": "2023-01-01", "value": 326.28}, {"date": "2024-01-01", "value": 345.26}, {"date": "2025-01-01", "value": 348.7}], "match": ["alexandria city,va", "alexandria,va"]}, {"id": "ATNHPIUS51013A", "name": "Arlington County, VA", "label": "FHFA all-transactions HPI, Arlington County, VA (FRED ATNHPIUS51013A)", "source": "https://fred.stlouisfed.org/data/ATNHPIUS51013A", "updated": "2026-03-31", "values": [{"date": "2010-01-01", "value": 210.2}, {"date": "2011-01-01", "value": 213.14}, {"date": "2012-01-01", "value": 217.4}, {"date": "2013-01-01", "value": 227.31}, {"date": "2014-01-01", "value": 239.83}, {"date": "2015-01-01", "value": 245.61}, {"date": "2016-01-01", "value": 252.12}, {"date": "2017-01-01", "value": 255.91}, {"date": "2018-01-01", "value": 266.38}, {"date": "2019-01-01", "value": 278.61}, {"date": "2020-01-01", "value": 284.98}, {"date": "2021-01-01", "value": 297.29}, {"date": "2022-01-01", "value": 320.65}, {"date": "2023-01-01", "value": 327.45}, {"date": "2024-01-01", "value": 348.68}, {"date": "2025-01-01", "value": 353.68}], "match": ["arlington,va"]}, {"id": "ATNHPIUS51059A", "name": "Fairfax County, VA", "label": "FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A)", "source": "https://fred.stlouisfed.org/data/ATNHPIUS51059A.txt", "updated": "2026-03-31", "values": [{"date": "2010-01-01", "value": 179.32}, {"date": "2011-01-01", "value": 180.87}, {"date": "2012-01-01", "value": 184.21}, {"date": "2013-01-01", "value": 192.44}, {"date": "2014-01-01", "value": 203.52}, {"date": "2015-01-01", "value": 207.0}, {"date": "2016-01-01", "value": 210.3}, {"date": "2017-01-01", "value": 215.03}, {"date": "2018-01-01", "value": 220.22}, {"date": "2019-01-01", "value": 228.66}, {"date": "2020-01-01", "value": 236.38}, {"date": "2021-01-01", "value": 253.55}, {"date": "2022-01-01", "value": 278.66}, {"date": "2023-01-01", "value": 293.45}, {"date": "2024-01-01", "value": 313.13}, {"date": "2025-01-01", "value": 319.72}], "match": ["fairfax,va"]}, {"id": "ATNHPIUS51061A", "name": "Fauquier County, VA", "label": "FHFA all-transactions HPI, Fauquier County, VA (FRED ATNHPIUS51061A)", "source": "https://fred.stlouisfed.org/data/ATNHPIUS51061A", "updated": "2026-03-31", "values": [{"date": "2010-01-01", "value": 142.92}, {"date": "2011-01-01", "value": 141.87}, {"date": "2012-01-01", "value": 142.12}, {"date": "2013-01-01", "value": 150.92}, {"date": "2014-01-01", "value": 159.32}, {"date": "2015-01-01", "value": 163.11}, {"date": "2016-01-01", "value": 167.24}, {"date": "2017-01-01", "value": 174.28}, {"date": "2018-01-01", "value": 179.59}, {"date": "2019-01-01", "value": 187.35}, {"date": "2020-01-01", "value": 192.73}, {"date": "2021-01-01", "value": 216.12}, {"date": "2022-01-01", "value": 239.07}, {"date": "2023-01-01", "value": 252.82}, {"date": "2024-01-01", "value": 269.29}, {"date": "2025-01-01", "value": 287.0}], "match": ["fauquier,va"]}, {"id": "ATNHPIUS51107A", "name": "Loudoun County, VA", "label": "FHFA all-transactions HPI, Loudoun County, VA (FRED ATNHPIUS51107A)", "source": "https://fred.stlouisfed.org/data/ATNHPIUS51107A", "updated": "2026-03-31", "values": [{"date": "2010-01-01", "value": 153.29}, {"date": "2011-01-01", "value": 151.94}, {"date": "2012-01-01", "value": 155.25}, {"date": "2013-01-01", "value": 162.99}, {"date": "2014-01-01", "value": 170.46}, {"date": "2015-01-01", "value": 175.09}, {"date": "2016-01-01", "value": 178.21}, {"date": "2017-01-01", "value": 183.53}, {"date": "2018-01-01", "value": 191.26}, {"date": "2019-01-01", "value": 199.51}, {"date": "2020-01-01", "value": 206.31}, {"date": "2021-01-01", "value": 229.1}, {"date": "2022-01-01", "value": 260.16}, {"date": "2023-01-01", "value": 276.27}, {"date": "2024-01-01", "value": 295.26}, {"date": "2025-01-01", "value": 308.04}], "match": ["loudoun,va"]}, {"id": "ATNHPIUS24031A", "name": "Montgomery County, MD", "label": "FHFA all-transactions HPI, Montgomery County, MD (FRED ATNHPIUS24031A)", "source": "https://fred.stlouisfed.org/data/ATNHPIUS24031A", "updated": "2026-03-31", "values": [{"date": "2010-01-01", "value": 178.4}, {"date": "2011-01-01", "value": 175.59}, {"date": "2012-01-01", "value": 174.85}, {"date": "2013-01-01", "value": 180.64}, {"date": "2014-01-01", "value": 187.71}, {"date": "2015-01-01", "value": 189.66}, {"date": "2016-01-01", "value": 194.37}, {"date": "2017-01-01", "value": 199.19}, {"date": "2018-01-01", "value": 203.69}, {"date": "2019-01-01", "value": 208.24}, {"date": "2020-01-01", "value": 211.17}, {"date": "2021-01-01", "value": 229.53}, {"date": "2022-01-01", "value": 252.77}, {"date": "2023-01-01", "value": 267.44}, {"date": "2024-01-01", "value": 281.54}, {"date": "2025-01-01", "value": 285.26}], "match": ["montgomery,md"]}, {"id": "ATNHPIUS24033A", "name": "Prince George's County, MD", "label": "FHFA all-transactions HPI, Prince George's County, MD (FRED ATNHPIUS24033A)", "source": "https://fred.stlouisfed.org/data/ATNHPIUS24033A", "updated": "2026-03-31", "values": [{"date": "2010-01-01", "value": 152.43}, {"date": "2011-01-01", "value": 140.3}, {"date": "2012-01-01", "value": 135.86}, {"date": "2013-01-01", "value": 141.97}, {"date": "2014-01-01", "value": 155.61}, {"date": "2015-01-01", "value": 165.84}, {"date": "2016-01-01", "value": 174.6}, {"date": "2017-01-01", "value": 186.29}, {"date": "2018-01-01", "value": 194.64}, {"date": "2019-01-01", "value": 203.12}, {"date": "2020-01-01", "value": 212.83}, {"date": "2021-01-01", "value": 236.95}, {"date": "2022-01-01", "value": 261.3}, {"date": "2023-01-01", "value": 273.3}, {"date": "2024-01-01", "value": 284.82}, {"date": "2025-01-01", "value": 292.86}], "match": ["prince georges,md"]}, {"id": "ATNHPIUS51153A", "name": "Prince William County, VA", "label": "FHFA all-transactions HPI, Prince William County, VA (FRED ATNHPIUS51153A)", "source": "https://fred.stlouisfed.org/data/ATNHPIUS51153A", "updated": "2026-03-31", "values": [{"date": "2010-01-01", "value": 148.31}, {"date": "2011-01-01", "value": 148.72}, {"date": "2012-01-01", "value": 153.38}, {"date": "2013-01-01", "value": 163.18}, {"date": "2014-01-01", "value": 174.05}, {"date": "2015-01-01", "value": 178.8}, {"date": "2016-01-01", "value": 184.0}, {"date": "2017-01-01", "value": 193.06}, {"date": "2018-01-01", "value": 200.07}, {"date": "2019-01-01", "value": 206.37}, {"date": "2020-01-01", "value": 214.38}, {"date": "2021-01-01", "value": 239.7}, {"date": "2022-01-01", "value": 266.83}, {"date": "2023-01-01", "value": 282.68}, {"date": "2024-01-01", "value": 307.02}, {"date": "2025-01-01", "value": 316.05}], "match": ["prince william,va"]}, {"id": "ATNHPIUS51177A", "name": "Spotsylvania County, VA", "label": "FHFA all-transactions HPI, Spotsylvania County, VA (FRED ATNHPIUS51177A)", "source": "https://fred.stlouisfed.org/data/ATNHPIUS51177A", "updated": "2026-03-31", "values": [{"date": "2010-01-01", "value": 149.63}, {"date": "2011-01-01", "value": 144.37}, {"date": "2012-01-01", "value": 142.7}, {"date": "2013-01-01", "value": 150.29}, {"date": "2014-01-01", "value": 158.0}, {"date": "2015-01-01", "value": 165.24}, {"date": "2016-01-01", "value": 169.24}, {"date": "2017-01-01", "value": 179.93}, {"date": "2018-01-01", "value": 185.23}, {"date": "2019-01-01", "value": 192.31}, {"date": "2020-01-01", "value": 199.51}, {"date": "2021-01-01", "value": 225.8}, {"date": "2022-01-01", "value": 260.03}, {"date": "2023-01-01", "value": 276.11}, {"date": "2024-01-01", "value": 298.62}, {"date": "2025-01-01", "value": 301.78}], "match": ["spotsylvania,va"]}, {"id": "ATNHPIUS51179A", "name": "Stafford County, VA", "label": "FHFA all-transactions HPI, Stafford County, VA (FRED ATNHPIUS51179A)", "source": "https://fred.stlouisfed.org/data/ATNHPIUS51179A", "updated": "2026-03-31", "values": [{"date": "2010-01-01", "value": 149.09}, {"date": "2011-01-01", "value": 144.85}, {"date": "2012-01-01", "value": 147.65}, {"date": "2013-01-01", "value": 155.43}, {"date": "2014-01-01", "value": 164.52}, {"date": "2015-01-01", "value": 169.39}, {"date": "2016-01-01", "value": 173.6}, {"date": "2017-01-01", "value": 178.58}, {"date": "2018-01-01", "value": 185.84}, {"date": "2019-01-01", "value": 193.35}, {"date": "2020-01-01", "value": 199.61}, {"date": "2021-01-01", "value": 225.29}, {"date": "2022-01-01", "value": 253.17}, {"date": "2023-01-01", "value": 272.51}, {"date": "2024-01-01", "value": 287.23}, {"date": "2025-01-01", "value": 299.78}], "match": ["stafford,va"]}]</script>
 <script id="mars-engine">
 /* MARS engine (degree 1, additive) - a line-for-line port of the forward pass,
    knot search and pruning rules of the R package earth (S. Milborrow, earth.c
@@ -1377,7 +1385,7 @@ if (typeof module !== "undefined") module.exports = MarsEngine;
    or opinion-of-value figure. */
 var MarsAnalysis = (function (M) {
   "use strict";
-  var VERSION = "2.3.0";
+  var VERSION = "2.3.1";
   var MONTH = 30.4375;
 
   // ------------------------------------------------------------------ parsing
@@ -1680,7 +1688,7 @@ var MarsAnalysis = (function (M) {
     // priced on the grid, in grid order (URAR order: site, room count, GLA, garage/carport, pool)
     features: ["lot_sf", "beds_ag", "fb_ag", "hb_ag", "gla", "garage", "carport", "pool"],
     // in the model as background controls so they cannot leak into the priced lines; never on the grid
-    controls: ["year_built", "levels"],
+    controls: ["year_built", "levels", "fin_bsmt"],
     linearOnly: [], location: "", locationMinN: 5,
     minVary: 10,            // a line is priced only when at least this many pool sales differ from the most common value
     countWeightCut: 2,      // a bedroom, bath, garage or carport count more than this far from what is typical for the sale's size gets less weight
@@ -1711,7 +1719,7 @@ var MarsAnalysis = (function (M) {
   }
   function fmtVal(f, v) { return (f === "year_built" || f === "levels") ? String(v) : Number(v).toLocaleString("en-US", { maximumFractionDigits: 6 }); }
   var LABELS = { time: "Market conditions (time)", gla: "Gross living area", lot_sf: "Site", beds_ag: "Bedrooms", fb_ag: "Full baths", hb_ag: "Half baths",
-    garage: "Garage", carport: "Carport", pool: "Pool", year_built: "Year built", levels: "Levels", location: "Location" };
+    garage: "Garage", carport: "Carport", pool: "Pool", year_built: "Year built", levels: "Levels", fin_bsmt: "Finished basement", location: "Location" };
   var UNITS = { gla: "sf", lot_sf: "sf", beds_ag: "bedroom", fb_ag: "full bath", hb_ag: "half bath", garage: "space", carport: "space", pool: "pool",
     year_built: "year", levels: "level" };
   function unitOf(f) { return UNITS[f] || "unit"; }
@@ -1947,13 +1955,13 @@ var MarsAnalysis = (function (M) {
       normK = byGla ? Math.min(dm.length, Math.max(cfg.normMin, rnd(cfg.normShare * dm.length))) : dm.length;
       dm.forEach(function (r) { var nrm = normsAt(r.gla), lw = listingWeight(r, nrm); r.lw = lw.w; r.lwWhy = lw.why; r.lwNorm = nrm; });
     }
-    function tmCandidates(dates) {
+    function tmCandidates(dates, minSide) {
       var lo = Infinity, hi = -Infinity; dates.forEach(function (t) { if (t < lo) lo = t; if (t > hi) hi = t; });
       var y0 = yearOf(lo), end = dayOf(yearOf(hi) + 1, 0, 1), out = [];
       for (var i = 0; ; i++) {
         var g = dayOf(y0, i * cfg.timeKnotMonths, 1); if (g > end) break;
         var below = 0, above = 0; dates.forEach(function (t) { if (t < g) below++; else above++; });
-        if (below >= cfg.timeMinSide && above >= cfg.timeMinSide) out.push(g);
+        if (below >= minSide && above >= minSide) out.push(g);
       }
       return out;
     }
@@ -1963,7 +1971,7 @@ var MarsAnalysis = (function (M) {
       var med = median(e), s = 1.4826 * median(e.map(function (v) { return Math.abs(v - med); })), hk = cfg.huberK * s;
       return e.map(function (v) { var a = Math.abs(v); return s > 0 && a > hk ? hk / a : 1; });
     }
-    function tmFit(ix, full) {
+    function tmFit(ix, full, minSide) {
       var nn = ix.length, rows = ix.map(function (i) { return dm[i]; });
       var age = rows.map(function (r) { return r.sale_age / MONTH; });
       var yv = rows.map(function (r) { return Math.log(r.price_used); }), ym = mean(yv), yc = yv.map(function (v) { return v - ym; });
@@ -1975,7 +1983,7 @@ var MarsAnalysis = (function (M) {
       var Fk = [], fk = [];
       F.forEach(function (c, j) { var lo = Infinity, hi = -Infinity; c.forEach(function (v) { if (v < lo) lo = v; if (v > hi) hi = v; }); if (hi > lo) { Fk.push(c); fk.push(fnames[j]); } });
       Fk = Fk.map(function (c) { var m0 = mean(c); return c.map(function (v) { return v - m0; }); });
-      var kd = tmCandidates(rows.map(function (r) { return r.date_used; })), ka = kd.map(function (k) { return (eff - k) / MONTH; });
+      var kd = tmCandidates(rows.map(function (r) { return r.date_used; }), minSide === undefined ? cfg.timeMinSide : minSide), ka = kd.map(function (k) { return (eff - k) / MONTH; });
       var T = [age].concat(ka.map(function (k) { return age.map(function (a) { return Math.max(0, a - k) - Math.max(0, -k); }); }));
       var Z = [new Array(nn).fill(1)].concat(Fk).concat(T), p0 = 1 + Fk.length, P = Z.length;
       var Zr = new Float64Array(nn * P);   // row-major copy for fast weighted Gram sums
@@ -2308,8 +2316,6 @@ var MarsAnalysis = (function (M) {
     // Time: the subject sits at the effective date. A gap up to cfg.timeGapDays between the newest
     // clean sale and the effective date counts as inside the indexed range.
     var timeGap = Math.min.apply(null, dm.map(function (r) { return r.sale_age; })), timeHi = Math.max.apply(null, dm.map(function (r) { return r.sale_age; }));
-    if (timeGap > cfg.timeGapDays) notes.push("WARNING: the most recent clean sale is " + Math.round(timeGap) + " days before the effective date (more than " +
-      cfg.timeGapDays + "). Time lines extend the last index segment beyond the data and are flagged.");
     var timeRangeLo = timeGap <= cfg.timeGapDays ? 0 : timeGap;
     function rangeLo(f) { return ranges[f][0]; }
     var compRows = comps.map(function (cr) {
@@ -2340,6 +2346,8 @@ var MarsAnalysis = (function (M) {
     if (outside.length) notes.push("Comps outside your adjustment-pool ranges (still adjusted; lines that fall outside the modeled sales are flagged): " + outside.join(", ") + ".");
     var offComps = compRows.map(function (cr, ci) { return cr._lw.w < 1 ? "C" + (ci + 1) + " " + (cr.address || cr.mls_id) + " (" + cr._lw.why.join("; ") + ")" : null; }).filter(Boolean);
     if (offComps.length) notes.push("Comp listings that look off by the same test the pool sales get: " + offComps.join("; ") + ". Check those records before relying on their count lines.");
+    if (timeGap > cfg.timeGapDays) notes.push("WARNING: the most recent clean sale is " + Math.round(timeGap) + " days before the effective date (more than " +
+      cfg.timeGapDays + "). Time lines extend the last index segment beyond the data and are flagged.");
 
     function provisional(L) {
       if (Math.abs(L.adj) < 0.5) { L.status = "NO MODEL DIFFERENCE (same value or flat segment)"; L.tone = "zero"; }
@@ -2464,11 +2472,13 @@ var MarsAnalysis = (function (M) {
     var hsMonthF = null, hsCompF = null, tmFreq = 0;
     if (H > 0) {
       var rt = M.rRNG(cfg.masterSeed + 20000), halfM = Math.floor(nMarket / 2);   // R: set.seed(master + 20000)
+      // the same procedure at half the sales: a bend needs the same share of the sales on each side, not the same count
+      var minSideH = Math.max(5, rnd(cfg.timeMinSide * halfM / nMarket));
       hsMonthF = []; hsCompF = [];
       for (var b2 = 0; b2 < H; b2++) {
         if (b2 % 20 === 0) { progress("Time index refits: " + b2 + " of " + H, 0.82 + 0.12 * b2 / H); await tick(); }
         var ixm = rt.sampleNoReplace(nMarket, halfM), fb;
-        try { fb = tmFit(ixm, false); } catch (err2) { hsMonthF.push(null); hsCompF.push(null); continue; }
+        try { fb = tmFit(ixm, false, minSideH); } catch (err2) { hsMonthF.push(null); hsCompF.push(null); continue; }
         hsMonthF.push(monthAge.map(function (aa) { return tmF(fb, aa); }));
         hsCompF.push(compAgeM.map(function (aa) { return tmF(fb, aa); }));
         if (fb.terms.length) tmFreq++;
@@ -2477,6 +2487,9 @@ var MarsAnalysis = (function (M) {
         hsApply(timeLine[ci], hsCompF.filter(Boolean).map(function (row) { return cr.price_comp * (Math.exp(-row[ci]) - 1); }));
       });
       hsFreq = Object.assign({ time: Math.round(1000 * tmFreq / H) / 1000 }, hsFreq);
+      if (tm.terms.length && 2 * tmFreq < H)
+        notes.push("WARNING: the time index found a trend in the full export, but only " + tmFreq + " of the " + H + " half-sample refits kept one. " +
+          "The time lines are not stable in this export; back them with FHFA, the yearly medians or paired sales.");
     }
     var curF = monthAge.map(function (aa) { return tmF(tm, aa); });
     var monthCount = {}; dm.forEach(function (r) { var mk = monthKey(r.date_used); monthCount[mk] = (monthCount[mk] || 0) + 1; });
@@ -2591,6 +2604,14 @@ var MarsAnalysis = (function (M) {
       }
     }
 
+    // ---- a full-data amount outside its own half-sample range: the halves do not reproduce it
+    grid.forEach(function (L) {
+      if (!isFinite(L.adj) || !isFinite(L.hsLo) || !isFinite(L.hsHi)) return;
+      if (L.adj < L.hsLo - 0.5 || L.adj > L.hsHi + 0.5)
+        L.review = (L.review ? L.review + " | " : "") + "OUTSIDE ITS RANGE: the full-data amount " + fmtMoney(L.adj) + " falls outside its half-sample range (" +
+          fmtMoney(L.hsLo) + " to " + fmtMoney(L.hsHi) + "); the refits on half the sales do not reproduce it, so treat it as unsupported.";
+    });
+
     progress("Segments and diagnostics", 0.96); await tick();
     // ---- per-segment slopes & curves (priced lines)
     var segments = [], curves = {};
@@ -2640,7 +2661,8 @@ var MarsAnalysis = (function (M) {
     // ---- local validation (GLA band, same levels), partial residuals
     var localVal = { verdict: "not run" };
     if (features.indexOf("gla") >= 0 && eligible.indexOf("gla") >= 0) {
-      var sg = subjRow.gla, band = isFinite(cfg.glaBand) ? cfg.glaBand : Math.max(250, Math.round(0.15 * sg / 10) * 10);
+      var sgb = num(subject.gla_band), gb = isFinite(sgb) ? sgb : cfg.glaBand;
+      var sg = subjRow.gla, band = isFinite(gb) ? gb : Math.max(250, Math.round(0.15 * sg / 10) * 10);
       var sameLv = eligible.indexOf("levels") >= 0 && isFinite(subjRow.levels);
       var inb = d.map(function (rw) { return Math.abs(rw.gla - sg) <= band && (!sameLv || rw.levels === subjRow.levels); });
       var cnt = inb.filter(Boolean).length;
@@ -2650,7 +2672,8 @@ var MarsAnalysis = (function (M) {
         var ol = ols([xv2], yv2), xr = [Math.min.apply(null, xv2), Math.max.apply(null, xv2)];
         var mAvg = slopeBetween("gla", xr[0], xr[1]);
         localVal = { band: band, n: cnt, range: xr, slope: ol.beta[1], se: ol.se[1], marsAvg: mAvg, sameLevels: sameLv,
-                     verdict: Math.abs(ol.beta[1] - mAvg) <= 1.96 * ol.se[1] ? "LOCALLY VALIDATED" : "DIVERGES: FLAG FOR APPRAISER JUDGMENT" };
+                     verdict: 1.96 * ol.se[1] >= Math.abs(ol.beta[1]) ? "NOT INFORMATIVE: the local slope is too noisy to confirm or reject the model rate" :
+                       Math.abs(ol.beta[1] - mAvg) <= 1.96 * ol.se[1] ? "LOCALLY VALIDATED" : "DIVERGES: FLAG FOR APPRAISER JUDGMENT" };
       } else localVal = { band: band, n: cnt, verdict: "BATCH TOO SMALL" };
     }
 
@@ -2691,7 +2714,7 @@ var MarsAnalysis = (function (M) {
     var dataHash = await sha256(canon), cfgHash = await sha256(JSON.stringify(settings));
     var timeMethod = "Quality-adjusted log-price index from " + nMarket + " clean sales: log price on " + modelVars.map(function (f) { return (LABELS[f] || f).toLowerCase(); }).join(", ") + (tmLoc.length ? ", location" : "") +
       (seasonOn ? ", quarter of the year (reported, not applied)" : "") + ", plus a time curve that may bend only on a " + cfg.timeKnotMonths + "-month calendar grid with at least " +
-      cfg.timeMinSide + " sales on each side, bends pruned by GCV (penalty " + gfmt(cfg.penalty) + "). Listings far from typical and prices far from the model count for less (listing and Huber weights). " +
+      cfg.timeMinSide + " sales on each side" + (H > 0 ? " (" + minSideH + " in the half-sample refits, which use half the sales)" : "") + ", bends pruned by GCV (penalty " + gfmt(cfg.penalty) + "). Listings far from typical and prices far from the model count for less (listing and Huber weights). " +
       "Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.";
     progress("Done", 1);
     return {
@@ -2702,7 +2725,7 @@ var MarsAnalysis = (function (M) {
                groups: groupsIn, picked: mod.picked, forced: forcedIn, rsq: rsqW, grsq: grsqW, cvrsq: cvMean, cvsd: cvSd, cvFolds: cvRsq.length,
                rmse: Math.sqrt(resid.reduce(function (sm, v) { return sm + v * v; }, 0) / n), mae: resid.reduce(function (sm, v) { return sm + Math.abs(v); }, 0) / n, k: k,
                earthRsq: mod.earth.rsq, earthGrsq: mod.earth.grsq, termcond: mod.earth.termcond, nForward: mod.earth.nForward, hsFreq: hsFreq, nEff: nEff(wts) },
-      time: { method: timeMethod, n: nMarket, knotMonths: cfg.timeKnotMonths, minSide: cfg.timeMinSide, seasonOn: seasonOn, season: tm.season,
+      time: { method: timeMethod, n: nMarket, knotMonths: cfg.timeKnotMonths, minSide: cfg.timeMinSide, minSideHalf: H > 0 ? minSideH : null, seasonOn: seasonOn, season: tm.season,
               candidates: tm.candidateDates.map(dayStr), overallSlope: tm.terms.some(function (k2) { return k2 === null; }), bends: tmBends.map(dayStr),
               flat: !tm.terms.length, segments: tmSegments.map(function (s) { return { from: dayStr(s.from), to: dayStr(s.to), rate: s.rate, total: s.total }; }),
               r2: tm.r2, halfSamples: H, trendShare: H > 0 ? tmFreq / H : NaN, months: timeMonths, years: timeYears, baseYear: baseYear, mixShift: mixShift, fhfa: fhfa,
@@ -2737,7 +2760,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
   "use strict";
   var A = window.MarsAnalysis;
   var PRICED = ["lot_sf", "beds_ag", "fb_ag", "hb_ag", "gla", "garage", "carport", "pool"];
-  var CONTROLS = ["year_built", "levels"];
+  var CONTROLS = ["year_built", "levels", "fin_bsmt"];
   var FDEF = {
     lot_sf: { label: "Site", unit: "sf", step: "1", hint: "Lot square feet (acres x 43,560)" },
     beds_ag: { label: "Bedrooms above grade", step: "1" },
@@ -2748,9 +2771,10 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     carport: { label: "Carport spaces", step: "1" },
     pool: { label: "Private pool", bool: true },
     year_built: { label: "Year built", step: "1", hint: "Background control; also sets the similarity range" },
-    levels: { label: "Levels", step: "0.5", hint: "Background control, same convention as the MLS field" }
+    levels: { label: "Levels", step: "0.5", hint: "Background control, same convention as the MLS field" },
+    fin_bsmt: { label: "Finished basement", bool: true, hint: "Background control: any finished area below grade. Never priced; you adjust basements yourself" }
   };
-  var SHORT = { lot_sf: "Site", beds_ag: "Bedrooms", fb_ag: "Full baths", hb_ag: "Half baths", gla: "GLA", garage: "Garage", carport: "Carport", pool: "Pool", year_built: "Year built", levels: "Levels" };
+  var SHORT = { lot_sf: "Site", beds_ag: "Bedrooms", fb_ag: "Full baths", hb_ag: "Half baths", gla: "GLA", garage: "Garage", carport: "Carport", pool: "Pool", year_built: "Year built", levels: "Levels", fin_bsmt: "Finished basement" };
   var ROLE_GROUPS = [
     ["Required", ["sale_price", "close_date", "gla"]],
     ["Dates and exposure", ["contract_date", "list_date"]],
@@ -2760,12 +2784,12 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     ["Identity and cleaning", ["mls_id", "address", "tax_id", "sale_type", "status", "arms_length", "new_construction", "zip", "subdivision", "county"]]
   ];
   var ROLE_LABEL = {}; A.ROLES.forEach(function (r) { ROLE_LABEL[r[0]] = r[1]; });
-  var DEMO_SUBJECT = { address: "Demo subject", gla: "2100", beds_ag: "4", fb_ag: "2", hb_ag: "1", garage: "2", carport: "0", pool: "0", lot_sf: "15000", year_built: "1995", levels: "2" };
+  var DEMO_SUBJECT = { address: "Demo subject", gla: "2100", beds_ag: "4", fb_ag: "2", hb_ag: "1", garage: "2", carport: "0", pool: "0", lot_sf: "15000", year_built: "1995", levels: "2", fin_bsmt: "1" };
   var DEMO_COMPS = ["DEMO200008", "DEMO200092", "DEMO200022", "DEMO200033"];
   var DEMO_EFF = "2026-09-15";
 
   var S = { table: null, fileName: "", map: {}, rows: [], isDemo: false, subject: {}, comps: [], nextId: 1, result: null, mine: {}, worker: null, running: false,
-    fhfaOwn: null, fhfaTouched: false, downloads: null, reportRecord: true,
+    fhfaOwn: null, fhfaTouched: false, downloads: null, reportRecord: true, demoEdits: {},
     framed: (function () { try { return window.self !== window.top; } catch (e) { return true; } })() || !!(window.claude && typeof window.claude.use === "function") };
   var FHFA_PRESETS = (function () { try { return JSON.parse(document.getElementById("fhfa-presets").textContent); } catch (e) { return []; } })();
 
@@ -2851,12 +2875,29 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     var t;
     try { t = A.parseCSV(text); } catch (e) { showFileError("That file could not be read as CSV."); return; }
     if (!t.header.length || !t.rows.length) { showFileError("No rows found in that file."); return; }
-    var wasDemo = S.isDemo;
+    if (!isDemo) exitDemo();
     S.table = t; S.fileName = name; S.isDemo = !!isDemo; S.map = A.autoMap(t.header);
-    if (wasDemo && !isDemo) { S.subject = {}; S.comps = []; S.mine = {}; $("eff").value = ""; }
     S.result = null; $("p-results").hidden = true; $("rail-results").hidden = true;
     applyMapping();
     renderMapping();
+  }
+  // The page opens on the synthetic demo. The first file of the user's own (subject, comps or market) or the
+  // "Start my own assignment" button clears every demo piece, so no made-up value can carry into real work.
+  function exitDemo(force) {
+    if (!S.isDemo && !force) return false;
+    var edits = force ? {} : (S.demoEdits || {}), keep = {};
+    Object.keys(edits).forEach(function (k) { if (k !== "eff" && S.subject[k] !== undefined) keep[k] = S.subject[k]; });
+    S.isDemo = false; S.table = null; S.rows = []; S.map = {}; S.fileName = ""; S.demoEdits = {};
+    S.subject = keep; S.comps = []; S.mine = {}; S.result = null; S.payload = null;
+    if (!edits.eff) $("eff").value = "";
+    $("r-new").checked = false;
+    POOL.forEach(function (q) { $(q[1]).value = ""; $(q[2]).value = ""; });
+    S.fhfaTouched = false; S.fhfaAuto = null; $("fhfa-preset").value = "";
+    clear($("file-summary")); clear($("data-check")); clear($("subj-hits")); clear($("comp-hits")); $("mapping-box").hidden = true;
+    $("p-results").hidden = true; $("rail-results").hidden = true; clear($("results")); clear($("run-error"));
+    $("demo-banner").hidden = true;
+    renderFeatureBoxes(); renderSubject(); renderComps(); updateFhfaStatus(); updatePoolCount(); updateChecklist();
+    return true;
   }
   function showFileError(msg) { var fs = clear($("file-summary")); fs.appendChild(note("err", msg)); }
   function applyMapping() {
@@ -2879,6 +2920,12 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     $("mapping-box").hidden = false;
     var req = ["sale_price", "close_date", "gla"].filter(function (k) { return !(S.map[k] >= 0); });
     if (req.length) { $("mapping-box").open = true; fs.appendChild(note("err", "Map these required fields below: " + req.map(function (k) { return ROLE_LABEL[k]; }).join(", ") + ".")); }
+    if (S.comps.length && !S.isDemo) {   // which report comps are in this file (the rest are still adjusted, just not modeled)
+      var ids = S.comps.map(function (c) { return compRow(c).mls_id; }), found = ids.filter(function (id) { return id && rows.some(function (r) { return r.mls_id === id; }); });
+      var missing = S.comps.map(compRow).filter(function (r) { return !(r.mls_id && rows.some(function (x) { return x.mls_id === r.mls_id; })); });
+      fs.appendChild(note(missing.length ? "warn" : "", found.length + " of your " + S.comps.length + " comps are in this file." + (missing.length ? " Not in it: " +
+        missing.map(function (r) { return r.address || r.mls_id || "typed-in comp"; }).join("; ") + ". They are still adjusted; they just cannot shape the model." : "")));
+    }
   }
   function renderMapping() {
     var tb = clear($("mapping-table").querySelector("tbody")), H = S.table.header;
@@ -2921,7 +2968,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
   }
 
   // ------------------------------------------------------------- 02 assignment
-  function inData(f) { return S.rows.some(function (r) { return fin(r[f]); }); }
+  function inData(f) { return !S.rows.length || S.rows.some(function (r) { return fin(r[f]); }); }
   function renderFeatureBoxes() {
     var fb = clear($("feat-boxes")), cb = clear($("ctrl-boxes"));
     PRICED.forEach(function (f) {
@@ -2935,8 +2982,8 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
         onchange: function (e) { S["ctl_" + f] = e.target.checked; } }), h("span", { text: SHORT[f] + (ok ? "" : " (not in file)") })));
     });
   }
-  function usedFeatures() { return PRICED.filter(function (f) { var b = document.getElementById("use-" + f); return b && b.checked && !b.disabled; }); }
-  function usedControls() { return CONTROLS.filter(function (f) { var b = document.getElementById("ctl-" + f); return b && b.checked && !b.disabled; }); }
+  function usedFeatures() { return PRICED.filter(function (f) { var b = document.getElementById("use-" + f); return b ? b.checked && !b.disabled : S["use_" + f] !== false; }); }
+  function usedControls() { return CONTROLS.filter(function (f) { var b = document.getElementById("ctl-" + f); return b ? b.checked && !b.disabled : S["ctl_" + f] !== false; }); }
 
   // ------------------------------------------------------------- 02b adjustment pool and FHFA
   var POOL = [["gla", "pr-gla-lo", "pr-gla-hi", "GLA"], ["year_built", "pr-yb-lo", "pr-yb-hi", "year built"], ["lot_sf", "pr-lot-lo", "pr-lot-hi", "lot"]];
@@ -3019,12 +3066,14 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
   }
   function renderSubject() {
     var box = clear($("subj-fields"));
+    // values typed while the demo is up are the user's own: they survive when the demo clears out
+    var mine = function (k) { if (S.isDemo) S.demoEdits[k] = true; };
     box.appendChild(h("label", { class: "field" }, h("span", { class: "l", text: "Address (for the report)" }),
-      h("input", { type: "text", value: S.subject.address || "", oninput: function (e) { S.subject.address = e.target.value; } })));
+      h("input", { type: "text", value: S.subject.address || "", oninput: function (e) { S.subject.address = e.target.value; mine("address"); } })));
     usedFeatures().forEach(function (f) {
-      box.appendChild(fieldInput(f, S.subject[f], function (v) { S.subject[f] = v; markMissing(); updateChecklist(); }, { required: true }));
+      box.appendChild(fieldInput(f, S.subject[f], function (v) { S.subject[f] = v; mine(f); markMissing(); updateChecklist(); }, { required: true }));
     });
-    CONTROLS.forEach(function (f) { box.appendChild(fieldInput(f, S.subject[f], function (v) { S.subject[f] = v; })); });
+    CONTROLS.forEach(function (f) { box.appendChild(fieldInput(f, S.subject[f], function (v) { S.subject[f] = v; mine(f); })); });
   }
   function markMissing() {
     Array.prototype.forEach.call($("subj-fields").querySelectorAll(".field"), function (lab) {
@@ -3062,9 +3111,10 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
   }
   function renderHits() {
     var q = $("comp-find").value.trim().toUpperCase(), box = clear($("comp-hits"));
-    if (!q || q.length < 2 || !S.rows.length) return;
+    if (!q || q.length < 2) return;
+    if (!S.rows.length) { box.appendChild(h("p", { class: "hint", text: "Load the market file in step 03 to search it. Until then, load your comps from a CSV or type them in." })); return; }
     var hits = S.rows.filter(function (r) { return (r.mls_id || "").toUpperCase().indexOf(q) >= 0 || (r.address || "").toUpperCase().indexOf(q) >= 0; }).slice(0, 8);
-    if (!hits.length) { box.appendChild(h("p", { class: "hint", text: "No sale in the file matches that." })); return; }
+    if (!hits.length) { box.appendChild(h("p", { class: "hint", text: "No sale in the market file matches that." })); return; }
     hits.forEach(function (r) {
       box.appendChild(h("div", { class: "hit" }, h("div", { class: "what" }, h("b", { text: r.address || r.mls_id }), h("span", { text: hitLine(r) })),
         h("div", { class: "row" },
@@ -3076,7 +3126,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     ["sale_date", "Closing date", "date"]];
   function renderComps() {
     var box = clear($("comp-list"));
-    if (!S.comps.length) { box.appendChild(h("p", { class: "hint", text: "No comps yet. Search the file above, or add one by hand." })); return; }
+    if (!S.comps.length) { box.appendChild(h("p", { class: "hint", text: "No comps yet. Load them from a CSV, type one in, or find one in the market file once it is loaded." })); return; }
     S.comps.forEach(function (c, i) {
       var r = compRow(c), edited = Object.keys(c.over).length > 0;
       var inFile = S.rows.some(function (x) { return x.mls_id && x.mls_id === r.mls_id; });
@@ -3090,7 +3140,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
         h("header", null,
           h("div", { class: "who" }, h("span", { class: "cnum", text: "C" + (i + 1) }),
             h("div", null, h("b", { text: r.address || r.mls_id || "Comp " + (i + 1) }),
-              h("span", { text: [r.mls_id, c.source === "manual" ? "entered by hand" : c.source === "compfile" ? "from comp CSV" : null, inFile ? "in the sales file" : "not in the sales file"].filter(Boolean).join(" · ") }))),
+              h("span", { text: [r.mls_id, c.source === "manual" ? "entered by hand" : c.source === "compfile" ? "from comp CSV" : null, !S.rows.length ? null : inFile ? "in the market file" : "not in the market file"].filter(Boolean).join(" · ") }))),
           h("div", { class: "row" },
             edited ? h("span", { class: "badge", text: "Verified values" }) : null,
             h("button", { type: "button", class: "btn small ghost", text: "Use as subject", onclick: function () { fillSubjectFrom(r); } }),
@@ -3121,11 +3171,11 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     var feats = usedFeatures();
     var subjMissing = feats.filter(function (f) { return !fin(A.num(S.subject[f])); }).map(function (f) { return SHORT[f].toLowerCase(); });
     return [
-      [S.rows.length >= 60, S.rows.length ? S.rows.length + " sales loaded" + (S.rows.length < 60 ? " (at least 60 needed)" : "") : "Load a sales file"],
-      [S.map.sale_price >= 0 && S.map.close_date >= 0 && S.map.gla >= 0, "Close price, closing date and GLA mapped"],
       [!!$("eff").value, $("eff").value ? "Effective date " + $("eff").value : "Enter the effective date"],
-      [S.rows.length > 0 && subjMissing.length === 0, !S.rows.length ? "Subject: load the sales file first" : subjMissing.length ? "Subject still needs: " + subjMissing.join(", ") : "Subject complete"],
+      [subjMissing.length === 0, subjMissing.length ? "Subject still needs: " + subjMissing.join(", ") : "Subject complete"],
       [S.comps.length > 0, S.comps.length ? S.comps.length + " comp" + (S.comps.length > 1 ? "s" : "") + " in the grid" : "Add at least one comp"],
+      [S.rows.length >= 60, S.rows.length ? S.rows.length + " sales in the market file" + (S.rows.length < 60 ? " (at least 60 needed)" : "") : "Load the market file"],
+      [S.map.sale_price >= 0 && S.map.close_date >= 0 && S.map.gla >= 0, "Close price, closing date and GLA mapped"],
       (function () { var e = S.rows.length ? poolEstimate() : null; return !e || !e.keys.length ? [true, "Adjustment pool: every clean sale (no similarity ranges)"] :
         [e.inside >= 60, "Adjustment pool: about " + int(e.inside) + " sales inside your ranges" + (e.inside < 60 ? " (at least 60 needed; widen them)" : "")]; })()
     ];
@@ -3134,10 +3184,11 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     var reqs = requirements(), box = clear($("checklist"));
     reqs.forEach(function (r) { box.appendChild(h("div", { class: r[0] ? "ok" : "no" }, icon(r[0] ? "check" : "dot"), h("span", { text: r[1] }))); });
     $("run").disabled = S.running || !reqs.every(function (r) { return r[0]; });
-    $("rail-data").classList.toggle("done", reqs[0][0] && reqs[1][0]);
-    $("rail-assign").classList.toggle("done", reqs[2][0]);
-    $("rail-subject").classList.toggle("done", reqs[3][0]);
-    $("rail-comps").classList.toggle("done", reqs[4][0]);
+    $("rail-subject").classList.toggle("done", reqs[0][0] && reqs[1][0]);
+    $("rail-comps").classList.toggle("done", reqs[2][0]);
+    $("rail-data").classList.toggle("done", reqs[3][0] && reqs[4][0]);
+    $("rail-assign").classList.toggle("done", reqs[3][0] && reqs[5][0]);
+    $("demo-banner").hidden = !S.isDemo;
     $("r-trim-row").hidden = $("clock").value !== "contract";
   }
   function gatherOpts() {
@@ -3221,6 +3272,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
       if (/^REVERSED/.test(part)) out.push({ cls: "serious", text: "Reversed segment", title: part });
       else if (/^FHFA CHECK/.test(part)) out.push({ cls: "serious", text: "FHFA disagrees", title: part });
       else if (/^COMP INFLUENCE/.test(part)) out.push({ cls: "serious", text: "Comp influence", title: part });
+      else if (/^OUTSIDE ITS RANGE/.test(part)) out.push({ cls: "serious", text: "Outside its range", title: part });
     });
     if (L.knot) out.push({ cls: "", text: L.key === "time" ? "Crosses bend" : "Crosses knot", title: L.key === "time" ? "The comp's period crosses a bend in the index; the change is the product of the segments" : "The line crosses a knot; the amount is the sum of the segments" });
     return out;
@@ -3590,12 +3642,12 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
   var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   function monthLabel(dn) { var t = new Date(dn * 86400000); return MON[t.getUTCMonth()] + " " + t.getUTCFullYear(); }
   function dayUTC(y, m, d) { return Math.round(Date.UTC(y, m, d) / 86400000); }
-  function trendSentence(T) {
+  function trendSentence(T, withTotals) {
     if (T.flat) return "No time trend cleared the GCV penalty: prices in this export show no change a reviewer could support, so sales are not time-adjusted.";
     var parts = T.segments.map(function (s) {
       var r = s.rate, a = Math.abs(100 * r).toFixed(2);
       var span = monthLabel(A.dayNum(s.from)) + " to " + monthLabel(A.dayNum(s.to));
-      return Math.abs(r) < 0.00005 ? "was flat from " + span : (r > 0 ? "rose " : "fell ") + a + "% a month from " + span;
+      return (Math.abs(r) < 0.00005 ? "was flat from " + span : (r > 0 ? "rose " : "fell ") + a + "% a month from " + span) + (withTotals && Math.abs(r) >= 0.00005 ? " (" + pct(s.total) + ")" : "");
     });
     return "The index " + parts.join(", then ") + ".";
   }
@@ -3898,7 +3950,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
       "Data rules: gross prices; sales after the effective date " + (st.excludeAfterEffective ? "excluded" : "kept") +
         "; likely flip purchases " + (st.excludeFlips ? "excluded" : "kept") + "; sales with no MLS exposure " + (st.excludeUnexposed ? (st.exposureChecked ? "excluded" : "not checked (no MLS entry date in the file)") : "kept") + (st.trimContractEdge ? "; contracts before the first closing excluded" : "") + ".",
       "Data SHA-256: " + res.repro.dataSha256 + "   Settings SHA-256: " + res.repro.configSha256 + "   Master seed: " + res.repro.masterSeed,
-      "Review flags: " + flags + " grid line(s) flagged (REVERSED SEGMENT " + flagN(/REVERSED/) + ", FHFA CHECK " + flagN(/FHFA CHECK/) + ", COMP INFLUENCE " + flagN(/COMP INFLUENCE/) + ")."
+      "Review flags: " + flags + " grid line(s) flagged (REVERSED SEGMENT " + flagN(/REVERSED/) + ", FHFA CHECK " + flagN(/FHFA CHECK/) + ", COMP INFLUENCE " + flagN(/COMP INFLUENCE/) + ", OUTSIDE ITS RANGE " + flagN(/OUTSIDE ITS RANGE/) + ")."
     ];
     if (s.entered.length) {
       lines.push("Appraiser grid check: " + s.inside + " of " + s.entered.length + " entered adjustments fall inside the model range" + (s.noRange ? " (" + s.noRange + " with no model range)" : "") + ".");
@@ -3942,23 +3994,20 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     '.muted{color:var(--muted)}',
     '.eyebrow{font:700 7.4pt/1 "Archivo",Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink);display:flex;gap:8pt;align-items:center;margin:0 0 6pt}',
     '.eyebrow i{display:inline-block;width:20pt;height:1.6pt;background:var(--gold)}',
-    '.cover-head{display:grid;gap:7pt;padding-bottom:12pt;border-bottom:1.6pt solid var(--band);margin-bottom:12pt}',
+    '.cover-head{display:grid;gap:6pt;padding-bottom:10pt;border-bottom:1.6pt solid var(--band);margin-bottom:10pt}',
     '.cover-head .eyebrow{margin:0}',
     '.cover-head .meta{color:var(--ink-2);font-size:9pt;margin:0}',
     '.demo{border:1.2pt solid var(--bad);color:var(--bad);font:700 8.4pt/1.35 "Archivo",Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;padding:6pt 9pt;border-radius:3pt}',
-    'dl.facts{display:grid;grid-template-columns:1.45in 1fr;gap:3.5pt 12pt;margin:0 0 12pt}',
+    'dl.facts{display:grid;grid-template-columns:1.45in 1fr;gap:2.5pt 12pt;margin:0 0 10pt}',
     'dl.facts dt{font:600 7.1pt/1.4 "Archivo",Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:1pt}',
     'dl.facts dd{margin:0}',
-    '.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:6pt;margin:0 0 12pt}',
-    '.tile{border:.6pt solid var(--line);border-radius:4pt;padding:6pt 8pt;display:grid;gap:2pt;break-inside:avoid;align-content:start}',
+    '.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:5pt;margin:0 0 10pt}',
+    '.tile{border:.6pt solid var(--line);border-radius:4pt;padding:5pt 7pt;display:grid;gap:1.5pt;break-inside:avoid;align-content:start}',
     '.tile .l{font:600 6.8pt/1.2 "Archivo",Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}',
-    '.tile .v{font:600 13pt/1.1 "IBM Plex Mono",ui-monospace,monospace}',
+    '.tile .v{font:600 12pt/1.1 "IBM Plex Mono",ui-monospace,monospace}',
     '.tile .s{font-size:7pt;color:var(--muted);line-height:1.35}',
     '.rvps{display:grid;gap:4pt;margin:0 0 10pt}',
-    '.rvp{border-left:2pt solid #ec835a;padding:2pt 0 2pt 8pt;font-size:8pt;break-inside:avoid}',
-    'ol.contents{margin:0 0 10pt;padding-left:14pt;columns:2;column-gap:18pt;font-size:8.2pt}',
-    'ol.contents li{margin:0 0 2pt;break-inside:avoid}',
-    'ol.contents li.rec{list-style:none;margin-left:-14pt;color:var(--ink-2)}',
+    '.rvp{border-left:2pt solid #ec835a;padding:1.5pt 0 1.5pt 8pt;font-size:7.8pt;line-height:1.4;break-inside:avoid}',
     '.scope{border-left:2pt solid var(--gold);padding:3pt 0 3pt 9pt;color:var(--ink-2);font-size:7.8pt;margin:10pt 0 0;break-inside:avoid}',
     '.tscroll{margin:0 0 9pt}',
     'table{border-collapse:collapse;width:100%;font-size:7.8pt}',
@@ -3968,6 +4017,8 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     'tr{break-inside:avoid}',
     'td.n,th.n{text-align:right;font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;white-space:nowrap}',
     'td.wrapcell{min-width:1.5in}',
+    '.tight th,.tight td{padding-top:2.2pt;padding-bottom:2.2pt}',
+    '.tight h3{margin-top:9pt}',
     'table.rates td:first-child{font-weight:600;white-space:nowrap}',
     'table.rates td.seg{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:7.4pt;white-space:nowrap}',
     'table.rgrid{table-layout:fixed;width:calc(100% - 1pt);border:.6pt solid var(--line-2);margin:0 0 6pt}',
@@ -4093,13 +4144,16 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     var st = res.settings, d = res.data, m = res.model, T = res.time, W = res.weights;
     var warns = res.notes.filter(function (t) { return /^WARNING|^NOTE|^Comp listings that look off|^Comps not in the modeled|^Comps outside/.test(t); });
     var flagged = res.grid.filter(function (L) { return L.review || L.extrap; }).length;
+    var nOf = function (re) { return res.grid.filter(function (L) { return re.test(L.review || ""); }).length; };
+    var flagParts = [[res.grid.filter(function (L) { return L.extrap; }).length, "outside the modeled sales"], [nOf(/REVERSED/), "reversed segment"],
+      [nOf(/FHFA CHECK/), "FHFA disagrees"], [nOf(/COMP INFLUENCE/), "comp influence"], [nOf(/OUTSIDE ITS RANGE/), "outside its own range"]]
+      .filter(function (q) { return q[0] > 0; }).map(function (q) { return q[0] + " " + q[1]; });
     var tiles = [["Cross-validated R\u00b2", dec(m.cvrsq, 3), "sd " + dec(m.cvsd, 3) + "; " + st.nfold + "-fold x " + st.ncross + ", whole procedure refit on each fold"],
       ["R\u00b2 / GRSq", dec(m.rsq, 3) + " / " + dec(m.grsq, 3), "weighted fit, " + m.k + " terms; GRSq is R\u00b2 penalized for model size"],
       ["Typical miss", dollars(m.mae), "mean absolute error on time-adjusted prices; RMSE " + dollars(m.rmse)],
       trendTile(T),
       ["Listings weighed down", int(W.nListing), "counts far from typical for their size; nothing dropped"],
       ["Prices weighed down", int(W.nPrice), "of " + int(d.n) + " pool sales priced far from the model (Huber)"]];
-    var contents = ["Summary", "Adjustment support grid", "Market conditions (time)", "Per-unit rates and value curves", "Cross-checks"];
     return sheet("cover", [
       h("header", { class: "cover-head" },
         h("div", { class: "eyebrow" }, h("i"), "Adjustment support \u00b7 MARS regression analysis"),
@@ -4121,22 +4175,18 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
       h("div", { class: "tiles" }, tiles.map(function (t) { return h("div", { class: "tile" }, h("span", { class: "l", text: t[0] }), h("span", { class: "v", text: t[1] }), h("span", { class: "s", text: t[2] })); })),
       h("h3", { text: "Review points" }),
       h("div", { class: "rvps" }, warns.length ? warns.map(function (t) { return h("div", { class: "rvp", text: t }); }) : h("p", { class: "hint", text: "No warnings from the run." }),
-        h("div", { class: "rvp", text: flagged ? flagged + " grid line" + (flagged > 1 ? "s carry" : " carries") + " a review flag (outside the modeled sales, reversed segment, FHFA disagreement or comp influence): see the grid." : "No grid line carries a review flag." })),
-      h("h3", { text: "In this report" }),
-      h("ol", { class: "contents" }, contents.map(function (c) { return h("li", { text: c }); }),
-        withRecord ? h("li", { class: "rec record", text: "Workfile record: workfile note, data trail, reproducibility, appendices" }) : null),
+        h("div", { class: "rvp", text: flagged ? flagged + " grid line" + (flagged > 1 ? "s carry" : " carries") + " a review flag (" + flagParts.join(", ") + "): see the grid." : "No grid line carries a review flag." })),
       h("p", { class: "scope", text: SCOPE })
     ]);
   }
   function rpTime(res, meta) {
     var T = res.time, st = res.settings;
     var kids = [h("h2", { text: "Market conditions (time)" }),
-      h("p", { class: "lede", text: trendSentence(T) + " " + (T.flat ? "" : "Bends allowed every " + T.knotMonths + " months with " + T.minSide + " sales on each side; " + T.candidates.length + " candidate dates, " + T.bends.length + " kept. ") +
+      h("p", { class: "lede", text: trendSentence(T, true) + " " + (T.flat ? "" : "Bends allowed every " + T.knotMonths + " months with " + T.minSide + " sales on each side; " + T.candidates.length + " candidate dates, " + T.bends.length + " kept. ") +
         "R\u00b2 " + dec(T.r2, 3) + " (weighted)" + (fin(T.trendShare) ? "; " + Math.round(100 * T.trendShare) + "% of the " + T.halfSamples + " half-sample refits kept a time trend." : ".") }),
       h("p", { class: "hint", text: "A quality-adjusted log-price index from all " + int(T.n) + " clean sales in the export: each comp's time line is its price times the index change from its sale date to " + meta.eff + "." +
         (T.season ? " Quarter of the year (reported, not applied): Q2 " + pct(T.season.Q2) + ", Q3 " + pct(T.season.Q3) + ", Q4 " + pct(T.season.Q4) + " against Q1." : "") })];
-    var tch = timeChart(res, { static: true, width: 700, height: 222 }); if (tch) kids.push(tch);
-    if (T.segments.length) kids.push(table(["From", "To", "Per month", "Over the segment"], T.segments.map(function (s) { return [s.from, s.to, pct(s.rate, 2), pct(s.total)]; }), { num: [2, 3] }));
+    var tch = timeChart(res, { static: true, width: 700, height: 204 }); if (tch) kids.push(tch);
     var effYear = new Date(A.dayNum(st.effectiveDate) * 86400000).getUTCFullYear();
     kids.push(h("h3", { text: "Median-to-median beside the index" }),
       h("p", { class: "hint", text: "Yearly medians of the export as pulled (every closed sale, by closing year). " + (T.baseYear !== effYear ? "The export has no " + effYear + " sales yet, so " + T.baseYear + " is the base. " : "") +
@@ -4145,7 +4195,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     if (T.fhfa) kids.push(h("h3", { text: "FHFA check: " + T.fhfa.label }),
       h("p", { class: "hint", text: "Both series over the same " + T.fhfa.frequency + " periods, to " + T.fhfa.endPeriod + ". FHFA is a county-wide repeat-sales index on conforming mortgages; this index is the export's own segment. A gap is a question to answer in the report, not an error." }),
       table(["Period", "FHFA index", "FHFA to " + T.fhfa.endPeriod, "This index", "Half-sample range", "FHFA is"], fhfaRows(T), { num: [1, 2, 3, 4] }));
-    return sheet("", kids);
+    return sheet("tight", kids);
   }
   function rpRates(res) {
     var t = table(["Line", "Per", "Model rate by segment", "MARS picked it", "OLS", "Theil-Sen", "Median (LAD)", "Grouped"], rateRows(res), { num: [4, 5, 6, 7] });
@@ -4232,7 +4282,7 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     for (var from = 0; from < res.comps.length; from += 4) {
       var to = Math.min(res.comps.length, from + 4);
       root.appendChild(sheet("", [
-        h("h2", { text: "Adjustment support grid" + (res.comps.length > 4 ? " (comps " + (from + 1) + " to " + to + ")" : "") }),
+        h("h2", { text: "Adjustment support grid" + (res.comps.length > 4 ? (to - from > 1 ? " (comps " + (from + 1) + " to " + to + ")" : " (comp " + to + ")") : "") }),
         h("p", { class: "hint", text: "Each cell: comp value, model amount (subject minus comp), half-sample range (" + st.halfSamples + " refits on random halves of the sales) and status. Time is the comp's price times the index change to " + meta.eff + "." }),
         rpGrid(res, from, to), rpLegend(), from === 0 ? rpMine(res) : null
       ]));
@@ -4317,10 +4367,11 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
   function loadDemo(quiet) {
     loadText($("demo-csv").textContent.trim(), "Demo market (synthetic).csv", true);
     $("eff").value = DEMO_EFF;
-    S.subject = Object.assign({}, DEMO_SUBJECT); S.mine = {};
+    S.subject = Object.assign({}, DEMO_SUBJECT); S.mine = {}; S.demoEdits = {};
     S.comps = [];
     DEMO_COMPS.forEach(function (id) { var r = S.rows.filter(function (x) { return x.mls_id === id; })[0]; if (r) addComp({ source: "file", mls: id, base: Object.assign({}, r) }); });
     renderSubject(); renderComps(); updatePoolCount(); updateChecklist();
+    $("demo-banner").hidden = false;
     if (quiet !== true) toast("Demo loaded: subject, four comps and an effective date are filled in");
   }
   function init() {
@@ -4330,7 +4381,11 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     ["dragenter", "dragover"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("over"); }); });
     ["dragleave", "drop"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("over"); }); });
     drop.addEventListener("drop", function (e) { var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; readFile(f, function (t, n) { loadText(t, n, false); }); });
-    $("demo").addEventListener("click", function () { loadDemo(false); });
+    $("demo").addEventListener("click", function (e) {   // with your own work on the page, the demo asks for a second click before replacing it
+      var b = e.currentTarget, yours = !S.isDemo && (S.comps.length || S.rows.length || Object.keys(S.subject).some(function (k) { return k !== "_mls" && String(S.subject[k] || "").trim(); }));
+      if (yours && !b._armed) { b._armed = true; b.textContent = "Click again: the demo replaces your subject, comps and market"; setTimeout(function () { b._armed = false; b.textContent = "Try the demo market"; }, 5000); return; }
+      b._armed = false; b.textContent = "Try the demo market"; loadDemo(false);
+    });
     ["eff", "clock", "r-after", "r-trim", "r-flip", "r-exposed", "r-new", "r-types", "r-flip-days", "r-flip-pct", "w-list", "w-price"].forEach(function (id) { $(id).addEventListener("change", function () { updatePoolCount(); updateChecklist(); }); });
     POOL.forEach(function (p) { [p[1], p[2]].forEach(function (id) { $(id).addEventListener("input", function () { updatePoolCount(); updateChecklist(); }); }); });
     $("pr-subject").addEventListener("click", function () {
@@ -4348,19 +4403,21 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
       readFile(e.target.files[0], function (text, name) { $("fhfa-text").value = text; readFhfaText(text); if (!$("fhfa-label").value.trim()) $("fhfa-label").value = name.replace(/\.(csv|txt)$/i, ""); });
       e.target.value = "";
     });
-    $("eff").addEventListener("input", updateChecklist);
+    $("eff").addEventListener("input", function () { if (S.isDemo) S.demoEdits.eff = true; updateChecklist(); });
     var by = store("mars.prepared_by"); if (by) $("rep-by").value = by;
     $("rep-by").addEventListener("input", function () { store("mars.prepared_by", $("rep-by").value); });
     $("subj-fill").addEventListener("click", function () {
       var q = $("subj-find").value.trim().toUpperCase(); if (!q) return;
+      if (!S.rows.length) { toast("Load the market file in step 03 first, or load the subject from a CSV"); return; }
       var r = S.rows.filter(function (x) { return (x.mls_id || "").toUpperCase() === q; })[0] || S.rows.filter(function (x) { return (x.address || "").toUpperCase().indexOf(q) >= 0; })[0];
-      if (r) fillSubjectFrom(r); else toast("No sale in the file matches that");
+      if (r) fillSubjectFrom(r); else toast("No sale in the market file matches that");
     });
     $("comp-find").addEventListener("input", renderHits);
     $("comp-file-btn").addEventListener("click", function () { $("comp-file").click(); });
     $("comp-file").addEventListener("change", function (e) {
       readFile(e.target.files[0], function (text, name) {
         var t = A.parseCSV(text), rows = A.mapRows(t, A.autoMap(t.header)), added = 0, skipped = [];
+        if (exitDemo()) toast("Demo cleared");
         rows.forEach(function (r) {
           var isSubject = (r.mls_id && r.mls_id === S.subject._mls) || (normAddr(r.address) && normAddr(r.address) === normAddr(S.subject.address));
           var dup = S.comps.some(function (c) { var x = compRow(c); return r.mls_id && x.mls_id === r.mls_id; });
@@ -4376,8 +4433,10 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
     $("subj-file-btn").addEventListener("click", function () { $("subj-file").click(); });
     $("subj-file").addEventListener("change", function (e) {
       readFile(e.target.files[0], function (text, name) {
-        var t = A.parseCSV(text), rows = A.mapRows(t, A.autoMap(t.header)), box = clear($("subj-hits"));
+        var t = A.parseCSV(text), rows = A.mapRows(t, A.autoMap(t.header));
         if (!rows.length) { toast("No rows found in " + name); return; }
+        exitDemo();
+        var box = clear($("subj-hits"));
         if (rows.length === 1) { fillSubjectFrom(rows[0]); return; }
         box.appendChild(h("p", { class: "hint small", text: name + " has " + rows.length + " rows. Which one is the subject?" }));
         rows.forEach(function (r) {
@@ -4388,7 +4447,14 @@ if (typeof module !== "undefined") module.exports = MarsAnalysis;
       });
       e.target.value = "";
     });
-    $("comp-manual").addEventListener("click", function () { addComp({ source: "manual", base: blankRow(), open: true }); });
+    $("comp-manual").addEventListener("click", function () { exitDemo(); addComp({ source: "manual", base: blankRow(), open: true }); });
+    // two clicks to clear everything (the viewer blocks confirm dialogs)
+    $("new-assign").addEventListener("click", function (e) {
+      var b = e.currentTarget;
+      if (!b._armed) { b._armed = true; b.textContent = "Click again to clear the demo"; setTimeout(function () { b._armed = false; b.textContent = "Start my own assignment"; }, 4000); return; }
+      b._armed = false; b.textContent = "Start my own assignment"; exitDemo(true); toast("Cleared. Enter the effective date and load your subject.");
+      $("p-subject").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
     $("run").addEventListener("click", function () { run(false); });
     $("cancel").addEventListener("click", cancel);
     Array.prototype.forEach.call(document.querySelectorAll(".rail button"), function (b) { b.addEventListener("click", function () { var t = $(b.getAttribute("data-go")); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); }); });

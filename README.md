@@ -1,4 +1,4 @@
-# MARS / Regression Adjustment Support (v2.3)
+# MARS / Regression Adjustment Support (v2.3.1)
 
 Adjustment support for residential sales-comparison grids, pulled from your own MLS export. It prices the lines an appraiser actually adjusts: site (in dollars per square foot of lot), bedrooms, full baths and half baths (above grade), GLA, garage spaces, carport spaces and pool, plus a percent market-conditions (time) line from a quality-adjusted index built on every sale in the export. MARS (multivariate adaptive regression splines, the R `earth` package) finds where each curve bends. Built for litigation work, including divorce assignments with retrospective effective dates.
 
@@ -12,6 +12,15 @@ Two ways to run it. They give the same numbers to the cent:
 The output is adjustment **support** only. It never produces an indicated value, a reconciled value or an opinion of value. The licensed appraiser selects every final adjustment.
 
 ---
+
+## What changed in v2.3.1: first field run
+
+| # | v2.3.1 behavior | Why it matters |
+|---|---|---|
+| 30 | **Finished basement (yes or no) is a background control**, next to year built and levels. It is read from Below Grade Finished SQFT or Basement Type and never prints as a grid line. | Basement value no longer leaks into the GLA and room rates, and the appraiser still adjusts basements by room and utility. |
+| 31 | **The time index's half-sample refits scale the bend rule to their size**: a bend needs the same share of the sales on each side (10 sales a side at half of the data when the full fit needs 20), the way the MARS refits already rescale the earth recipe. | On a 74-sale export the full fit could keep a bend the halves could never place, so a comp's time line read -10.7% with a range of 0 to +5.7%. |
+| 32 | **New review prompts.** A grid amount outside its own half-sample range gets the flag OUTSIDE ITS RANGE. A trend the full data keep but most refits drop gets a warning. The GLA local validation reads NOT INFORMATIVE when its slope is too noisy to confirm or reject anything (its 95% interval includes zero). | Thin data now say so instead of reading as validated. |
+| 33 | **The page loads in the order the work is done**: subject and effective date, the comps in the report, then the market file, then the pool and rules. Comps loaded from a Spark CSV are matched to the market file when it arrives, and the page says which ones are not in it. Loudoun County joins the FHFA presets (eleven counties). The report cover and time page are tighter, and the R script now keeps comps in the order listed. | Matches how an appraiser builds the grid. |
 
 ## What changed in v2.3: the appraiser's own grid lines
 
@@ -66,8 +75,8 @@ v1.2 got gross living area roughly right and most other lines wrong. An audit ag
 ## Validation
 
 * **Engine.** The JavaScript MARS engine reproduces R `earth` (forward pass, knot search, `leaps` backward pruning) on 71 of 71 test fits: 11 fixed cases, including a 1,488-sale fit on earthUI's demo file, and 60 random configurations. Coefficients agree to within 1e-10, relative.
-* **Full workup.** On nine test cases the browser and the R script produce the same exclusions, the same data SHA-256, the same listing and price weights, the same CVRSq, the same time index (bends, monthly and yearly tables, FHFA comparison) and the same amount, standard errors, half-sample range, status, review flag and leave-comps-out amount on every grid line: 300 grid lines, 16,490 values compared. The cases: a real 244-sale Bright export on the contract clock, and on the closing clock with a comp file from Spark; a real 1,027-sale six-year Bright export from zip 22406 run three ways (current date with similarity ranges and the Stafford FHFA series; a retrospective date with a quarterly FHFA series and a 3-month bend grid; cut at January 1 so the effective year has no sales yet); the v2.3 synthetic demo market with a lumped-basement comp, a garage-abuse comp and two hand-entered comps, one with a blank bedroom count; the v2.2 demo market; a stale data window; and the v1.2 example file with location turned on.
-* **Uncertainty, with realtor-style listing errors.** Sixteen synthetic markets (420 sales each, four price paths) built from true above-grade counts, with the errors realtors make mixed into what the listing records: 22% of finished basements leave the lower-level section blank and put those rooms on the main line, 3% of listings add 3 to 8 garage spaces, 1% add 3 bedrooms, 8% of houses are dated and 8% redone, plus REO and short sales and a 10x price typo. On 316 grid lines the half-sample range held the true amount 302 times (96%); the conditional ±1.96 SE interval 204 times (65%). Every line rated SUPPORTED (220) had the right sign, and 57 of 59 rated SUPPORTED, SIZE VARIABLE. By line: time 44 of 48, site 64 of 64, bedrooms 36 of 37, full baths 34 of 36, half baths 22 of 25, GLA 61 of 64, garage 29 of 30, carport 5 of 5, pool 7 of 7. With the weights switched off the range held the truth 93% of the time and the median miss grew on 8 of the 9 line types.
+* **Full workup.** On ten test cases the browser and the R script produce the same exclusions, the same data SHA-256, the same listing and price weights, the same CVRSq, the same time index (bends, monthly and yearly tables, FHFA comparison), the same local validation, the same run notes word for word, and the same amount, standard errors, half-sample range, status, review flag and leave-comps-out amount on every grid line: 336 grid lines, 17,573 values compared. The cases: a real 244-sale Bright export on the contract clock, and on the closing clock with a comp file from Spark; a real 1,027-sale six-year Bright export from zip 22406 run three ways (current date with similarity ranges and the Stafford FHFA series; a retrospective date with a quarterly FHFA series and a 3-month bend grid; cut at January 1 so the effective year has no sales yet); the v2.3 synthetic demo market with a lumped-basement comp, a garage-abuse comp and two hand-entered comps, one with a blank bedroom count; the v2.2 demo market; a stale data window; the v1.2 example file with location turned on; and a thin market cut from the 22406 export (homes of 3,700 sf and up, 80 clean sales) run with 20 half-samples so the OUTSIDE ITS RANGE flag fires.
+* **Uncertainty, with realtor-style listing errors.** Sixteen synthetic markets (420 sales each, four price paths) built from true above-grade counts, with the errors realtors make mixed into what the listing records: 22% of finished basements leave the lower-level section blank and put those rooms on the main line, 3% of listings add 3 to 8 garage spaces, 1% add 3 bedrooms, 8% of houses are dated and 8% redone, plus REO and short sales and a 10x price typo. On 320 grid lines the half-sample range held the true amount 308 times (96%); the conditional ±1.96 SE interval 205 times (64%). Every line rated SUPPORTED (220) had the right sign, and 57 of 63 rated SUPPORTED, SIZE VARIABLE. By line: time 48 of 52, site 64 of 64, bedrooms 36 of 37, full baths 34 of 36, half baths 23 of 25, GLA 62 of 64, garage 29 of 30, carport 5 of 5, pool 7 of 7. With the weights switched off the range held the truth 95% of the time and the median miss grew on 8 of the 9 line types. (The synthetic markets give a finished basement no value, so the basement control is pure noise in this test; it cost nothing in coverage.)
 
 Check it yourself. `examples/` holds the synthetic demo market, its inputs and the R output (`examples/expected_output/`); `examples/truth.json` holds the true values it was built from.
 
@@ -83,12 +92,12 @@ tests/synthetic/run_coverage.sh
 
 ### Browser
 
-Open `docs/index.html` in a current browser, or host it: GitHub repository Settings, Pages, deploy from branch `main`, folder `/docs`. The page opens with a synthetic demo market loaded and run.
+Open `docs/index.html` in a current browser, or host it: GitHub repository Settings, Pages, deploy from branch `main`, folder `/docs`. The page opens with a synthetic demo market loaded and run; your first file (subject, comps or market) clears it.
 
-1. Load the MLS export (CSV): every closed sale of the property type in the market over the whole window (up to six years is fine). Bright MLS (Spark) columns map automatically; other exports can be mapped by hand. Bedrooms and baths are read above grade (total minus the lower-level count).
-2. Enter the effective date, your name and the file number for the report, and check the data rules and weights. Set the similarity ranges for the adjustment pool (GLA, year built, lot size in square feet), and pick the FHFA series (the county is preselected from the export's County column when it is one of the ten built in).
-3. Enter the subject as of the effective date.
-4. Pick the comps (from the file, a second CSV, or typed in). Edited values are treated as verified data for the grid; the model keeps the MLS record. Each comp's record gets the same listing check as the pool sales.
+1. Subject: enter the effective date, your name and the file number for the report, then load the subject from a Spark CSV or type it in, as of the effective date.
+2. Comps: load the comps in your report from a Spark CSV, or type them in. Edited values are treated as verified data for the grid; the model keeps the MLS record. Each comp's record gets the same listing check as the pool sales.
+3. Market: load the MLS export (CSV), every closed sale of the property type in the market over the whole window (up to six years is fine). Bright MLS (Spark) columns map automatically; other exports can be mapped by hand. Bedrooms and baths are read above grade (total minus the lower-level count). The page says which of your comps are in the file.
+4. Pool and rules: set the similarity ranges for the adjustment pool (GLA, year built, lot size in square feet), check the data rules and weights, and pick the FHFA series (the county is preselected from the export's County column when it is one of the eleven built in).
 5. Run. Type your own grid adjustments into the result grid to see which fall inside the model range. **Print report** opens the print dialog with the Letter report (pick Save as PDF); **Save report file** keeps an HTML copy. Copy the grid (Excel or CSV), the workfile note, or the full JSON.
 
 ### R
@@ -124,7 +133,7 @@ Pass `comps.txt,comps.csv` to combine MLS numbers with verified comp rows.
 | `pool` | 1 or 0 (private pool only: "Yes - Personal") |
 | `lot_sf` | Lot square feet (Lot Size SqFt, else acres x 43,560) |
 | `year_built`, `levels` | Background controls |
-| `fin_bsmt`, `ll_blank` | 1 or 0: finished basement; lower-level room fields all blank. Read from Bright's basement fields; used only by the listing check. |
+| `fin_bsmt`, `ll_blank` | 1 or 0: finished basement; lower-level room fields all blank. Read from Bright's basement fields. Finished basement is a background control; both feed the listing check. |
 | `zip`, `subdivision`, `county` | Kept for the record; county picks the FHFA series. Location is off unless you name a column. |
 | `sale_type`, `status`, `arms_length`, `new_construction` | Cleaning |
 
@@ -142,7 +151,7 @@ Older files still load: `ag_baths` is split into full and half baths, and `lot_a
 | `trim_contract_edge` | `true` | Contract clock only: drop contracts dated before the first closing in the file |
 | `exclude_after_effective` | `true` | Only sales closed on or before the effective date |
 | `features` | lot_sf, beds_ag, fb_ag, hb_ag, gla, garage, carport, pool | Priced lines, in grid order |
-| `controls` | year_built, levels | Background controls: in the model, never on the grid |
+| `controls` | year_built, levels, fin_bsmt | Background controls: in the model, never on the grid |
 | `min_vary` | `10` | Pool sales that must differ from the most common value to price a line |
 | `count_weight_cut` | `2` | A count more than this from typical for the sale's size gets weight cut/distance |
 | `lumped_weight` | `0.5` | Extra weight factor for a finished basement with blank lower-level rooms and more main-line rooms than typical |
@@ -181,7 +190,7 @@ Example (the 22406 test run):
 * **Time line:** the comp's price times the index change from its sale date to the effective date. A comp sold in a flat stretch gets $0 (NO MODEL DIFFERENCE) with its range still shown. Segment math lists each stretch of the index the comp's period crosses, in percent per month. In the browser grid you can type a percent (8%) or dollars.
 * Feature lines: g(subject) minus g(comp) for that variable on time-adjusted prices, the standard grid direction, per sf of site, per bedroom, per bath, per sf of GLA, per garage or carport space, per pool. Knot safe: a line that crosses a knot is the sum of its segments, and the segment math is shown.
 * **SUPPORTED**: same sign in at least 90% of the half-sample refits. **SUPPORTED, SIZE VARIABLE**: at least 60%. **UNSTABLE**: under 60%. **NOT ENOUGH DATA**: fewer than 10 pool sales differ from the most common value (subject and comp alike read NO MODEL DIFFERENCE instead). Nothing is filled in.
-* **OUTSIDE MODELED DATA RANGE**: the comp or subject sits beyond the modeled sales; the line is an extrapolation. **REVERSED SEGMENT**: a segment runs against the normal market direction (more GLA, site, rooms, garage and so on adding value). **FHFA CHECK**: FHFA's change over the comp's FHFA periods falls outside this index's half-sample range over the same periods. **COMP INFLUENCE**: with the report comps left out of the fit, the line moves outside its range. A comp whose own listing fails the listing check is named in the run notes and the comp check. The amounts are never changed by a flag.
+* **OUTSIDE MODELED DATA RANGE**: the comp or subject sits beyond the modeled sales; the line is an extrapolation. **REVERSED SEGMENT**: a segment runs against the normal market direction (more GLA, site, rooms, garage and so on adding value). **FHFA CHECK**: FHFA's change over the comp's FHFA periods falls outside this index's half-sample range over the same periods. **COMP INFLUENCE**: with the report comps left out of the fit, the line moves outside its range. **OUTSIDE ITS RANGE**: the full-data amount falls outside its own half-sample range; the refits on half the sales do not reproduce it, so treat it as unsupported. A comp whose own listing fails the listing check is named in the run notes and the comp check. The amounts are never changed by a flag.
 
 ## Divorce and other retrospective assignments
 
@@ -200,7 +209,7 @@ Have your E&O carrier or an appraisal attorney review this block once before ado
 Ask the assistant to run the R script, not to estimate from the data:
 
 ```
-Run R/mars_adjustment_support.R (v2.3) from this repository on my files with the default
+Run R/mars_adjustment_support.R (v2.3.1) from this repository on my files with the default
 settings unless I say otherwise: sales.csv (my MLS export), subject.csv (effective date
 and subject features), comps.txt. Do not change the code and do not impute anything.
 Report comp_grid.csv line by line with the amount, half-sample range and status, list every
@@ -222,4 +231,4 @@ Never produce an indicated, reconciled or opinion-of-value figure.
 
 MARS: J. H. Friedman, "Multivariate Adaptive Regression Splines," *Annals of Statistics* 19(1), 1991. The `earth` R package by S. Milborrow, from whose source the JavaScript engine was reimplemented. Parameter recipe, the value-contribution adjustment convention and the CQA rank follow W. Craytor's open-source earthUI.
 
-*MARS / Regression Adjustment Support v2.3. MIT License.*
+*MARS / Regression Adjustment Support v2.3.1. MIT License.*

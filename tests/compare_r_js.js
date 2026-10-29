@@ -60,6 +60,19 @@ const near = (r, j, tol) => { checked++; const a = num(r); if (isNaN(a)) return 
   if ([].concat(rj.variables.background_controls || []).join() !== res.controls.join()) fail('controls', rj.variables.background_controls, res.controls);
   if (rj.weights.listing_downweighted !== res.weights.nListing) fail('listing weights count', rj.weights.listing_downweighted, res.weights.nListing);
   if (rj.weights.model_price_downweighted !== res.weights.nPrice) fail('model Huber count', rj.weights.model_price_downweighted, res.weights.nPrice);
+  // v2.3.1: local validation verdict and slope, the half-sample bend rule, and every run note word for word
+  const rl = rj.local_validation || {}, jl = res.localVal || {};
+  if ((rl.verdict || '') !== (jl.verdict || '')) fail('local validation verdict', rl.verdict, jl.verdict);
+  if (rl.batch_n !== undefined && rl.batch_n !== jl.n) fail('local validation n', rl.batch_n, jl.n);
+  if (rl.batch_slope_per_sf !== undefined && !near(rl.batch_slope_per_sf, jl.slope, 0.006)) fail('local validation slope', rl.batch_slope_per_sf, jl.slope);
+  if ((rj.time_index.min_side_half_samples === undefined ? null : rj.time_index.min_side_half_samples) !== (res.time.minSideHalf === undefined ? null : res.time.minSideHalf))
+    fail('half-sample bend rule', rj.time_index.min_side_half_samples, res.time.minSideHalf);
+  // the listing-weights note names where each surface keeps the list; everything else must match word for word
+  const where = t => String(t).replace(/the list is in (listing_weights\.csv|the data trail)\./, 'the list is in [where].');
+  const rNotes = [].concat(rj.data.notes || []).filter(t => !/^Raw Bright MLS export detected/.test(t)).map(where);
+  const jNotes = res.notes.map(where);
+  checked += Math.max(rNotes.length, jNotes.length);
+  for (let i = 0; i < Math.max(rNotes.length, jNotes.length); i++) if (rNotes[i] !== jNotes[i]) { fail('run note ' + (i + 1) + '\n   R:', rNotes[i], '\n  JS:', jNotes[i]); }
   if (rj.weights.time_price_downweighted !== res.time.nDown) fail('time Huber count', rj.weights.time_price_downweighted, res.time.nDown);
   const rb = [].concat(rj.time_index.bends || []), jb = res.time.bends;
   if (rb.join() !== jb.join()) fail('time bends', rb.join(), jb.join());

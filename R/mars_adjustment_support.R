@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # =============================================================================
-# MARS / Regression Adjustment Support - Reference Implementation v2.3
+# MARS / Regression Adjustment Support: Reference Implementation v2.3.1
 # DC Metro Appraisals
 # =============================================================================
 # Computes adjustment SUPPORT only. It produces no indicated value, no
@@ -57,6 +57,15 @@
 #  5. Yearly medians use the latest year with sales as the base when the
 #     export has no sales yet in the effective date's year.
 #
+# v2.3.1: finished basement (yes/no, from Below Grade Finished SQFT or Basement
+# Type) joins year built and levels as a background control; it never prints.
+# The time index's half-sample refits scale the bend rule to their size (a bend
+# needs the same share of the sales on each side, not the same count), so the
+# halves of a small export can place the bends the full fit keeps. A grid amount
+# that still falls outside its own half-sample range gets the review flag
+# OUTSIDE ITS RANGE, a trend that most refits drop gets a warning, and the GLA local
+# validation reads NOT INFORMATIVE when its slope is too noisy to test anything.
+#
 # USAGE
 #   Rscript mars_adjustment_support.R <sales.csv> <subject.csv> <comps> <out_dir> [config.json]
 #
@@ -83,7 +92,7 @@
 # =============================================================================
 
 suppressMessages({ library(earth); library(jsonlite) })
-ENGINE_VERSION <- "2.3.0"
+ENGINE_VERSION <- "2.3.1"
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 4) stop("Usage: Rscript mars_adjustment_support.R sales.csv subject.csv comps.txt[,comps.csv] out_dir [config.json]")
@@ -102,7 +111,7 @@ cfg <- list(
   exclude_after_effective = TRUE,     # retrospective work: only sales closed by the date
   cutoff_basis = "close",             # "close" (closed on or before) or "contract"
   features = c("lot_sf", "beds_ag", "fb_ag", "hb_ag", "gla", "garage", "carport", "pool"),   # priced, in grid order
-  controls = c("year_built", "levels"),   # background controls: in the model, never on the grid
+  controls = c("year_built", "levels", "fin_bsmt"),   # background controls: in the model, never on the grid
   linear_only = character(0),
   location = "",                      # "" = the whole export is one market (default); a column name turns location on
   location_min_n = 5L,                # levels with fewer sales are pooled into OTHER
@@ -172,7 +181,7 @@ fmt_pct <- function(v, digits = 1) ifelse(is.na(v), "NA", paste0(ifelse(v >= 0, 
 add_months <- function(d, k) { lt <- as.POSIXlt(d); lt$mon <- lt$mon + k; as.Date(lt) }
 month_days <- 30.4375
 LABELS <- c(time = "Market conditions (time)", gla = "Gross living area", lot_sf = "Site", beds_ag = "Bedrooms", fb_ag = "Full baths",
-            hb_ag = "Half baths", garage = "Garage", carport = "Carport", pool = "Pool", year_built = "Year built", levels = "Levels", location = "Location")
+            hb_ag = "Half baths", garage = "Garage", carport = "Carport", pool = "Pool", year_built = "Year built", levels = "Levels", fin_bsmt = "Finished basement", location = "Location")
 label_of <- function(f) if (f %in% names(LABELS)) LABELS[[f]] else f
 UNITS <- c(gla = "sf", lot_sf = "sf", beds_ag = "bedroom", fb_ag = "full bath", hb_ag = "half bath", garage = "space", carport = "space",
            pool = "pool", year_built = "year", levels = "level")
@@ -472,10 +481,10 @@ tm_design <- function(dd) {
   if (!length(cols)) return(matrix(0, nrow(dd), 0))
   M <- do.call(cbind, cols); colnames(M) <- names(cols); M
 }
-tm_candidates <- function(dates) {
+tm_candidates <- function(dates, min_side = cfg$time_min_side) {
   y0 <- as.integer(format(min(dates), "%Y")); y1 <- as.integer(format(max(dates), "%Y")) + 1L
   g <- seq(as.Date(sprintf("%d-01-01", y0)), as.Date(sprintf("%d-01-01", y1)), by = paste(as.integer(cfg$time_knot_months), "months"))
-  g[vapply(seq_along(g), function(i) sum(dates < g[i]) >= cfg$time_min_side && sum(dates >= g[i]) >= cfg$time_min_side, logical(1))]
+  g[vapply(seq_along(g), function(i) sum(dates < g[i]) >= min_side && sum(dates >= g[i]) >= min_side, logical(1))]
 }
 tm_phi <- function(fit, age) {   # basis of the kept time terms at ages (months before the effective date)
   out <- matrix(0, length(age), length(fit$terms))
@@ -483,13 +492,13 @@ tm_phi <- function(fit, age) {   # basis of the kept time terms at ages (months 
   out
 }
 tm_f <- function(fit, age) if (!length(fit$terms)) rep(0, length(age)) else drop(tm_phi(fit, age) %*% fit$coef)
-tm_fit <- function(ix, full = FALSE) {
+tm_fit <- function(ix, full = FALSE, min_side = cfg$time_min_side) {
   dd <- dm[ix, , drop = FALSE]; nn <- nrow(dd); age <- dd$sale_age / month_days
   yv <- log(dd$price_used); yc <- yv - mean(yv); Lw <- dd$lw
   Fm <- tm_design(dd)
   if (ncol(Fm)) { Fm <- Fm[, apply(Fm, 2, function(v) max(v) > min(v)), drop = FALSE]
     if (ncol(Fm)) Fm <- sweep(Fm, 2, colMeans(Fm)) }
-  kd <- tm_candidates(dd$date_used); ka <- as.numeric(eff_date - kd) / month_days
+  kd <- tm_candidates(dd$date_used, min_side); ka <- as.numeric(eff_date - kd) / month_days
   Tm <- cbind(age, if (length(ka)) outer(age, ka, function(x, k) pmax(0, x - k) - pmax(0, -k)))
   Z <- cbind(1, Fm, Tm); p0 <- 1 + ncol(Fm); tcols <- p0 + seq_len(ncol(Tm)); P <- ncol(Z)
   gram_w <- function(w) list(G = crossprod(Z * sqrt(w)), Zy = drop(crossprod(Z, w * yc)), yy = sum(w * yc^2))
@@ -781,7 +790,7 @@ for (f in controls) subj_df[[f]] <- if (is.null(subject[[f]])) NA_real_ else to_
 subj_loc_model <- if (loc_var != "" && subj_loc %in% loc_levels) subj_loc else (if (loc_var != "") loc_ref else NULL)
 X_subj <- build_X(subj_df, loc_value = subj_loc_model)
 
-comp_rows <- sales[sales$mls_id %in% comp_ids, , drop = FALSE]
+comp_rows <- sales[match(comp_ids[comp_ids %in% sales$mls_id], sales$mls_id), , drop = FALSE]   # in the order listed
 missing_ids <- setdiff(comp_ids, sales$mls_id)
 if (!is.null(extra_comps)) {
   # comps.csv rows are appraiser-verified data. A comp that is also in the MLS
@@ -798,10 +807,12 @@ if (!nrow(comp_rows)) stop("No comparable sales found. Check comps.txt / comps.c
 comp_rows$date_used <- to_date(comp_rows[[date_col]])
 comp_rows$sale_age <- as.numeric(eff_date - comp_rows$date_used)
 comp_rows$price_comp <- comp_rows$sale_price
-lost <- comp_rows$mls_id[comp_rows$exclude_reason != "" & comp_rows$mls_id %in% sales$mls_id]
-if (length(lost)) note("Comps excluded from model fitting by cleaning (still adjusted, flagged): %s", paste(lost, collapse = ", "))
+lost_i <- which(!is.na(comp_rows$mls_id) & comp_rows$mls_id != "" & !comp_rows$mls_id %in% dm$mls_id)
+lost <- vapply(lost_i, function(i) { e <- excl$exclude_reason[match(comp_rows$mls_id[i], excl$mls_id)]
+  sprintf("%s (%s)", comp_rows$mls_id[i], if (length(e) && !is.na(e)) e else "not in the sales file") }, character(1))
+if (length(lost)) note("Comps not in the modeled data (still adjusted, flagged): %s.", paste(lost, collapse = "; "))
 outside <- comp_rows$mls_id[comp_rows$mls_id %in% dm$mls_id[!in_pool]]
-if (length(outside)) note("Comps outside your adjustment-pool ranges (still adjusted; lines that fall outside the modeled sales are flagged): %s", paste(outside, collapse = ", "))
+if (length(outside)) note("Comps outside your adjustment-pool ranges (still adjusted; lines that fall outside the modeled sales are flagged): %s.", paste(outside, collapse = ", "))
 comp_lw <- lapply(seq_len(nrow(comp_rows)), function(i) { cr <- comp_rows[i, ]
   ok <- all(vapply(count_vars, function(f) f %in% names(cr) && !is.na(suppressWarnings(as.numeric(cr[[f]]))), logical(1)))
   if (!ok) return(list(w = NA_real_, why = character(0)))
@@ -998,13 +1009,15 @@ tm_months <- local({   # one point per calendar month: the 15th (the effective d
 tm_month_age <- as.numeric(eff_date - tm_months) / month_days
 comp_age_m <- comp_rows$sale_age / month_days
 hs_month_f <- NULL; hs_comp_f <- NULL
+# the same procedure at half the sales: a bend needs the same share of the sales on each side, not the same count
+min_side_h <- max(5L, as.integer(rnd(cfg$time_min_side * floor(n_market / 2) / n_market)))
 if (B_boot > 0) {
   set.seed(seeds$time); half_m <- floor(n_market / 2)
   hs_month_f <- matrix(NA_real_, B_boot, length(tm_months)); hs_comp_f <- matrix(NA_real_, B_boot, nrow(comp_rows))
   tm_freq <- 0
   for (b in seq_len(B_boot)) {
     ix <- sample.int(n_market, half_m, replace = FALSE)
-    fb <- tryCatch(tm_fit(ix), error = function(e) NULL)
+    fb <- tryCatch(tm_fit(ix, min_side = min_side_h), error = function(e) NULL)
     if (is.null(fb)) next
     hs_month_f[b, ] <- tm_f(fb, tm_month_age); hs_comp_f[b, ] <- tm_f(fb, comp_age_m)
     tm_freq <- tm_freq + (length(fb$terms) > 0)
@@ -1012,6 +1025,9 @@ if (B_boot > 0) {
   for (i in seq_len(nrow(comp_rows))) grid <- hs_apply(grid, time_row[i], comp_rows$price_comp[i] * (exp(-hs_comp_f[, i]) - 1))
   boot_freq <- c(list(time = round(tm_freq / B_boot, 3)), as.list(boot_freq))
   msg("Half-sample stability: %d refits of the time index on n = %d", B_boot, half_m)
+  if (length(tm$terms) && 2 * tm_freq < B_boot)
+    note("WARNING: the time index found a trend in the full export, but only %d of the %d half-sample refits kept one. The time lines are not stable in this export; back them with FHFA, the yearly medians or paired sales.",
+         as.integer(tm_freq), B_boot)
 }
 q_or_na <- function(v, p) { v <- v[!is.na(v)]; if (length(v) >= 20) unname(quantile(v, p)) else NA_real_ }
 month_pct <- exp(-tm_f(tm, tm_month_age)) - 1
@@ -1133,6 +1149,14 @@ if (isTRUE(cfg$leave_comps_out)) {
     }
   }
 }
+## ---- A full-data amount outside its own half-sample range: the halves do not reproduce it ----
+for (r in seq_len(nrow(grid))) {
+  a <- grid$adjustment[r]; lo <- grid$boot_low[r]; hi <- grid$boot_high[r]
+  if (is.na(a) || is.na(lo) || is.na(hi)) next
+  if (a < lo - 0.5 || a > hi + 0.5) grid$review_flag[r] <- paste(c(if (grid$review_flag[r] != "") grid$review_flag[r],
+    sprintf("OUTSIDE ITS RANGE: the full-data amount %s falls outside its half-sample range (%s to %s); the refits on half the sales do not reproduce it, so treat it as unsupported.",
+            fmt_money(a), fmt_money(lo), fmt_money(hi))), collapse = " | ")
+}
 names(grid)[names(grid) == "low"] <- "cond_low"; names(grid)[names(grid) == "high"] <- "cond_high"
 names(grid)[names(grid) == "boot_low"] <- "half_sample_p2.5"
 names(grid)[names(grid) == "boot_high"] <- "half_sample_p97.5"
@@ -1209,7 +1233,7 @@ if (requireNamespace("MASS", quietly = TRUE)) {
 ## ---- Local validation (GLA band, same levels) on partial residuals -------------------
 local_val <- list(verdict = "not run")
 if ("gla" %in% features && "gla" %in% eligible) {
-  band <- if (is.na(cfg$gla_band)) max(250, round(0.15 * X_subj[1, "gla"], -1)) else cfg$gla_band
+  band <- if (is.na(cfg$gla_band)) max(250, rnd(0.15 * X_subj[1, "gla"] / 10) * 10) else cfg$gla_band   # round half up, as in the browser
   same_lv <- "levels" %in% eligible && !is.na(subj_df$levels[1])
   inb <- abs(d$gla - X_subj[1, "gla"]) <= band & (if (same_lv) d$levels == subj_df$levels[1] else TRUE)
   if (sum(inb) >= 10) {
@@ -1221,7 +1245,8 @@ if ("gla" %in% features && "gla" %in% eligible) {
     se_sl <- summary(lm(yv ~ xv))$coefficients[2, 2]
     local_val <- list(gla_band_sf = band, batch_n = sum(inb), batch_gla_range = xr, same_levels = same_lv,
       batch_slope_per_sf = round(sl, 2), batch_slope_se = round(se_sl, 2), mars_avg_slope_over_band = round(mars_avg, 2),
-      verdict = if (abs(sl - mars_avg) <= 1.96 * se_sl) "LOCALLY VALIDATED" else "DIVERGES: FLAG FOR APPRAISER JUDGMENT")
+      verdict = if (1.96 * se_sl >= abs(sl)) "NOT INFORMATIVE: the local slope is too noisy to confirm or reject the model rate" else
+                if (abs(sl - mars_avg) <= 1.96 * se_sl) "LOCALLY VALIDATED" else "DIVERGES: FLAG FOR APPRAISER JUDGMENT")
   } else local_val <- list(gla_band_sf = band, batch_n = sum(inb), verdict = "BATCH TOO SMALL")
 }
 
@@ -1284,9 +1309,9 @@ scope <- paste("Scope and use: statistical analysis supporting the appraiser's a
   "Prepared with reference to USPAP Advisory Opinion 41 (Use of Technology in an Appraisal or Appraisal Review Assignment):",
   "the tool cannot comply with USPAP; the appraiser remains responsible for judging whether this output is accurate and relevant to the assignment.")
 seg_txt <- if (is.null(tm_segments)) "" else paste(sprintf("%s to %s %s/mo", tm_segments$from, tm_segments$to, fmt_pct(tm_segments$pct_per_month, 2)), collapse = "; ")
-time_method <- sprintf("Quality-adjusted log-price index from %d clean sales: log price on %s%s%s, plus a time curve that may bend only on a %d-month calendar grid with at least %d sales on each side, bends pruned by GCV (penalty %s). Listings far from typical and prices far from the model count for less (listing and Huber weights). Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.",
+time_method <- sprintf("Quality-adjusted log-price index from %d clean sales: log price on %s%s%s, plus a time curve that may bend only on a %d-month calendar grid with at least %d sales on each side%s, bends pruned by GCV (penalty %s). Listings far from typical and prices far from the model count for less (listing and Huber weights). Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.",
   n_market, paste(tolower(vapply(model_vars, label_of, "")), collapse = ", "), if (length(tm_loc)) ", location" else "", if (season_on) ", quarter of the year (reported, not applied)" else "",
-  as.integer(cfg$time_knot_months), as.integer(cfg$time_min_side), format(cfg$penalty))
+  as.integer(cfg$time_knot_months), as.integer(cfg$time_min_side), if (B_boot > 0) sprintf(" (%d in the half-sample refits, which use half the sales)", min_side_h) else "", format(cfg$penalty))
 results <- list(
   scope_notice = scope,
   engine = list(name = "MARS / Regression Adjustment Support", version = ENGINE_VERSION, earth_version = as.character(packageVersion("earth")),
@@ -1304,6 +1329,7 @@ results <- list(
                  time_price_downweighted = tm_down, time_effective_n = round(n_eff(tm$w), 1)),
   review_flags = grid[grid$review_flag != "", c("comp_mls", "feature", "review_flag")],
   time_index = list(method = time_method, n_sales = n_market, knot_months = as.integer(cfg$time_knot_months), min_side = as.integer(cfg$time_min_side),
+                    min_side_half_samples = if (B_boot > 0) min_side_h else NULL,
                     season_control = season_on, season_effects_vs_q1_pct = if (is.null(tm$season)) NULL else as.list(round(100 * tm$season, 2)),
                     candidate_dates = format(tm$candidate_dates), overall_slope_kept = any(is.na(tm$terms)), bends = format(tm_bends),
                     flat = !length(tm$terms), segments = tm_segments, r2 = round(tm$r2, 4), half_sample_refits = B_boot,
@@ -1359,8 +1385,8 @@ wf <- c(sprintf("WORKFILE NOTE: MARS / Regression Adjustment Support v%s", ENGIN
           if (isTRUE(cfg$exclude_flip_purchases)) "excluded" else "kept",
           if (!isTRUE(cfg$exclude_unexposed)) "kept" else if (exposure_checked) "excluded" else "not checked (no MLS entry date in the file)"),
   sprintf("Data SHA-256: %s   Config SHA-256: %s   Master seed: %d", data_hash, cfg_hash, cfg$master_seed),
-  sprintf("Review flags: %d grid line(s) flagged (REVERSED SEGMENT %d, FHFA CHECK %d, COMP INFLUENCE %d); see comp_grid.csv, review_flag column.",
-          sum(grid$review_flag != ""), flag_n("REVERSED"), flag_n("FHFA CHECK"), flag_n("COMP INFLUENCE")),
+  sprintf("Review flags: %d grid line(s) flagged (REVERSED SEGMENT %d, FHFA CHECK %d, COMP INFLUENCE %d, OUTSIDE ITS RANGE %d); see comp_grid.csv, review_flag column.",
+          sum(grid$review_flag != ""), flag_n("REVERSED"), flag_n("FHFA CHECK"), flag_n("COMP INFLUENCE"), flag_n("OUTSIDE ITS RANGE")),
   "", scope, "",
   "I reviewed the MARS/regression statistical output for this assignment. I considered the modeled estimates, standard errors and ranges in the context of the specific comparable sales, market conditions and paired-sales support where available. Final adjustments were determined by my independent professional judgment and reconciliation of all evidence. Where data support was insufficient, adjustments were treated as not supported or developed qualitatively.",
   "[ ] Adopted   [ ] Modified   [ ] Rejected   Notes: ________________________________")
