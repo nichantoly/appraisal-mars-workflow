@@ -1,272 +1,234 @@
-MARS / Regression Adjustment Support Workflow (v1.2)
+# MARS / Regression Adjustment Support (v2.3.1)
 
-**A statistical adjustment-support protocol for residential appraisers, designed to be run inside an AI assistant (Claude, ChatGPT, Grok, etc.) or implemented directly in R/Python.**
+Adjustment support for residential sales-comparison grids, pulled from your own MLS export. It prices the lines an appraiser actually adjusts: site (in dollars per square foot of lot), bedrooms, full baths and half baths (above grade), GLA, garage spaces, carport spaces and pool, plus a percent market-conditions (time) line from a quality-adjusted index built on every sale in the export. MARS (multivariate adaptive regression splines, the R `earth` package) finds where each curve bends. Built for litigation work, including divorce assignments with retrospective effective dates.
 
-This workflow produces defensible, documented, uncertainty-quantified support for sales-comparison adjustments using MARS (Multivariate Adaptive Regression Splines, earth-equivalent) as the primary method, cross-checked by a battery of regression and robust estimators. It produces **no indicated value, no reconciled value, and no opinion of value — ever.** The licensed appraiser selects all final adjustments. Tool outputs are information, not assignment results (per USPAP Advisory Opinion 41, adopted April 23, 2026).
+Two ways to run it. They give the same numbers to the cent:
 
-> **How to use:** Copy the "AI Prompt" section below into your AI assistant verbatim, provide the three inputs, and you will get the same model and deliverables. Or implement the spec directly in R (`earth`) / Python.
+| | What it is | Use it when |
+|---|---|---|
+| **Browser** | `docs/index.html`, one self-contained page. The MLS file is read in the browser and never uploaded. It prints a Letter report for the appraisal. | Day-to-day work. Nothing to install. |
+| **R** | `R/mars_adjustment_support.R`, the reference script. | You want CSV/JSON outputs on disk, the degree-2 interaction check, or an independent rerun by a reviewer or opposing expert. |
 
----
-
-## Summary of Design Decisions (v1.2)
-
-This spec evolved through peer review (AppraisersForum MARS threads) and alignment with AO-41:
-
-| # | Design element | Why |
-|---|--------|-----|
-| 1 | **Reproducibility block** in Model Detail: master seed + derived seeds (LMS, bootstrap, CV folds), package + version, full earth config (degree, penalty, nk, pmethod, nfold), config hash | Collinearity means multiple near-equivalent models exist; runs must be exactly repeatable for the workfile. Note: MARS coefficients from GCV backward pruning are deterministic — seeds matter only for the stochastic battery members and CV checks. |
-| 2 | **Knot-safe adjustments**: for any feature where MARS retains a hinge, each comp's adjustment = ĝ(x_comp) − ĝ(x_subject) (segment-weighted path along the fitted function), never one slope × total difference | A subject and comp on opposite sides of a knot make any single slope wrong. Example: $500/sf below a 2,000 sf knot, $400/sf above; subject 1,900 sf, comp 2,140 sf → correct adjustment is 100×500 + 140×400 = $106,000, not $120,000 or $96,000. |
-| 3 | **Per-segment slopes** reported in Model Detail with their ranges; **knot-crossing flag** in Adjustment Comments with segment math shown | Transparency for reviewers; the headline $/unit is never a single misleading number when the function bends. |
-| 4 | **Exact SEs on knotted adjustments** from the coefficient covariance of the basis-function linear combination | The adjustment is a fixed linear combination of MARS basis coefficients, so its SE is exact — no approximation needed. |
-| 5 | **Levels (story count) as an explicit model variable** | In markets where GLA × levels jointly determine cohort/vintage/style, levels is a cheap, powerful control. |
-| 6 | **Interaction diagnostic**: fit degree=2 MARS as a check; if a GLA×levels or GLA×age term survives GCV pruning, report cohort-specific $/sf. Headline model stays additive unless the interaction is retained | Catches segment-specific $/sf behavior without fishing. |
-| 7 | **Local Validation Check**: simple-slope methods run on the appraiser's characteristic-filtered comp batch (a GLA similarity band scaled to the subject — e.g., ±250 sf for smaller homes up to ±1000 sf for larger — plus same levels) and compared to the MARS segment slope at the subject's position. Inside the CI → "locally validated"; outside → flagged for appraiser judgment | The appraiser's comp-selection filter and the global model audit each other. Division of labor: **the filter selects comps; the model estimates adjustments; this check is the handshake.** |
-| 8 | **Bracketing report** (diagnostic only): per feature, whether selected comps bracket the subject, plus observed price spread of the characteristic-filtered batch | Documents that comp selection worked; flags extrapolated adjustments. |
-| 9 | **Mandatory scope/disclaimer language** on every deliverable, aligned to AO-41 | Tool outputs are information, not assignment results; only the appraiser can comply with USPAP. |
-| 10 | **Auto-generated workfile note** per run with adopt/modify/reject sign-off | Supports RECORD KEEPING RULE documentation with 60 seconds of effort. |
-| 11 | **Assignment-aware cleaning**: exclusions depend on the subject. New-construction sales are excluded only when the subject is not new/newer; to-be-built listings without closed prices are always excluded | Cleaning rules serve comparability to the subject, not blanket policy. |
-
-**Explicitly considered and rejected:** (a) Residual-allocation approaches that carry through to a complete indicated value — out of scope by design; allocating unexplained residual to condition/quality/view is the appraiser's judgment, not the model's. (b) Estimating coefficients from small characteristic-filtered batches — range restriction inflates SEs exactly because the batch is homogeneous; filtered batches are for comp *selection* and *local validation*, not primary estimation. (c) Any pre-filtering of sales by price — selecting on the dependent variable attenuates every adjustment toward zero and invites an anchoring critique.
+The output is adjustment **support** only. It never produces an indicated value, a reconciled value or an opinion of value. The licensed appraiser selects every final adjustment.
 
 ---
 
-## Complete Workflow Specification
+## What changed in v2.3.1: first field run
 
-### Inputs (appraiser provides)
+| # | v2.3.1 behavior | Why it matters |
+|---|---|---|
+| 30 | **Finished basement (yes or no) is a background control**, next to year built and levels. It is read from Below Grade Finished SQFT or Basement Type and never prints as a grid line. | Basement value no longer leaks into the GLA and room rates, and the appraiser still adjusts basements by room and utility. |
+| 31 | **The time index's half-sample refits scale the bend rule to their size**: a bend needs the same share of the sales on each side (10 sales a side at half of the data when the full fit needs 20), the way the MARS refits already rescale the earth recipe. | On a 74-sale export the full fit could keep a bend the halves could never place, so a comp's time line read -10.7% with a range of 0 to +5.7%. |
+| 32 | **New review prompts.** A grid amount outside its own half-sample range gets the flag OUTSIDE ITS RANGE. A trend the full data keep but most refits drop gets a warning. The GLA local validation reads NOT INFORMATIVE when its slope is too noisy to confirm or reject anything (its 95% interval includes zero). | Thin data now say so instead of reading as validated. |
+| 33 | **The page loads in the order the work is done**: subject and effective date, the comps in the report, then the market file, then the pool and rules. Comps loaded from a Spark CSV are matched to the market file when it arrives, and the page says which ones are not in it. Loudoun County joins the FHFA presets (eleven counties). The report cover and time page are tighter, and the R script now keeps comps in the order listed. | Matches how an appraiser builds the grid. |
 
-1. **MLS export (CSV)** of closed sales from the subject's competitive market area only, pulled back in time just far enough to reach ~150+ usable sales (150–300 ideal).
-2. **Subject specs**: address + GLA above grade, lot SF, garage spaces, full/half baths, basement finished/unfinished SF, year built, levels. If pending, say so. (MLS and tax-record data are public-record information; subject details appear on outputs normally. An anonymized share copy is available on request.)
-3. **Comp selections** (addresses or MLS #s) — the comps actually used in the report.
+## What changed in v2.3: the appraiser's own grid lines
 
-### Stage 0 — Cleaning (report everything excluded and why)
+| # | v2.3 behavior | Why it matters |
+|---|---|---|
+| 22 | **Priced lines are exactly** site ($ per sf of lot), bedrooms, full baths and half baths (all above grade: the MLS total minus the lower-level count), GLA, garage spaces, carport spaces (both per space) and pool, plus time. Basement finished area, fireplaces, decks, patios, porches, concessions and location are gone. | Regression cannot price a deck that could be a $4,000 deck or a $70,000 one, and finished basement area is rarely recorded the same way twice. Those stay with the appraiser (basements by room and utility), and so do concessions. |
+| 23 | **Year built and levels are background controls.** They stay in the model and never print as grid lines. | Newer houses or a different style cannot leak into the priced lines. |
+| 24 | **Every priced variable gets a number and a range.** MARS still decides where curves bend; a priced variable it leaves out goes back in as a straight line. A line needs at least 10 pool sales that differ from the most common value; with fewer it reads NOT ENOUGH DATA. | The 2 BR versus 3 BR townhouse question gets an answer with an honest range, even where MARS alone would drop bedrooms. |
+| 25 | **Listings that deviate from the norm count for less, never dropped.** A bedroom, bath, garage or carport count more than 2 from what is typical for the sale's size (the median count among the nearest 20% of the sales by GLA, at least 30) gets weight 2 divided by the distance. A finished basement whose lower-level rooms are left blank while the main line shows more rooms than typical (rooms put on one line) gets half weight on top. Where MARS looks for bends, far-out counts are pulled in to the edge of the normal band. Every listing that lost weight is listed with the reason. | Realtors count driveway spots as garage spaces and put basement rooms on the main line. A recorded 36-car garage on a 2-car street counts about 6%. |
+| 26 | **Prices far from the model count for less too:** Huber weights (1.345 robust SDs) by iteratively reweighted least squares, in the time index and in the adjustment model. The dollar amounts come from the weighted refit. | A dated house or a full renovation the MLS fields do not describe moves the rates less. |
+| 27 | **The whole procedure is refit** on each cross-validation fold, each half-sample and the leave-comps-out check, weights included. | The reported out-of-sample fit and ranges describe the procedure actually used. |
+| 28 | **Printable report.** Summary, the grid, market conditions with the chart, per-unit rates with the value curves, cross-checks, then the workfile record (workfile note with sign-off lines, data trail, reproducibility, appendices), which can be switched off before printing. | Part one goes into the appraisal as an addendum; the workfile record backs it up. |
+| 29 | **Fixes.** Yearly medians use the latest year with sales as the base when the export has no sales yet in the effective date's year. Lot size is read in square feet (acres x 43,560 when only acres are given). A blank full-bath field is unknown, not zero. Zip is never used against a sale. | The median column no longer reads n/a early in a year. |
 
-- **Assignment-aware new-construction rule**: if the subject is *not* new/newer construction, exclude new-construction sales as non-comparable. If the subject *is* new or newer, new-construction sales are valid and retained. To-be-built / not-yet-closed listings are always excluded (no closed market price).
-- Exclude non-arm's-length transfers.
-- Exclude records with impossible field values.
-- Net sale prices of seller concessions.
-- Output an **Exclusions table**: each dropped record + reason, and state which new-construction rule applied for this assignment.
+## What changed in v2.2: time in percent, one export, two pools
 
-### Stage 1 — Time Index
+v2.1 priced time the way it priced square feet: a dollar slope inside the MARS model. Over a four to six year window that is wrong, because a 2021 comp needs the same percent change whether it sold for $400,000 or $900,000. v2.2 replaces it.
 
-- Fit MARS (earth-equivalent, additive, GCV backward-pruned) on **ln(price)** with full hedonic controls + subdivision controls; extract the monthly time index.
-- **Cross-validate** the index against (a) a half-year dummy regression and (b) repeat sales, if any exist in the data. Report agreement/divergence.
+| # | v2.2 behavior | Why it matters |
+|---|---|---|
+| 13 | **Time is a percent index.** A quality-adjusted log-price model is fit on every clean sale in the export (the market pool): log price on the model features, location and quarter of the year, plus a time curve that may change slope only on a calendar grid (Jan 1 and Jul 1 by default) and only where at least 20 sales sit on each side. Bends are pruned by GCV, so the curve keeps a bend only when the data pay for it. | A bigger pool gives a tighter index. On a real 22406 export, acreage homes and subdivision-lot homes appreciated at the same rate (p = 0.37), while narrowing the pool by lot size made the index noisier (quarterly ranges about 1.7 times wider) and let an unrestricted curve drop 13.8% and then rise 10.0% within ten months. |
+| 14 | **Quarter-of-year control.** Spring and winter swings are estimated and reported, not applied. | Without it, a 6-month grid chases the season: up every spring, down every winter. |
+| 15 | **One export, two pools.** The similarity ranges you set (GLA, year built, lot size) pick the adjustment pool. Its prices are brought to the effective date with the index, then MARS prices the features on those time-adjusted prices. | No second MLS pull. The 5,000-row export limit is not an issue for a zip-level, one-property-type pull. |
+| 16 | **The time line** is the comp's price times the index change from its sale date to the effective date, with its own half-sample range (the whole time fit, bends included, refit on 200 halves of the market pool). | Defensible in percent, and the range says how sure the data are. |
+| 17 | **FHFA check.** Pick a county FHFA series (ten DC-area counties built in, from FRED, through 2025) or paste any FRED/FHFA series. It is compared with this index over the same FHFA periods; a comp whose FHFA change falls outside the local half-sample range gets a review flag. Partial periods are not compared. | The national cross-check a reviewer will ask for, on an apples-to-apples basis. |
+| 18 | **Your median-to-median method**, side by side: yearly medians of the export as pulled, year-over-year, change to the effective year, and each year's new-construction share. | Shows the reader why the medians move: in the narrowed 22406 pull, new construction was 28% of 2024's sales and 8% of 2026's. |
+| 19 | **Leave-comps-out check.** The adjustment model is refit without the report comps; a line their own sales push outside its range is flagged. | Answers "did your comps make their own adjustments?" |
+| 20 | **Price screen.** A sale more than 3x above or below what the time model expects for its features, location and date is listed and left out (data error or not a market sale). Switchable. | One $4,995 "sale" in a $780,000 market took the v1.2 example's time model from R-squared 0.97 to 0.17. |
+| 21 | **Fixes.** Placeholder tax IDs (NOTAXRECORD, NONE, 0000) no longer tie different houses together as repeat sales. "New construction" is judged against the year each house sold, not the effective date's year. A Bright export without a Status column no longer drops every row. | 26 rows in the 22406 export carried NOTAXRECORD. |
 
-### The Model (single-stage, v1.2)
-- One MARS model (earth-equivalent, additive, GCV backward-pruned):
-  **net price ~ sale_age + features + subdivision** — no price pre-adjustment.
-- **sale_age** (days before the effective date) is a regular predictor, so the
-  Date-of-Sale adjustment per comp is a knot-safe fitted-function difference
-  with an exact SE — identical machinery to every other feature, reported as
-  its own line in the comp grid.
-- **Monthly time index** derived from the model's partial dependence on
-  sale_age ($ and % at the median price); a **half-year ln-price dummy
-  regression** is retained as a proportionality cross-check; a
-  **price-dispersion diagnostic** (P75/P25 > 1.6) flags when the market area
-  is too price-diverse for the additive-$/day time assumption.
-- **Levels always included** as an explicit variable; subdivision fixed effects.
-- **Pruning: GCV backward** (`pmethod="backward"`) — deterministic; headline
-  coefficients are seed-independent by construction.
-- **Interaction diagnostic**: fit degree=2 as a check. If GLA×levels or GLA×age
-  survives GCV pruning, report cohort-specific $/sf; otherwise headline stays additive.
-- **Location adjustments** computed relative to the subject's subdivision.
-- **Collinear full/half baths**: report the pooled per-bathroom value and say so explicitly.
+## What changed from v1.2, and why
 
-### Knot Handling (mandatory)
+v1.2 got gross living area roughly right and most other lines wrong. An audit against W. Craytor's earthUI and a test on a real 244-sale Bright MLS export found these causes, all fixed in v2.1:
 
-1. For any feature where MARS retains a hinge, each comp's adjustment = **ĝ(x_comp) − ĝ(x_subject)** — walk the fitted function segment by segment. Never one slope × total difference.
-2. Model Detail reports **per-segment slopes with their ranges** (e.g., "$500/sf up to 2,000 sf; $400/sf above").
-3. Adjustment Comments **flags every subject–comp pair spanning a knot** and shows the segment math.
-4. **SEs are exact**: the adjustment is a linear combination of basis coefficients; compute its SE from the coefficient covariance matrix.
-
-### Multi-Method Battery (every feature)
-
-Grouped Data · Sensitivity · OLS Simple · Theil-Sen · LAD · LMS · Modified Quantile · OLS Multiple · **MARS (primary)**.
-
-- **Local Validation Check**: run the simple-slope methods on the appraiser's characteristic-filtered batch (the appraiser declares the GLA band per assignment, scaled to the subject — typically ±250 sf to ±1000 sf — plus same levels; *characteristics only, never price*) and compare to the MARS segment slope at the subject's position. Inside CI → "locally validated"; outside → flag for appraiser judgment. Record the declared band in the deliverable.
-- **NEVER GUESS RULE**: if the data can't support an adjustment (feature absent, n too small, coefficient unstable), mark it **NOT SUPPORTED / NOT EXTRACTABLE**. Never fill in a plausible number.
-
-### Diagnostics
-
-- **Bracketing report**: per feature, do the selected comps bracket the subject? Plus observed price spread of the characteristic-filtered batch. Diagnostic only.
-- *(Optional)* **Residual column** in Comp Data: actual time-adjusted price minus model prediction per comp, labeled as unexplained variance — no allocation to condition/quality/etc.
-
-### Reproducibility Block (Model Detail tab, every run)
-
-- Master seed (one integer per job); derived seeds via deterministic offsets for LMS resampling, bootstrap SEs, CV folds.
-- MARS implementation + exact version; language runtime version.
-- Full model config: degree, penalty, nk, thresh, pmethod, nfold/ncross; model formula as fitted (after any pooling).
-- SHA-256 hash of config + cleaned-data row count.
-- Per-method determinism flag: deterministic (MARS/GCV, OLS, Theil-Sen, LAD, Grouped, Sensitivity, Mod. Quantile) vs. seed-dependent (LMS, bootstrap, CV check).
-
-### Deliverables
-
-**PDF addendum (Spark-style):**
-- Adjustment Support page(s): headline / low / high / methods per feature
-- Adjustment Comments (incl. knot-crossing flags, local validation results)
-- Calculated Method Detail table
-- Methods glossary
-- Scope and Use block (below) on first page + footer
-
-**Excel workbook:**
-- Comp Grid (appraiser's comps, adjustment lines only)
-- Adjustments w/ SE and reliability flags
-- Location
-- Monthly Time Adjustment index
-- Comp Data
-- Model Detail (incl. Reproducibility block + Scope language)
-
-**Workfile note (auto-generated, pre-filled per run):** dataset description, run date, config hash, modeled estimates reviewed, and sign-off line:
-
-> "I reviewed the MARS/regression statistical output for this assignment (see attached addendum). I considered the modeled per-unit estimates, standard errors, and ranges in the context of the specific comparable sales, market conditions, and traditional paired-sales support where available. Final adjustments were determined by my independent professional judgment and reconciliation of all evidence. Where data support was insufficient, adjustments were treated as not supported or developed qualitatively. ☐ Adopted ☐ Modified ☐ Rejected (notes: ______)"
-
-**Hard rules:** No indicated, reconciled, or opinion-of-value figure anywhere. On request: anonymized share copy with subject identifiers withheld.
-
-### Scope and Use Language (mandatory on every deliverable)
-
-> **Scope and Use of This Analysis**
->
-> *This addendum presents statistical analysis performed as a tool to support the appraiser's adjustment development. The per-unit figures shown are model-derived estimates with stated uncertainty (standard errors and low/high ranges) — they are analytical output, not confirmed market facts. Market participants do not transact at extracted coefficients; these figures describe patterns in the sale data under the stated model assumptions.*
->
-> *The appraiser has exercised independent professional judgment in reviewing this analysis and makes all final adjustment determinations, whether within or outside the supported ranges shown, based on the totality of evidence and market knowledge. This analysis supports, and does not replace, the appraiser's reasoning and reconciliation. No indicated value, reconciled value, or opinion of value is produced by this analysis. Where the data could not support an adjustment, it is marked NOT SUPPORTED rather than estimated.*
->
-> *Consistent with USPAP Advisory Opinion 41, outputs of this tool are information considered by the appraiser, not assignment results; only the appraiser can comply with USPAP. Data sources, exclusion criteria, model configuration, and reproducibility parameters are documented herein for workfile retention.*
+| # | v1.2 behavior | v2.1 behavior | Why it matters |
+|---|---|---|---|
+| 1 | Blank MLS fields were median-imputed, and features over 30% blank were dropped | Blanks that mean "none" in the MLS (garage spaces, half baths, fireplaces, carports, basement finish when Basement = No) are read as 0. Nothing is imputed. A truly unknown value excludes the sale and is listed. | On Bright exports a blank garage field means no garage. v1.2 dropped the garage and half-bath variables entirely and invented basement finish. |
+| 2 | Effective date defaulted to the latest sale | Effective date is a required input | Retrospective dates (date of separation, filing, trial) are the norm in divorce work. |
+| 3 | Prices were always netted of concessions | Gross prices by default. Concessions are deducted only at a market reaction you declare (0 to 1), and the run tests the reaction from the data. | Dollar-for-dollar netting distorts prices where concessions don't move price. |
+| 4 | Default `earth` settings, no cross-validation | earthUI's parameter recipe (nk, minspan, endspan, penalty 2, new-variable penalty 0.1, backward pruning) and cross-validation on every run (CVRSq) | Settings scale with the number of sales; CVRSq shows out-of-sample fit. |
+| 5 | Location fell back silently | Location is a declared column (zip by default). Thin levels are pooled. If the subject's level is not in the data, location is NOT EXTRACTABLE. | No invented location adjustment. |
+| 6 | Total bath count | Above-grade baths (full + 0.5 x half, lower-level baths removed) | Matches the grid's room count. |
+| 7 | Line status from the textbook +/-1.96 SE interval | Status from 200 half-sample refits of the whole procedure (knots and variable choice can move) | In tests with known answers the textbook interval held the true amount 56% of the time; the half-sample range held it 94% of the time. |
+| 8 | Extrapolation and odd segments not flagged | Flags for comp or subject outside the modeled sales, time gaps over 91 days, knot crossings (with segment math), and segments that run against the normal market direction | The lines a cross-examiner will go after are marked before you sign. |
+| 9 | Rare amenities forced into the regression | Fireplace, pool, deck, porch and carport priced from the model residuals (earthUI's residual-contribution method), with t-values | Thin features don't distort the core model. |
+| 10 | No repeat-sale, exposure or flip checks | Repeat sales reported. The earlier sale of a property resold within 365 days for 20% or more (likely bought for renovation) is excluded. Sales entered in the MLS on or after closing (no MLS exposure) are excluded. Only resales that closed by the effective date count, so no hindsight enters a retrospective assignment. | In the 244-sale test file, six sales that were flip purchases or off-market entries were sitting in the model as low-price outliers. |
+| 11 | Sale age from the contract date only | Closing-date clock by default; contract-date clock optional | Exports are pulled by closing date. On a contract clock the oldest weeks only contain the slow closings, which bent the time curve in testing. The contract clock now drops contracts dated before the first closing in the file. |
+| 12 | Seeds documented, RNG not pinned | R's RNG is pinned (Mersenne-Twister, Rejection sampling) and the browser reproduces it draw for draw | The browser and R give identical folds, half-samples, ranges and statuses, and the same data SHA-256. |
 
 ---
 
-## AI Prompt (paste this into your assistant verbatim)
+## Validation
+
+* **Engine.** The JavaScript MARS engine reproduces R `earth` (forward pass, knot search, `leaps` backward pruning) on 71 of 71 test fits: 11 fixed cases, including a 1,488-sale fit on earthUI's demo file, and 60 random configurations. Coefficients agree to within 1e-10, relative.
+* **Full workup.** On ten test cases the browser and the R script produce the same exclusions, the same data SHA-256, the same listing and price weights, the same CVRSq, the same time index (bends, monthly and yearly tables, FHFA comparison), the same local validation, the same run notes word for word, and the same amount, standard errors, half-sample range, status, review flag and leave-comps-out amount on every grid line: 336 grid lines, 17,573 values compared. The cases: a real 244-sale Bright export on the contract clock, and on the closing clock with a comp file from Spark; a real 1,027-sale six-year Bright export from zip 22406 run three ways (current date with similarity ranges and the Stafford FHFA series; a retrospective date with a quarterly FHFA series and a 3-month bend grid; cut at January 1 so the effective year has no sales yet); the v2.3 synthetic demo market with a lumped-basement comp, a garage-abuse comp and two hand-entered comps, one with a blank bedroom count; the v2.2 demo market; a stale data window; the v1.2 example file with location turned on; and a thin market cut from the 22406 export (homes of 3,700 sf and up, 80 clean sales) run with 20 half-samples so the OUTSIDE ITS RANGE flag fires.
+* **Uncertainty, with realtor-style listing errors.** Sixteen synthetic markets (420 sales each, four price paths) built from true above-grade counts, with the errors realtors make mixed into what the listing records: 22% of finished basements leave the lower-level section blank and put those rooms on the main line, 3% of listings add 3 to 8 garage spaces, 1% add 3 bedrooms, 8% of houses are dated and 8% redone, plus REO and short sales and a 10x price typo. On 320 grid lines the half-sample range held the true amount 308 times (96%); the conditional ±1.96 SE interval 205 times (64%). Every line rated SUPPORTED (220) had the right sign, and 57 of 63 rated SUPPORTED, SIZE VARIABLE. By line: time 48 of 52, site 64 of 64, bedrooms 36 of 37, full baths 34 of 36, half baths 23 of 25, GLA 62 of 64, garage 29 of 30, carport 5 of 5, pool 7 of 7. With the weights switched off the range held the truth 95% of the time and the median miss grew on 8 of the 9 line types. (The synthetic markets give a finished basement no value, so the basement control is pure noise in this test; it cost nothing in coverage.)
+
+Check it yourself. `examples/` holds the synthetic demo market, its inputs and the R output (`examples/expected_output/`); `examples/truth.json` holds the true values it was built from.
 
 ```
-STANDARD WORKFLOW — MARS/regression MLS adjustment support (run this way every
-time, no deviations):
-
-INPUTS I will provide:
-1. MLS export (CSV) of closed sales from the subject's competitive market area only —
-   pulled back just far enough to reach ~150+ usable sales (150–300 ideal).
-2. Subject: address + specs (GLA above grade, lot SF, garage spaces, full/half
-   baths, basement fin/unf SF, year built, levels). If pending, I'll say so.
-3. My comp selections (addresses or MLS #s).
-
-PROCESS:
-- Clean first (assignment-aware): exclude to-be-built listings without closed
-  prices always; exclude new-construction sales ONLY if my subject is not
-  new/newer construction — if my subject is new/newer, keep them. Exclude
-  non-arm's-length and impossible fields. Net prices of seller concessions.
-  Show me what was excluded and why, and which new-construction rule applied.
-- Single-stage MARS (earth-equivalent, additive, GCV backward-pruned):
-  net_price ~ sale_age + features + subdivision in ONE model; no price
-  pre-adjustment. sale_age = days before effective date. Date-of-Sale
-  adjustment per comp = knot-safe fitted-function difference over
-  sale_age with exact SE, reported as its own line in the comp grid.
-  Monthly time index from partial dependence on sale_age; half-year
-  ln-price dummy regression as cross-check; warn if price dispersion
-  (P75/P25 > 1.6) makes additive $/day time questionable.
-- Interaction diagnostic: fit degree=2 as a check; if GLA×levels or GLA×age survives
-  GCV pruning, report cohort-specific $/sf; headline stays additive otherwise.
-- KNOT HANDLING (mandatory): where MARS retains a hinge, each comp's adjustment is
-  the fitted-function difference ĝ(x_comp) − ĝ(x_subject) computed segment by
-  segment — NEVER one slope × total difference. Report per-segment slopes with
-  ranges. Flag every subject–comp pair spanning a knot and show the segment math.
-  SEs exact from the coefficient covariance of the basis-function combination.
-- Location adjustments relative to MY SUBJECT's subdivision.
-- If full/half baths are collinear, report the pooled per-bathroom value and say so.
-- NEVER GUESS: if the data can't support an adjustment (feature absent or n too
-  small), mark it NOT SUPPORTED / NOT EXTRACTABLE. Never fill in a plausible number.
-- Multi-method battery on every feature: Grouped Data, Sensitivity, OLS simple,
-  Theil-Sen, LAD, LMS, Modified Quantile, OLS Multiple, MARS (primary).
-- Local Validation Check: run simple-slope methods on my characteristic-filtered
-  comp batch (I'll state my GLA band per assignment, scaled to the subject —
-  typically ±250sf to ±1000sf — plus same levels; characteristics only, never
-  filter on price) and compare to the MARS segment slope at my subject's
-  position. Inside the CI = "locally validated"; outside = flag for my judgment.
-  Record my declared band in the deliverable.
-- Bracketing report (diagnostic): per feature, do my selected comps bracket the
-  subject; plus observed price spread of the filtered batch.
-- Reproducibility: one master seed per job with derived seeds (LMS, bootstrap, CV
-  folds); log package + version, full config (degree, penalty, nk, pmethod,
-  nfold), and a config hash in Model Detail. Note which methods are deterministic
-  vs seed-dependent.
-- Always write and execute code for all calculations (or run the included R script); never estimate results by reading the data directly.
-
-DELIVERABLES:
-- PDF addendum (Spark-style): Adjustment Support page(s) with headline/low/high/
-  methods, Adjustment Comments (knot flags, local validation), Calculated Method
-  Detail table, Methods glossary, and the Scope and Use block on the first page
-  and footer.
-- Excel workbook: Comp Grid (my comps, adjustment lines only), Adjustments w/ SE
-  and reliability flags, Location, monthly Time Adjustment index, Comp Data,
-  Model Detail (with Reproducibility block and Scope language).
-- Auto-generated workfile note: dataset description, run date, config hash,
-  estimates reviewed, and an adopt/modify/reject sign-off line stating final
-  adjustments were determined by my independent professional judgment.
-- NO indicated, reconciled, or opinion-of-value figures anywhere. I am the
-  licensed appraiser; output is adjustment support only. Outputs are information,
-  not assignment results (USPAP AO-41); only I can comply with USPAP.
-- On request: anonymized share copy with subject identifiers withheld.
+Rscript R/mars_adjustment_support.R examples/sales.csv examples/subject.csv examples/comps.txt,examples/comps.csv examples/out examples/cfg.json
+node tests/compare_r_js.js examples out
+tests/synthetic/run_coverage.sh
 ```
 
 ---
 
-## Run It Locally (optional — for coders)
+## Run it
 
-A tested reference implementation is included at `R/mars_adjustment_support.R`
-(R + the canonical `earth` MARS package). Validated against synthetic data
-with known true values: exact knot recovery, segment math verified to the
-dollar, exclusion and time-index logic confirmed.
+### Browser
 
-One-time setup: install R from cran.r-project.org, then in R:
-`install.packages(c("earth","quantreg","MASS","jsonlite"))`
+Open `docs/index.html` in a current browser, or host it: GitHub repository Settings, Pages, deploy from branch `main`, folder `/docs`. The page opens empty. Try the demo market (step 03) loads and runs a synthetic demo market; your first file (subject, comps or market) clears it.
 
-Each run (from a terminal in the folder with your files):
-`Rscript R/mars_adjustment_support.R sales.csv subject.csv comps.txt out/`
+1. Subject: enter the effective date, your name and the file number for the report, then load the subject from a Spark CSV or type it in, as of the effective date.
+2. Comps: load the comps in your report from a Spark CSV, or type them in. Edited values are treated as verified data for the grid; the model keeps the MLS record. Each comp's record gets the same listing check as the pool sales.
+3. Market: load the MLS export (CSV), every closed sale of the property type in the market over the whole window (up to six years is fine). Bright MLS (Spark) columns map automatically; other exports can be mapped by hand. Bedrooms and baths are read above grade (total minus the lower-level count). The page says which of your comps are in the file.
+4. Pool and rules: set the similarity ranges for the adjustment pool (GLA, year built, lot size in square feet), check the data rules and weights, and pick the FHFA series (the county is preselected from the export's County column when it is one of the eleven built in).
+5. Run. Type your own grid adjustments into the result grid to see which fall inside the model range. **Print report** opens the print dialog with the Letter report (pick Save as PDF); **Save report file** keeps an HTML copy. Copy the grid (Excel or CSV), the workfile note, or the full JSON.
 
-### Input File Formats
+### R
 
-**`sales.csv`** — one row per comparable sale:
+One-time setup: install R, then in R
 
-| Column | Format | Description |
+```
+install.packages(c("earth", "MASS", "jsonlite", "digest"))
+```
+
+Each run:
+
+```
+Rscript R/mars_adjustment_support.R sales.csv subject.csv comps.txt out/ [config.json]
+```
+
+Pass `comps.txt,comps.csv` to combine MLS numbers with verified comp rows.
+
+---
+
+## Inputs
+
+**sales.csv**: a raw Bright MLS (Spark) export, or the standard schema:
+
+| Column | Notes |
+|---|---|
+| `mls_id`, `address`, `tax_id` | Tax ID (else address) identifies repeat sales |
+| `sale_price` | Gross closed price |
+| `sale_date`, `contract_date`, `list_date` | YYYY-MM-DD (M/D/YYYY also read). `list_date` is the MLS entry date. |
+| `gla` | Above-grade finished square feet |
+| `beds_ag`, `fb_ag`, `hb_ag` | Bedrooms, full baths and half baths above grade. From a Bright export: Beds, Bathrooms Full and Bathrooms Half minus the Lower Levels Total fields (blank read as 0). |
+| `garage`, `carport` | Spaces. Blank in a Bright export means none. |
+| `pool` | 1 or 0 (private pool only: "Yes - Personal") |
+| `lot_sf` | Lot square feet (Lot Size SqFt, else acres x 43,560) |
+| `year_built`, `levels` | Background controls |
+| `fin_bsmt`, `ll_blank` | 1 or 0: finished basement; lower-level room fields all blank. Read from Bright's basement fields. Finished basement is a background control; both feed the listing check. |
+| `zip`, `subdivision`, `county` | Kept for the record; county picks the FHFA series. Location is off unless you name a column. |
+| `sale_type`, `status`, `arms_length`, `new_construction` | Cleaning |
+
+Older files still load: `ag_baths` is split into full and half baths, and `lot_ac` is converted to square feet. In the standard schema a blank is unknown; enter 0 for none.
+
+**subject.csv**: one row with `effective_date` (required) and the same feature columns, `subject_is_new` (1 keeps new-construction sales) and optional `gla_band` for the local validation check.
+
+**comps.txt**: one MLS number per line. **comps.csv**: full rows for comps that are not in the export or that you verified.
+
+**config.json** (optional, any subset):
+
+| Key | Default | Meaning |
 |---|---|---|
-| `mls_id` | text | MLS number, unique per sale |
-| `address` | text | Property address |
-| `sale_price` | number | Gross sale price |
-| `sale_date` | YYYY-MM-DD | Closing date |
-| `concessions` | number | Seller concessions in $ (0 if none) |
-| `gla` | number | Gross living area, above grade, sf |
-| `lot_sf` | number | Lot size, sf |
-| `garage` | number | Garage spaces |
-| `full_baths` | number | Full bathrooms |
-| `half_baths` | number | Half bathrooms |
-| `bsmt_fin_sf` | number | Finished basement, sf |
-| `bsmt_unf_sf` | number | Unfinished basement, sf |
-| `year_built` | number | Year built |
-| `levels` | number | Story count |
-| `subdivision` | text | Subdivision/neighborhood name |
-| `arms_length` | 1 or 0 | 1 = arm's-length sale |
-| `new_construction` | 1 or 0 | 1 = new construction sale |
-| `to_be_built` | 1 or 0 | 1 = not-yet-closed listing (no market price yet) |
+| `date_basis` | `"close"` | `"close"` or `"contract"` |
+| `trim_contract_edge` | `true` | Contract clock only: drop contracts dated before the first closing in the file |
+| `exclude_after_effective` | `true` | Only sales closed on or before the effective date |
+| `features` | lot_sf, beds_ag, fb_ag, hb_ag, gla, garage, carport, pool | Priced lines, in grid order |
+| `controls` | year_built, levels, fin_bsmt | Background controls: in the model, never on the grid |
+| `min_vary` | `10` | Pool sales that must differ from the most common value to price a line |
+| `count_weight_cut` | `2` | A count more than this from typical for the sale's size gets weight cut/distance |
+| `lumped_weight` | `0.5` | Extra weight factor for a finished basement with blank lower-level rooms and more main-line rooms than typical |
+| `norm_share`, `norm_min` | `0.2`, `30` | Typical count = median among the nearest 20% of the sales by GLA, at least 30 |
+| `huber_k` | `1.345` | Huber weight constant, in robust SDs |
+| `clip_for_selection` | `true` | Where MARS looks for bends, far-out counts are pulled in to the edge of the normal band |
+| `location`, `location_min_n` | `""`, `5` | Location column (empty = the whole export is one market) and pooling threshold |
+| `exclude_sale_types` | REO, BANK OWNED, SHORT SALE, FORECLOSURE, AUCTION | Matched against Sale Type |
+| `exclude_flip_purchases`, `flip_days`, `flip_ratio` | `true`, `365`, `1.2` | Likely flip rule |
+| `exclude_unexposed` | `true` | Drop sales entered in the MLS on or after closing |
+| `time_gap_days` | `91` | Newest sale older than this: time lines flagged |
+| `bootstrap` | `200` | Half-sample refits |
+| `master_seed` | `20260606` | Seeds CV folds, half-samples and Theil-Sen sampling |
+| `penalty`, `newvar_penalty`, `thresh` | `2`, `0.1`, `0.001` | earth settings; nk, minspan, endspan, nfold and ncross follow the earthUI recipe unless set. `penalty` is also the GCV cost per bend in the time index. |
+| `pool_ranges` | none | Adjustment pool, e.g. `{"gla": [2200, 3200], "year_built": [1980, null], "lot_sf": [21780, null]}`; `null` is an open end |
+| `time_knot_months` | `6` | Calendar grid the time curve may bend on (3, 6 or 12) |
+| `time_min_side` | `20` | Sales needed before and after a bend |
+| `time_season` | `"auto"` | Quarter-of-year control: `"auto"` (2+ years and 10+ sales in every quarter), `"on"`, `"off"` |
+| `time_screen_ratio` | `3` | Price screen (0 = off) |
+| `fhfa` | none | `{"label": "...", "csv": "fred_download.csv"}` or `{"label": "...", "values": [{"date": "2025-01-01", "value": 299.78}]}` |
+| `leave_comps_out` | `true` | Refit without the report comps and flag lines they move |
 
-Missing values in numeric columns are median-imputed automatically; you don't need every cell filled for every sale.
+Example (the 22406 test run):
 
-**`subject.csv`** — exactly one row, same columns as above, plus:
+```
+{"pool_ranges": {"lot_sf": [21780, null], "gla": [2200, 3200]},
+ "fhfa": {"label": "FHFA all-transactions HPI, Stafford County, VA (FRED ATNHPIUS51179A)", "csv": "ATNHPIUS51179A.csv"}}
+```
 
-| Column | Format | Description |
-|---|---|---|
-| `subject_is_new` | 1 or 0 | 1 if subject is new/newer construction (controls the new-construction exclusion rule) |
-| `gla_band` | number (optional) | Your declared GLA similarity band in sf for the Local Validation Check — defaults to 500 if omitted |
+## Outputs (R)
 
-Subject values should be filled in completely — every adjustment is computed relative to these.
+`comp_grid.csv` (one row per comp and line: amount, conditional and HC1 SEs, half-sample range and sign counts, knot and extrapolation flags, segment math, status, review flag, percent of price for the time line, leave-comps-out amount for the feature lines), `listing_weights.csv` (every sale that counts for less, with its weight and the reason), `time_index.csv` (the index by month, with its half-sample range), `time_years.csv` (yearly medians as pulled, new-construction share, and the index by year), `fhfa_check.csv` (when an FHFA series is given), `comp_influence.csv`, `segments.csv`, `battery.csv`, `exclusions.csv` (cleaning exclusions, price-screen exclusions, and sales outside the adjustment-pool ranges, which still feed the time index), `repeat_sales.csv`, `model_data.csv` (with each sale's time factor, time-adjusted price, listing weight, price weight and combined weight), `results.json`, `workfile_note.txt`. The browser page shows the same content, copies it to the clipboard and prints it as a report.
 
-**`comps.txt`** — plain text, one `mls_id` per line: the specific comps you selected for this report. Must match `mls_id` values in `sales.csv`.
+## Reading a grid line
 
-## Notes for Adopters
+* **Time line:** the comp's price times the index change from its sale date to the effective date. A comp sold in a flat stretch gets $0 (NO MODEL DIFFERENCE) with its range still shown. Segment math lists each stretch of the index the comp's period crosses, in percent per month. In the browser grid you can type a percent (8%) or dollars.
+* Feature lines: g(subject) minus g(comp) for that variable on time-adjusted prices, the standard grid direction, per sf of site, per bedroom, per bath, per sf of GLA, per garage or carport space, per pool. Knot safe: a line that crosses a knot is the sum of its segments, and the segment math is shown.
+* **SUPPORTED**: same sign in at least 90% of the half-sample refits. **SUPPORTED, SIZE VARIABLE**: at least 60%. **UNSTABLE**: under 60%. **NOT ENOUGH DATA**: fewer than 10 pool sales differ from the most common value (subject and comp alike read NO MODEL DIFFERENCE instead). Nothing is filled in.
+* **OUTSIDE MODELED DATA RANGE**: the comp or subject sits beyond the modeled sales; the line is an extrapolation. **REVERSED SEGMENT**: a segment runs against the normal market direction (more GLA, site, rooms, garage and so on adding value). **FHFA CHECK**: FHFA's change over the comp's FHFA periods falls outside this index's half-sample range over the same periods. **COMP INFLUENCE**: with the report comps left out of the fit, the line moves outside its range. **OUTSIDE ITS RANGE**: the full-data amount falls outside its own half-sample range; the refits on half the sales do not reproduce it, so treat it as unsupported. A comp whose own listing fails the listing check is named in the run notes and the comp check. The amounts are never changed by a flag.
 
-- **Your comp filter vs. the model.** Characteristic filters (size band + levels, or whatever fits your market) are excellent for *selecting comps* and for the *Local Validation Check*. Do not estimate primary coefficients from the filtered batch alone — range restriction inflates standard errors precisely because the batch is homogeneous. Let the full dataset estimate; let your batch validate.
-- **The GLA band is a similarity heuristic, not a rule.** It scales with the subject — a tighter band for smaller homes, wider for larger — because its job is to auto-capture the most similar comps (which in cohort-driven markets also tends to bracket price naturally, as an outcome). Declare your band per assignment; it is recorded in the Local Validation section.
-- **Never filter sales by price.** Filtering on characteristics is fine; filtering on the dependent variable biases every adjustment toward zero and creates an anchoring critique. If your characteristic filter happens to produce price clustering, that's evidence it works — not a screen you applied.
-- **Cleaning is assignment-aware, not blanket policy.** The clearest example is new construction: those sales are noise when your subject is a 1985 colonial and signal when your subject is a 2024 build. Exclusion rules exist to serve comparability to *this* subject.
-- **Market-specific variables.** "Levels" earns its slot in markets where stories × size proxy for cohort/vintage (e.g., DMV colonials vs. split levels). Substitute or add the cohort proxy that plays that role in *your* market.
-- **Data quantity vs. data drift.** Prefer a recent window with 150–300 sales over reaching back many years; long lookbacks introduce taste-change interactions with sale date that are hard to control.
-- **Data handling.** MLS listing and tax-record inputs are public-record market data, and subject details appear on outputs normally. Follow AO-41's ETHICS RULE for anything that is genuinely confidential in your assignment (client identity, assignment results, non-public information) — don't enter that into tools that can't safeguard it.
-- **Compliance.** This spec and its language are *designed to support* USPAP compliance and AO-41-consistent documentation. No tool can be USPAP-compliant — that determination is yours, per assignment, in your jurisdiction. Have your E&O carrier or an appraisal attorney bless the Scope block once before adopting it as boilerplate.
-- **Competency.** AO-41's COMPETENCY RULE discussion applies: don't rely on outputs or terminology you don't understand. Read the Methods glossary; understand what a hinge function and a GCV-pruned model are before you sign a report that leans on them.
+## Divorce and other retrospective assignments
 
-*MARS/Regression Adjustment Support Workflow v1.2 — July 2026. Contributions and market-specific forks welcome.*
+* Enter the date of value. Sales that closed after it drop out, and the flip rule only uses resales that had closed by that date. The time index, its bends and the FHFA comparison are all built from what was knowable on that date.
+* Enter the subject as it was on that date.
+* The workfile note records the data rules, the data SHA-256 and the seed. Anyone with the same export can rerun the analysis in the browser or in R and get the same numbers.
+
+## Scope and use language
+
+> Scope and use: statistical analysis supporting the appraiser's adjustment development. Per-unit figures and line amounts are model estimates with stated uncertainty, not confirmed market facts. The appraiser makes all final adjustment selections, within or outside the supported ranges. No indicated, reconciled or opinion-of-value figure is produced. Prepared with reference to USPAP Advisory Opinion 41 (Use of Technology in an Appraisal or Appraisal Review Assignment): the tool cannot comply with USPAP; the appraiser remains responsible for judging whether this output is accurate and relevant to the assignment.
+
+Have your E&O carrier or an appraisal attorney review this block once before adopting it as boilerplate.
+
+## Using an AI assistant
+
+Ask the assistant to run the R script, not to estimate from the data:
+
+```
+Run R/mars_adjustment_support.R (v2.3.1) from this repository on my files with the default
+settings unless I say otherwise: sales.csv (my MLS export), subject.csv (effective date
+and subject features), comps.txt. Do not change the code and do not impute anything.
+Report comp_grid.csv line by line with the amount, half-sample range and status, list every
+flag and every listing in listing_weights.csv, and include workfile_note.txt.
+Never produce an indicated, reconciled or opinion-of-value figure.
+```
+
+## Notes for adopters
+
+* Export the whole market for the window; let the similarity ranges narrow the adjustment pool. Keep the pool at 150 or more sales: narrower ranges trade bias for noise. The time index always uses the whole export.
+* Never filter sales by price. Filtering on the dependent variable biases every adjustment toward zero. The one exception is the price screen, which only removes sales more than 3x away from what the time model expects (data errors and non-market sales), lists each one, and can be switched off.
+* Cleaning is assignment aware: new-construction sales are noise for a 1985 colonial and signal for a 2024 build.
+* Year built and levels (story count) stay in the model as background controls because age and stories proxy for cohort and style in many markets. They never print as grid lines.
+* Long windows are fine for the time index (several hundred sales over four to six years is a good pool). The FHFA check is only as current as the FHFA series: the built-in county series are annual through 2025.
+* The model only sees what the MLS records. Condition, quality, view, finish and basement finish are not in the data; the comp check (residual and CQA rank) shows how far each comp sold above or below the model.
+* No tool can be USPAP compliant. That determination is the appraiser's, per assignment.
+
+## Credits
+
+MARS: J. H. Friedman, "Multivariate Adaptive Regression Splines," *Annals of Statistics* 19(1), 1991. The `earth` R package by S. Milborrow, from whose source the JavaScript engine was reimplemented. Parameter recipe, the value-contribution adjustment convention and the CQA rank follow W. Craytor's open-source earthUI.
+
+*MARS / Regression Adjustment Support v2.3.1. MIT License.*
