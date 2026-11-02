@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # =============================================================================
-# MARS / Regression Adjustment Support: Reference Implementation v2.3.1
+# MARS / Regression Adjustment Support: Reference Implementation v2.4
 # DC Metro Appraisals
 # =============================================================================
 # Computes adjustment SUPPORT only. It produces no indicated value, no
@@ -66,6 +66,24 @@
 # OUTSIDE ITS RANGE, a trend that most refits drop gets a warning, and the GLA local
 # validation reads NOT INFORMATIVE when its slope is too noisy to test anything.
 #
+# v2.4 (support, not a grid): the tool prints per-unit rates, value curves and
+# time support; it no longer prints comp-by-comp grid amounts (the comp lines
+# stay internal for the leave-comps-out check). Beside MARS sits a multiple
+# regression: least squares with the listing weights (no price weights), every
+# priced line and control as a straight line, site as ln(1 + lot sf); it never
+# uses MARS. Theil-Sen,
+# median (LAD) and grouped slopes now run on the multiple regression's partial
+# residuals. Both models get the same held-out test: pooled out-of-fold
+# R-squared and the median absolute percentage miss over every sale predicted
+# while left out. A MARS segment reads no model rate when the pool is under
+# mars_min_pool sales (150), when MARS's pooled out-of-fold R-squared is under
+# mars_min_oof (0), or when fewer than seg_min_sales pool sales (20) sit inside
+# it. Value curves get half-sample bands. Comps sold more than 12 months before
+# the effective date get a time-support table (index, FHFA, yearly medians, in
+# percent). Sales the appraiser excludes by MLS number carry the reason given.
+# The local GLA validation and the comp residual table are gone. Run notes state
+# facts only.
+#
 # USAGE
 #   Rscript mars_adjustment_support.R <sales.csv> <subject.csv> <comps> <out_dir> [config.json]
 #
@@ -85,14 +103,18 @@
 #   bg_full_baths/bg_half_baths, ag_baths, lot_ac.
 #
 # OUTPUTS (out_dir)
-#   results.json, comp_grid.csv, segments.csv, time_index.csv (monthly),
-#   time_years.csv (yearly medians vs index), fhfa_check.csv (when an FHFA
-#   series is given), comp_influence.csv, listing_weights.csv, battery.csv,
-#   exclusions.csv, repeat_sales.csv, model_data.csv, workfile_note.txt
+#   results.json, per_unit_rates.csv (MARS beside the multiple regression and
+#   the robust slopes), segments.csv, value_curves.csv, mr_coefficients.csv,
+#   time_index.csv (monthly), time_years.csv (yearly medians vs index),
+#   time_support.csv (comps over 12 months), fhfa_check.csv (when an FHFA series
+#   is given), comp_influence.csv and mr_influence.csv (leave-comps-out),
+#   records_to_check.csv, listing_weights.csv, exclusions.csv, repeat_sales.csv,
+#   model_data.csv, comp_lines.csv (internal comp lines behind the
+#   leave-comps-out check), workfile_note.txt
 # =============================================================================
 
 suppressMessages({ library(earth); library(jsonlite) })
-ENGINE_VERSION <- "2.3.1"
+ENGINE_VERSION <- "2.4.0"
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 4) stop("Usage: Rscript mars_adjustment_support.R sales.csv subject.csv comps.txt[,comps.csv] out_dir [config.json]")
@@ -125,8 +147,6 @@ cfg <- list(
   degree = 1L, penalty = 2, newvar_penalty = 0.1, thresh = 0.001,
   nk = NA, minspan = NA, endspan = NA, nfold = NA, ncross = NA,
   bootstrap = 200L,                   # half-sample refits (name kept for v1.x config files)
-  gla_band = NA,
-  interaction_check = TRUE,
   exclude_flip_purchases = TRUE,      # earlier sale of a property resold within flip_days for flip_ratio x or more
   flip_days = 365L, flip_ratio = 1.20,
   exclude_unexposed = TRUE,           # MLS entry date on or after the closing date (no MLS exposure)
@@ -143,8 +163,12 @@ cfg <- list(
   time_season = "auto",               # quarter-of-year control: "auto" (2+ years and 10+ sales in every quarter), "on", "off"
   fhfa = NULL,                        # list(label = "...", csv = "fred.csv") or list(label = "...", values = [{date, value}])
   leave_comps_out = TRUE,             # refit the adjustment model without the report comps and flag lines that move
-  time_screen_ratio = 3               # price screen: a sale more than 3x above or below the time model's estimate is
+  time_screen_ratio = 3,              # price screen: a sale more than 3x above or below the time model's estimate is
                                       # a data error or not a market sale (listed, left out). 0 = off.
+  mars_min_pool = 150,                # a pool smaller than this: every MARS segment reads no model rate
+  seg_min_sales = 20,                 # a MARS segment with fewer pool sales than this (ends included) reads no model rate
+  mars_min_oof = 0,                   # MARS pooled out-of-fold R-squared below this: every MARS segment reads no model rate
+  manual_exclude = list()             # list of {mls_id, reason}: sales the appraiser excludes, with the reason printed
 )
 if (length(args) >= 5) { user_cfg <- fromJSON(args[5]); cfg[names(user_cfg)] <- user_cfg }
 if (is.null(cfg$pool_ranges)) cfg$pool_ranges <- list()
@@ -153,7 +177,7 @@ if (is.null(cfg$location)) cfg$location <- ""
 # (the browser engine reproduces this generator draw for draw).
 RNGkind(kind = "Mersenne-Twister", normal.kind = "Inversion", sample.kind = "Rejection")
 seeds <- list(cv = cfg$master_seed + 1L, boot = cfg$master_seed + 10000L, time = cfg$master_seed + 20000L,
-              theilsen = cfg$master_seed + 30000L, lms = cfg$master_seed + 40000L)
+              theilsen = cfg$master_seed + 30000L)
 
 ## ---- Helpers -----------------------------------------------------------------
 to_num <- function(x) suppressWarnings(as.numeric(gsub("[$, ]", "", as.character(x))))
@@ -214,6 +238,10 @@ irls_fit <- function(B, yv, L) {
   w <- L * h; f <- wls(B, yv, w); if (is.null(f)) return(NULL)
   f$w <- w; f$h <- h; f$resid <- yv - f$fit; f
 }
+q_or_na <- function(v, p) { v <- v[!is.na(v)]; if (length(v) >= 20) unname(quantile(v, p)) else NA_real_ }
+f2 <- function(v) if (is.na(v)) "NA" else sprintf("%.2f", v)
+f1p <- function(v) if (is.na(v)) "NA" else sprintf("%.1f%%", 100 * v)
+gfmt <- function(v) as.character(v)
 gcv_fn <- function(nterms, n, rss, penalty) {   # earth's GCV: effective parameters = terms + penalty x (terms - 1) / 2
   cost <- if (penalty < 0) 0 else (nterms + penalty * (nterms - 1) / 2) / n
   if (cost >= 1) Inf else rss / (n * (1 - cost)^2)
@@ -314,7 +342,6 @@ eff_date <- to_date(subject$effective_date)
 if (is.na(eff_date)) stop("effective_date could not be parsed")
 for (cn in intersect(num_cols, names(subject))) subject[[cn]] <- to_num(subject[[cn]])
 subject_is_new <- isTRUE(to_num(subject$subject_is_new) == 1)
-if (!is.null(subject$gla_band) && !blank(subject$gla_band)) cfg$gla_band <- to_num(subject$gla_band)
 
 comp_ids <- character(0); extra_comps <- NULL
 for (p in strsplit(comps_arg, ",")[[1]]) {
@@ -347,6 +374,19 @@ sales$date_used <- to_date(sales[[date_col]])
 sales$exclude_reason <- ""
 mark <- function(cond, reason) { cond[is.na(cond)] <- FALSE
   i <- which(cond & sales$exclude_reason == ""); sales$exclude_reason[i] <<- reason }
+# sales the appraiser excludes by MLS number, each with the reason the appraiser gives (printed in the exclusions)
+mx_ids <- character(0); mx_reason <- character(0)
+local({
+  mx <- cfg$manual_exclude; ids <- character(0); rs <- character(0)
+  if (is.data.frame(mx) && nrow(mx)) { ids <- as.character(mx$mls_id); rs <- if ("reason" %in% names(mx)) as.character(mx$reason) else rep("", length(ids)) }
+  else if (is.list(mx) && length(mx)) { ids <- vapply(mx, function(m) if (is.null(m$mls_id)) "" else as.character(m$mls_id), "")
+    rs <- vapply(mx, function(m) if (is.null(m$reason)) "" else as.character(m$reason), "") }
+  ids[is.na(ids)] <- ""; rs[is.na(rs)] <- ""; ids <- trimws(ids); rs <- trimws(rs)
+  for (j in seq_along(ids)) { if (ids[j] == "") next
+    if (!ids[j] %in% mx_ids) { mx_ids <<- c(mx_ids, ids[j]); mx_reason <<- c(mx_reason, rs[j]) } else mx_reason[match(ids[j], mx_ids)] <<- rs[j] }
+})
+manual_why <- function(j) paste0("excluded by the appraiser: ", if (mx_reason[j] == "") "no reason given" else mx_reason[j])
+for (j in seq_along(mx_ids)) mark(!is.na(sales$mls_id) & sales$mls_id == mx_ids[j], manual_why(j))
 if ("status" %in% names(sales)) mark(!is.na(sales$status) & !(sales$status %in% c("CLS", "CLOSED", "SOLD", "")), "not a closed sale")
 mark(is.na(sales$sale_price) | sales$sale_price <= 1000, "no closed price")
 if ("arms_length" %in% names(sales)) mark(!is.na(sales$arms_length) & sales$arms_length == 0, "non-arm's-length (flag)")
@@ -383,6 +423,11 @@ mark(!is.na(yb_all) & (yb_all < 1700 | yb_all > 2100), "impossible year built")
 for (f in model_vars) mark(is.na(sales[[f]]), sprintf("unknown %s (left blank on a property where blank is not 'none')", tolower(label_of(f))))
 loc_var <- if (is.null(cfg$location) || cfg$location == "" || !cfg$location %in% names(sales) || all(blank(sales[[cfg$location]]))) "" else cfg$location
 if (loc_var != "") mark(blank(sales[[loc_var]]), sprintf("no %s value", loc_var))
+if (length(mx_ids)) {
+  m_hit <- mx_ids[mx_ids %in% sales$mls_id]; m_miss <- mx_ids[!mx_ids %in% sales$mls_id]
+  note("%s", paste0("Excluded by the appraiser: ", if (length(m_hit)) paste(sprintf("%s (%s)", m_hit, ifelse(mx_reason[match(m_hit, mx_ids)] == "", "no reason given", mx_reason[match(m_hit, mx_ids)])), collapse = "; ") else "none of the listed MLS numbers is in the export",
+    ".", if (length(m_miss)) paste0(" Not in the export: ", paste(m_miss, collapse = ", "), ".") else ""))
+}
 
 ## ---- Market exposure and repeat sales ------------------------------------------
 close_dt <- if ("sale_date" %in% names(sales)) to_date(sales$sale_date) else as.Date(rep(NA, nrow(sales)))
@@ -555,7 +600,7 @@ build_market <- function() {
   dm$price_used <<- dm$sale_price
   dm$sale_age <<- as.numeric(eff_date - dm$date_used)
   n_market <<- nrow(dm)
-  if (n_market < 60) stop(sprintf("Only %d usable sales after cleaning. Widen the market area or the time window (aim for 150 to 300).", n_market))
+  if (n_market < 60) stop(sprintf("Only %d usable sales after cleaning; a run needs at least 60.", n_market))
   ip <- rep(TRUE, n_market); pd <- character(0); pu <- list()
   for (f in names(cfg$pool_ranges)) {
     r <- suppressWarnings(as.numeric(unlist(cfg$pool_ranges[[f]])))
@@ -620,7 +665,7 @@ note("Time index: %d clean sales, log-price model with the model features%s%s; b
      if (!length(tm$terms)) "no time trend (flat)" else paste(c(if (any(is.na(tm$terms))) "overall slope", if (length(tm_bends)) paste("bends at", paste(format(tm_bends), collapse = ", "))), collapse = "; "),
      tm$r2, tm_down)
 if (!season_on && identical(as.character(cfg$time_season), "auto")) note("Time index: quarter-of-year control off (needs 2 years of sales and 10 in every quarter).")
-if (n_market < 200) note("NOTE: %d clean sales for the time index; its ranges will be wide. Several hundred over the window is better.", n_market)
+if (n_market < 200) note("NOTE: the time index rests on %d clean sales (under 200).", n_market)
 
 # Adjustment pool, with prices brought to the effective date by the time index
 d <- dm[in_pool, , drop = FALSE]
@@ -631,17 +676,16 @@ pool_out <- dm[!in_pool, intersect(c("mls_id", "address", "sale_price", date_col
 if (nrow(pool_out)) pool_out$exclude_reason <- "outside the adjustment-pool ranges (used for the time index only)"
 if (length(pool_desc)) note("Adjustment pool: %d of %d clean sales inside your ranges (%s).", n, n_market, paste(pool_desc, collapse = "; ")) else
   note("Adjustment pool: all %d clean sales (no similarity ranges set).", n)
-if (n < 60) stop(sprintf("Only %d sales inside the adjustment-pool ranges. Widen the ranges (the time index still uses all %d clean sales).", n, n_market))
-if (n < 150) note("NOTE: %d sales in the adjustment pool; earthUI and this workflow target 150 to 300.", n)
+if (n < 60) stop(sprintf("Only %d sales inside the adjustment-pool ranges; the adjustment model needs at least 60 (the time index uses all %d clean sales).", n, n_market))
 
 # Which variables the pool can price: at least min_vary sales must differ from the most common value
 vary_n <- vapply(model_vars, function(f) as.integer(n - max(table(d[[f]]))), integer(1))
 eligible <- model_vars[vary_n >= cfg$min_vary]
 thin_priced <- features[!features %in% eligible]
 ctrl_used <- controls[controls %in% eligible]
-note("Priced on the grid: %s.%s", paste(vapply(features[features %in% eligible], label_of, character(1)), collapse = ", "),
-     if (length(ctrl_used)) sprintf(" Background controls in the model, never on the grid: %s.", paste(tolower(vapply(ctrl_used, label_of, character(1))), collapse = ", ")) else "")
-if (length(thin_priced)) note("Not enough data to price: %s. A line needs %d; those lines read NOT ENOUGH DATA unless the subject and comp match.",
+note("Lines priced: %s.%s", paste(vapply(features[features %in% eligible], label_of, character(1)), collapse = ", "),
+     if (length(ctrl_used)) sprintf(" Background controls in both models, never priced: %s.", paste(tolower(vapply(ctrl_used, label_of, character(1))), collapse = ", ")) else "")
+if (length(thin_priced)) note("Not enough data to price: %s; a line needs %d.",
   paste(sprintf("%s (%d of %d sales differ from the most common value)", vapply(thin_priced, label_of, character(1)), vary_n[thin_priced], n), collapse = "; "), as.integer(cfg$min_vary))
 
 ## ---- Location coding (off unless a location variable is set) ------------------------
@@ -737,6 +781,26 @@ fit_adj <- function(ix, rl) {
 }
 predict_of <- function(tms, Xn) drop(basis_of(tms, Xn) %*% tms$coef)
 
+## ---- The multiple regression: least squares with the listing weights (no price weights), every model column a straight line ----
+# Site enters as ln(1 + lot sf), so its value per sf falls as lots get bigger. It never uses MARS.
+mr_cols <- X; if ("lot_sf" %in% colnames(mr_cols)) mr_cols[, "lot_sf"] <- log1p(mr_cols[, "lot_sf"])
+mr_fit <- function(rows = NULL) {   # weighted least squares as ordinary least squares on rows scaled by the root of the weight;
+  idx <- if (is.null(rows)) seq_len(n) else rows   # columns that do not vary inside the rows are left out of that fit
+  Xr <- mr_cols[idx, , drop = FALSE]; sw <- sqrt(Lw[idx]); yr <- y[idx] * sw
+  use <- which(apply(Xr, 2, function(v) max(v) > min(v)))
+  Z <- cbind(sw, Xr[, use, drop = FALSE] * sw)
+  sc <- sqrt(colSums(Z^2)); sc[!(sc > 0)] <- 1   # same column-normalized Cholesky as the browser engine
+  R <- tryCatch(chol(crossprod(Z) / outer(sc, sc)), error = function(e) NULL)
+  if (is.null(R) || min(diag(R))^2 <= 1e-12) return(NULL)
+  inv <- chol2inv(R); beta <- drop(inv %*% (drop(crossprod(Z, yr)) / sc)) / sc
+  coef <- setNames(rep(NA_real_, ncol(mr_cols)), colnames(mr_cols)); coef[use] <- beta[-1]
+  list(a = beta[1], coef = coef, use = use, fit = drop(cbind(1, Xr[, use, drop = FALSE]) %*% beta), rss = sum((yr - drop(Z %*% beta))^2), XtXi = inv / outer(sc, sc))
+}
+mr_predict <- function(m, Xn) m$a + drop(Xn[, m$use, drop = FALSE] %*% m$coef[m$use])
+# held-out score over every sale predicted while left out: R-squared and the median absolute percentage miss
+pooled_score <- function(pv) { ok <- !is.na(pv); if (sum(ok) < 2) return(NULL); yy <- y[ok]; pp <- pv[ok]
+  list(r2 = 1 - sum((yy - pp)^2) / sum((yy - mean(yy))^2), mdape = median(abs(yy - pp) / abs(yy))) }
+
 mod <- fit_adj(NULL, rec_full)
 mterms <- mod$terms; k <- nrow(mterms); beta <- mterms$coef
 term_group <- groups_of(mterms)
@@ -760,21 +824,26 @@ note("Weighted fit: %d of %d pool sales priced far from the model (beyond 1.345 
 ## ---- Cross-validation: the whole procedure refit on each fold (folds drawn the way earth draws them) --
 set.seed(seeds$cv)
 lab <- (seq_len(n) - 1L) %% cfg$nfold
-cv_rsq <- numeric(0)
+cv_rsq <- numeric(0); oof_m <- numeric(0); md_m <- numeric(0); oof_r <- numeric(0); md_r <- numeric(0)
 for (cc in seq_len(cfg$ncross)) {
   g <- lab[sample.int(n)]; if (all(y != 0)) g <- lab[sample.int(n)]
+  p_m <- rep(NA_real_, n); p_r <- rep(NA_real_, n)
   for (fo in 0:(cfg$nfold - 1L)) {
     te <- which(g == fo); tr <- which(g != fo)
+    mrf <- mr_fit(tr); if (!is.null(mrf)) p_r[te] <- mr_predict(mrf, mr_cols[te, , drop = FALSE])
     mf <- tryCatch(fit_adj(tr, rec_full), error = function(e) NULL); if (is.null(mf)) next
-    pr <- predict_of(mf$terms, X[te, , drop = FALSE])
+    pr <- predict_of(mf$terms, X[te, , drop = FALSE]); p_m[te] <- pr
     cv_rsq <- c(cv_rsq, 1 - sum((y[te] - pr)^2) / sum((y[te] - mean(y[te]))^2))
   }
+  sm <- pooled_score(p_m); sr <- pooled_score(p_r)
+  if (!is.null(sm)) { oof_m <- c(oof_m, sm$r2); md_m <- c(md_m, sm$mdape) }
+  if (!is.null(sr)) { oof_r <- c(oof_r, sr$r2); md_r <- c(md_r, sr$mdape) }
 }
 cvrsq <- mean(cv_rsq); cvrsq_sd <- sd(cv_rsq)
+oof_mars <- mean(oof_m); md_mars <- mean(md_m); oof_mr <- mean(oof_r); md_mr <- mean(md_r)
 msg("Model: %d terms, RSq %.3f, GRSq %.3f (weighted), CVRSq %.3f (sd %.3f)", k, rsq_w, grsq_w, cvrsq, cvrsq_sd)
-if (cvrsq < 0.5 || (!is.na(cvrsq_sd) && cvrsq_sd > 0.3))
-  note("WARNING: cross-validated R-squared is %.2f (sd %.2f) against %.2f in-sample: the model holds up poorly on sales it was not fit on. In a pool of similar houses most of the price spread is condition and updating, which the MLS fields do not carry; a bigger pull (more sales with real differences in the priced features) is the fix.",
-       cvrsq, cvrsq_sd, rsq_w)
+note("Held-out test (%d-fold x %d, the same folds for both models): MARS pooled out-of-fold R-squared %s, typical miss %s; multiple regression %s, typical miss %s. MARS cross-validated R-squared averaged fold by fold %s (sd %s).",
+     as.integer(cfg$nfold), as.integer(cfg$ncross), f2(oof_mars), f1p(md_mars), f2(oof_mr), f1p(md_mr), f2(cvrsq), f2(cvrsq_sd))
 
 ## ---- Basis machinery ------------------------------------------------------------
 g_contrib <- function(Xrow, grp) { b <- basis_of(mterms, Xrow); idx <- which(term_group == grp); sum(b[1, idx] * beta[idx]) }
@@ -810,16 +879,16 @@ comp_rows$price_comp <- comp_rows$sale_price
 lost_i <- which(!is.na(comp_rows$mls_id) & comp_rows$mls_id != "" & !comp_rows$mls_id %in% dm$mls_id)
 lost <- vapply(lost_i, function(i) { e <- excl$exclude_reason[match(comp_rows$mls_id[i], excl$mls_id)]
   sprintf("%s (%s)", comp_rows$mls_id[i], if (length(e) && !is.na(e)) e else "not in the sales file") }, character(1))
-if (length(lost)) note("Comps not in the modeled data (still adjusted, flagged): %s.", paste(lost, collapse = "; "))
+if (length(lost)) note("Comps not in the modeled data: %s.", paste(lost, collapse = "; "))
 outside <- comp_rows$mls_id[comp_rows$mls_id %in% dm$mls_id[!in_pool]]
-if (length(outside)) note("Comps outside your adjustment-pool ranges (still adjusted; lines that fall outside the modeled sales are flagged): %s.", paste(outside, collapse = ", "))
+if (length(outside)) note("Comps outside the adjustment-pool ranges: %s.", paste(outside, collapse = ", "))
 comp_lw <- lapply(seq_len(nrow(comp_rows)), function(i) { cr <- comp_rows[i, ]
   ok <- all(vapply(count_vars, function(f) f %in% names(cr) && !is.na(suppressWarnings(as.numeric(cr[[f]]))), logical(1)))
   if (!ok) return(list(w = NA_real_, why = character(0)))
   if (!"fin_bsmt" %in% names(cr)) cr$fin_bsmt <- NA; if (!"ll_blank" %in% names(cr)) cr$ll_blank <- NA
   listing_weight(cr, norms_at(as.numeric(cr$gla))) })
 off <- which(vapply(comp_lw, function(x) isTRUE(x$w < 1), logical(1)))
-if (length(off)) note("Comp listings that look off by the same test the pool sales get: %s. Check those records before relying on their count lines.",
+if (length(off)) note("Comp listings that look off by the same test the pool sales get: %s.",
   paste(sprintf("C%d %s (%s)", off, ifelse(is.na(comp_rows$address[off]) | comp_rows$address[off] == "", comp_rows$mls_id[off], comp_rows$address[off]),
                 vapply(comp_lw[off], function(x) paste(x$why, collapse = "; "), character(1))), collapse = "; "))
 
@@ -832,7 +901,7 @@ range_lo <- function(f) ranges[[f]][1]
 # to cfg$time_gap_days and flagged as extrapolation beyond that.
 time_gap <- min(dm$sale_age); time_hi <- max(dm$sale_age)
 if (time_gap > cfg$time_gap_days)
-  note("WARNING: the most recent clean sale is %d days before the effective date (more than %d). Time lines extend the last index segment beyond the data and are flagged.",
+  note("WARNING: the most recent clean sale is %d days before the effective date (more than %d); the index carries its last segment past the data to the effective date.",
        round(time_gap), as.integer(cfg$time_gap_days))
 time_range_lo <- if (time_gap <= cfg$time_gap_days) 0 else time_gap
 
@@ -854,8 +923,7 @@ reversal_flag <- function(f, a, b) {   # review prompt only; amounts are never c
   bad <- s[s$slope < 0 & abs(s$slope * (s$to - s$from)) >= 0.5, , drop = FALSE]
   if (!nrow(bad)) return("")
   paste0("REVERSED SEGMENT: ", paste(sprintf("%s to %s at %s/%s (%s)", sapply(bad$from, fmt_val, f = f), sapply(bad$to, fmt_val, f = f),
-         fmt_rate(bad$slope), unit_of(f), fmt_money(bad$slope * (bad$to - bad$from))), collapse = "; "),
-         ". More of this feature normally adds value; check the segment and its value curve before relying on this line.")
+         fmt_rate(bad$slope), unit_of(f), fmt_money(bad$slope * (bad$to - bad$from))), collapse = "; "), ".")
 }
 time_bend_ages <- function() { ks <- tm$terms[!is.na(tm$terms)]; ks[ks > 0] }
 time_seg_text <- function(a) {   # index segments between a comp's sale (a months back) and the effective date, oldest first
@@ -969,13 +1037,23 @@ hs_apply <- function(grid, r, v) {   # half-sample range and status for grid row
   grid
 }
 
+## ---- Value-curve points: 61 even steps across the pool's range plus the range ends and the bends ----
+curve_feats <- features[features %in% groups_in_model]
+curve_x <- lapply(setNames(curve_feats, curve_feats), function(f) { rg <- ranges[[f]]; ks <- knots_of(f)
+  bnd <- sort(unique(c(rg[1], ks[ks > rg[1] & ks < rg[2]], rg[2]))); sort(c(rg[1] + (rg[2] - rg[1]) * (0:60) / 60, bnd)) })
+curve_rows <- function(f) { xs <- curve_x[[f]]; Xg <- X_subj[rep(1, length(xs)), , drop = FALSE]; Xg[, f] <- xs; Xg }
+contrib_of <- function(tms, tg, Xn, f) { b <- basis_of(tms, Xn); idx <- which(tg == f); if (!length(idx)) return(rep(0, nrow(Xn))); drop(b[, idx, drop = FALSE] %*% tms$coef[idx]) }
+
 ## ---- Half-sample stability: refit the whole procedure (selection uncertainty) --------
+# The multiple regression is refit on the same halves; each MARS refit's value curves give the chart bands.
 # Half-samples drawn WITHOUT replacement (delete-d jackknife, d = n/2). Each refit uses the
 # same earthUI recipe recomputed for the half-sample size, forces back any priced variable
 # MARS leaves out, and refits with weights. The time index has its own half-sample loop below.
 B_boot <- as.integer(cfg$bootstrap)
 boot_freq <- NULL
 freq_keys <- unique(vapply(pred_names, group_of, character(1)))
+mr_hs <- matrix(NA_real_, max(1, B_boot), ncol(mr_cols), dimnames = list(NULL, colnames(mr_cols)))
+band_store <- lapply(setNames(curve_feats, curve_feats), function(f) matrix(NA_real_, max(1, B_boot), length(curve_x[[f]])))
 if (B_boot > 0) {
   set.seed(seeds$boot)
   boot_adj <- array(NA_real_, dim = c(B_boot, nrow(comp_rows), max(1, length(model_lines))), dimnames = list(NULL, comp_rows$mls_id, if (length(model_lines)) model_lines else "none"))
@@ -983,11 +1061,13 @@ if (B_boot > 0) {
   half <- floor(n / 2); rec_h <- recipe(half)
   for (b in seq_len(B_boot)) {
     ix <- sample.int(n, half, replace = FALSE)
+    mrh <- mr_fit(ix); if (!is.null(mrh)) mr_hs[b, ] <- mrh$coef
     mb <- tryCatch(fit_adj(ix, rec_h), error = function(e) NULL)
     if (is.null(mb)) next
     tg <- groups_of(mb$terms)
     for (gname in mb$picked) if (gname %in% names(freq)) freq[gname] <- freq[gname] + 1
     bsb <- basis_of(mb$terms, X_subj)
+    for (f in curve_feats) band_store[[f]][b, ] <- contrib_of(mb$terms, tg, curve_rows(f), f) - contrib_of(mb$terms, tg, X_subj, f)
     for (i in seq_along(comp_X)) {
       bcb <- basis_of(mb$terms, comp_X[[i]])   # a missing comp value only blanks the lines of its own variable (NA stays in that group)
       for (gname in model_lines) { idx <- which(tg == gname); boot_adj[b, i, gname] <- if (length(idx)) sum((bsb[1, idx] - bcb[1, idx]) * mb$terms$coef[idx]) else 0 }
@@ -1026,10 +1106,9 @@ if (B_boot > 0) {
   boot_freq <- c(list(time = round(tm_freq / B_boot, 3)), as.list(boot_freq))
   msg("Half-sample stability: %d refits of the time index on n = %d", B_boot, half_m)
   if (length(tm$terms) && 2 * tm_freq < B_boot)
-    note("WARNING: the time index found a trend in the full export, but only %d of the %d half-sample refits kept one. The time lines are not stable in this export; back them with FHFA, the yearly medians or paired sales.",
+    note("WARNING: the time index found a trend in the full export, but only %d of the %d half-sample refits kept one.",
          as.integer(tm_freq), B_boot)
 }
-q_or_na <- function(v, p) { v <- v[!is.na(v)]; if (length(v) >= 20) unname(quantile(v, p)) else NA_real_ }
 month_pct <- exp(-tm_f(tm, tm_month_age)) - 1
 month_hs <- if (is.null(hs_month_f)) NULL else exp(-hs_month_f) - 1
 mkey <- format(dm$date_used, "%Y-%m")
@@ -1074,7 +1153,7 @@ mix_shift <- nrow(mix) >= 2 && diff(range(mix$new_construction_share_pct)) >= 10
 if (mix_shift) note("Mix shift: new construction was %s%% to %s%% of the sales pulled each year. Year-to-year medians move with that mix; the index holds the mix constant.",
                     format(min(mix$new_construction_share_pct)), format(max(mix$new_construction_share_pct)))
 ## ---- FHFA check: the same FHFA periods compared on both series ---------------------------
-fhfa_out <- NULL
+fhfa_out <- NULL; fhfa_sup <- list()
 if (!is.null(cfg$fhfa)) {
   fv <- if (!is.null(cfg$fhfa$csv)) { x <- read.csv(cfg$fhfa$csv, stringsAsFactors = FALSE, check.names = FALSE, colClasses = "character")
           data.frame(date = x[[1]], value = x[[2]], stringsAsFactors = FALSE) } else as.data.frame(cfg$fhfa$values, stringsAsFactors = FALSE)
@@ -1108,8 +1187,16 @@ if (!is.null(cfg$fhfa)) {
       if (is.na(pc) || is.na(pe) || is.na(grid$adjustment[r]) || !ok_period(pc)) next
       fp <- fv$value[pe] / fv$value[pc] - 1; lp <- sb_full(pc); h <- sb_hs(pc); lo <- q_or_na(h, 0.025); hi <- q_or_na(h, 0.975)
       if (!is.na(lo) && (fp < lo || fp > hi))
-        grid$review_flag[r] <- sprintf("FHFA CHECK: %s shows %s from %s to %s; these sales show %s over the same periods (half-sample range %s to %s). Find out why before relying on this time line.",
+        grid$review_flag[r] <- sprintf("FHFA CHECK: %s shows %s from %s to %s; these sales show %s over the same periods (half-sample range %s to %s).",
           flabel, fmt_pct(fp), plab(pc), plab(pe), fmt_pct(lp), fmt_pct(lo), fmt_pct(hi))
+    }
+    for (i in seq_len(nrow(comp_rows))) {   # older comps: FHFA's own change from the sale's period to the end period
+      sa <- comp_rows$sale_age[i]; if (is.na(sa) || !(sa > 365)) next
+      pc <- period_of(comp_rows$date_used[i])
+      if (is.na(pc) || is.na(pe)) { fhfa_sup[[as.character(i)]] <- list(label = flabel, missing = if (comp_rows$date_used[i] < fv$date[1]) "the FHFA series starts after this sale" else "no FHFA period for this sale"); next }
+      tot <- fv$value[pe] / fv$value[pc] - 1; mo <- as.numeric(fv$date[pe] - fv$date[pc]) / month_days
+      fhfa_sup[[as.character(i)]] <- list(label = flabel, from = plab(pc), to = plab(pe), months = mo, total = tot,
+        per_month = if (mo > 0) (1 + tot)^(1 / mo) - 1 else NA_real_, per_month_simple = if (mo > 0) tot / mo else NA_real_, ends_early = ends_early)
     }
     fhfa_out <- list(label = flabel, frequency = c(`12` = "annual", `3` = "quarterly", `1` = "monthly")[[as.character(len_m)]],
                      first_period = plab(1), last_period = plab(nrow(fv)), end_period_used = if (is.na(pe)) NA else plab(pe),
@@ -1120,6 +1207,28 @@ if (!is.null(cfg$fhfa)) {
   } else note("FHFA series has fewer than 2 usable values; FHFA check skipped.")
 }
 
+## ---- The multiple regression on the whole pool: coefficients, rates at the subject, half-sample ranges ----
+# per-unit rate: the coefficient, or for site the value per sf at the subject's lot (d/dx of b ln(1 + x))
+mr_rate <- function(f, b) if (f == "lot_sf") b / (1 + subj_df[1, "lot_sf"]) else b
+mr_full <- mr_fit(); mr <- NULL
+if (!is.null(mr_full)) {
+  k_mr <- length(mr_full$use) + 1L; s2_mr <- mr_full$rss / (n - k_mr)
+  se_mr <- setNames(rep(NA_real_, ncol(mr_cols)), colnames(mr_cols)); se_mr[mr_full$use] <- sqrt(pmax(0, s2_mr * diag(mr_full$XtXi)[-1]))
+  mr_resid <- y - mr_full$fit
+  mr_rates <- list()
+  for (jj in seq_len(ncol(mr_cols))) { cn <- colnames(mr_cols)[jj]; if (group_of(cn) == "location") next
+    hv <- mr_rate(cn, mr_hs[, jj]); hv <- hv[!is.na(hv)]
+    mr_rates[[cn]] <- list(rate = mr_rate(cn, mr_full$coef[[jj]]), se = mr_rate(cn, se_mr[[jj]]), lo = q_or_na(hv, 0.025), hi = q_or_na(hv, 0.975), n_refits = length(hv)) }
+  ywm_mr <- sum(Lw * y) / sum(Lw)   # weighted, like the MARS refit's R-squared
+  mr <- list(n = n, k = k_mr, r2 = 1 - mr_full$rss / sum(Lw * (y - ywm_mr)^2), rmse = sqrt(mean(mr_resid^2)), sigma = sqrt(s2_mr), oof_r2 = oof_mr, mdape = md_mr,
+             intercept = mr_full$a, intercept_se = sqrt(max(0, s2_mr * mr_full$XtXi[1, 1])),
+             coefficients = data.frame(variable = colnames(mr_cols), label = vapply(colnames(mr_cols), function(cn) if (group_of(cn) == "location") paste("Location", loc_dummy_map[[cn]]) else label_of(cn), ""),
+                                       transform = ifelse(colnames(mr_cols) == "lot_sf", "ln(1 + lot sf)", ""),
+                                       role = vapply(colnames(mr_cols), function(cn) if (group_of(cn) == "location") "location" else if (cn %in% features) "priced" else "control", ""),
+                                       coefficient = unname(mr_full$coef), se = unname(se_mr), t = unname(mr_full$coef / se_mr), stringsAsFactors = FALSE),
+             rates = mr_rates, influence = NULL)
+} else note("Multiple regression: the least-squares fit is singular on this pool, so it has no rates.")
+
 ## ---- Leave-comps-out: refit the adjustment model without the report comps ----------------
 influence <- NULL
 grid$leave_comps_out <- NA_real_
@@ -1127,6 +1236,11 @@ if (isTRUE(cfg$leave_comps_out)) {
   drop_rows <- which(d$mls_id %in% comp_rows$mls_id & !is.na(d$mls_id) & d$mls_id != "")
   if (!length(drop_rows)) note("Leave-comps-out check: none of the comps is in the adjustment pool, so none of them shaped the model.") else
   if (n - length(drop_rows) < 60) note("Leave-comps-out check skipped: fewer than 60 sales would remain.") else {
+    mlr <- if (!is.null(mr)) mr_fit(seq_len(n)[-drop_rows]) else NULL
+    if (!is.null(mlr)) mr$influence <- do.call(rbind, lapply(features[features %in% names(mr$rates)], function(f) {
+      r0 <- mr$rates[[f]]; v <- mr_rate(f, mlr$coef[[f]])
+      data.frame(feature = f, with_comps = r0$rate, without_comps = v, change = v - r0$rate, half_sample_p2.5 = r0$lo, half_sample_p97.5 = r0$hi,
+                 outside_range = !is.na(v) && !is.na(r0$lo) && (v < r0$lo || v > r0$hi), stringsAsFactors = FALSE) }))
     ml <- tryCatch(fit_adj(seq_len(n)[-drop_rows], rec_full), error = function(e) NULL)
     if (!is.null(ml)) {
       tgl <- groups_of(ml$terms); bsl <- basis_of(ml$terms, X_subj); inf_rows <- list()
@@ -1138,14 +1252,14 @@ if (isTRUE(cfg$leave_comps_out)) {
         grid$leave_comps_out[r] <- v
         lo <- grid$boot_low[r]; hi <- grid$boot_high[r]; out <- !is.na(lo) && (v < lo - 0.5 || v > hi + 0.5)
         if (out) grid$review_flag[r] <- paste(c(if (grid$review_flag[r] != "") grid$review_flag[r],
-          sprintf("COMP INFLUENCE: with your comps left out of the fit this line is %s, outside its half-sample range (%s to %s). Your comps are steering their own adjustment; check them.",
+          sprintf("COMP INFLUENCE: with your comps left out of the fit this line is %s, outside its half-sample range (%s to %s).",
                   fmt_money(v), fmt_money(lo), fmt_money(hi))), collapse = " | ")
         inf_rows[[length(inf_rows) + 1]] <- data.frame(comp_mls = grid$comp_mls[r], feature = grid$feature[r], with_comps = grid$adjustment[r],
           without_comps = v, change = v - grid$adjustment[r], half_sample_p2.5 = lo, half_sample_p97.5 = hi, outside_range = out, stringsAsFactors = FALSE)
       }
       influence <- if (length(inf_rows)) do.call(rbind, inf_rows) else NULL
-      note("Leave-comps-out check: refit without the %d comp(s) in the adjustment pool; %d line(s) moved outside their half-sample range.",
-           length(drop_rows), if (is.null(influence)) 0L else sum(influence$outside_range))
+      note("Leave-comps-out check: refit without the %d comp(s) in the adjustment pool; %d MARS comp line(s) and %d multiple-regression rate(s) moved outside their half-sample range.",
+           length(drop_rows), if (is.null(influence)) 0L else sum(influence$outside_range), if (is.null(mr) || is.null(mr$influence)) 0L else sum(mr$influence$outside_range))
     }
   }
 }
@@ -1154,25 +1268,44 @@ for (r in seq_len(nrow(grid))) {
   a <- grid$adjustment[r]; lo <- grid$boot_low[r]; hi <- grid$boot_high[r]
   if (is.na(a) || is.na(lo) || is.na(hi)) next
   if (a < lo - 0.5 || a > hi + 0.5) grid$review_flag[r] <- paste(c(if (grid$review_flag[r] != "") grid$review_flag[r],
-    sprintf("OUTSIDE ITS RANGE: the full-data amount %s falls outside its half-sample range (%s to %s); the refits on half the sales do not reproduce it, so treat it as unsupported.",
+    sprintf("OUTSIDE ITS RANGE: the full-data amount %s falls outside its half-sample range (%s to %s); the refits on half the sales do not reproduce it.",
             fmt_money(a), fmt_money(lo), fmt_money(hi))), collapse = " | ")
 }
 names(grid)[names(grid) == "low"] <- "cond_low"; names(grid)[names(grid) == "high"] <- "cond_high"
 names(grid)[names(grid) == "boot_low"] <- "half_sample_p2.5"
 names(grid)[names(grid) == "boot_high"] <- "half_sample_p97.5"
 
-## ---- Per-segment slopes and value-contribution curves (priced lines) ----------------
+## ---- Per-segment slopes and value-contribution curves (priced lines), with the MARS flags ------
+# A segment reads no model rate when the pool is under mars_min_pool sales, when MARS's pooled out-of-fold
+# R-squared is under mars_min_oof, or when fewer than seg_min_sales pool sales sit inside it (ends included).
+flag_pool <- n < cfg$mars_min_pool; flag_oof <- !isTRUE(oof_mars >= cfg$mars_min_oof)
 segs <- list()
 for (f in features) {
-  if (!f %in% groups_in_model) { segs[[f]] <- data.frame(feature = f, from = ranges[[f]][1], to = ranges[[f]][2], slope_per_unit = 0, in_model = FALSE); next }
+  if (!f %in% groups_in_model) { segs[[f]] <- data.frame(feature = f, from = ranges[[f]][1], to = ranges[[f]][2], slope_per_unit = 0, in_model = FALSE,
+                                                         n_sales = n, no_model_rate = FALSE, flags = "", stringsAsFactors = FALSE); next }
   ks <- knots_of(f); bnd <- sort(unique(c(ranges[[f]][1], ks[ks > ranges[[f]][1] & ks < ranges[[f]][2]], ranges[[f]][2])))
   rows <- lapply(seq_len(length(bnd) - 1), function(i) {
     xa <- X_subj; xb <- X_subj; xa[1, f] <- bnd[i]; xb[1, f] <- bnd[i + 1]
+    ns <- sum(d[[f]] >= bnd[i] & d[[f]] <= bnd[i + 1])
+    fl <- c(if (flag_pool) "pool", if (flag_oof) "oof", if (ns < cfg$seg_min_sales) "segment")
     data.frame(feature = f, from = bnd[i], to = bnd[i + 1],
-               slope_per_unit = round((g_contrib(xb, f) - g_contrib(xa, f)) / (bnd[i + 1] - bnd[i]), 2), in_model = TRUE) })
+               slope_per_unit = (g_contrib(xb, f) - g_contrib(xa, f)) / (bnd[i + 1] - bnd[i]), in_model = TRUE,
+               n_sales = ns, no_model_rate = length(fl) > 0, flags = paste(fl, collapse = ","), stringsAsFactors = FALSE) })
   segs[[f]] <- do.call(rbind, rows)
 }
-segments <- do.call(rbind, segs)
+segments <- do.call(rbind, segs); rownames(segments) <- NULL
+n_seg_m <- sum(segments$in_model); n_seg_fl <- sum(segments$no_model_rate); n_seg_thin <- sum(segments$in_model & segments$n_sales < cfg$seg_min_sales)
+if (n_seg_fl) note("MARS flags: %d of %d MARS segments read no model rate (%s).", n_seg_fl, n_seg_m,
+  paste(c(if (flag_pool) sprintf("pool of %d sales under the bar of %s", n, gfmt(cfg$mars_min_pool)),
+          if (flag_oof) sprintf("pooled out-of-fold R-squared %s under the bar of %s", f2(oof_mars), gfmt(cfg$mars_min_oof)),
+          if (n_seg_thin) sprintf("%d segment(s) with fewer than %s sales", n_seg_thin, gfmt(cfg$seg_min_sales))), collapse = "; "))
+value_curves <- do.call(rbind, lapply(curve_feats, function(f) {
+  xs <- curve_x[[f]]; g0 <- g_contrib(X_subj, f); Xg <- curve_rows(f)
+  bm <- if (!is.null(mr)) mr_full$coef[[f]] else NA_real_
+  tx <- function(v) if (f == "lot_sf") log1p(v) else v
+  data.frame(feature = f, x = xs, mars_vs_subject = vapply(seq_along(xs), function(q) g_contrib(Xg[q, , drop = FALSE], f), 0) - g0,
+             mars_half_sample_p2.5 = apply(band_store[[f]], 2, q_or_na, 0.025), mars_half_sample_p97.5 = apply(band_store[[f]], 2, q_or_na, 0.975),
+             mr_vs_subject = bm * (tx(xs) - tx(subj_df[1, f])), stringsAsFactors = FALSE) }))
 loc_effects <- NULL
 if (loc_var != "" && length(loc_levels)) {
   loc_effects <- data.frame(level = loc_levels, n_sales = as.integer(table(d$loc)[loc_levels]),
@@ -1180,24 +1313,8 @@ if (loc_var != "" && length(loc_levels)) {
       if (subj_loc %in% loc_levels) round(g_contrib(xl, "location") - g_contrib(X_subj, "location")) else NA }))
 }
 
-## ---- Comp diagnostics: model residual, CQA rank (earthUI) and listing check ----------
-comp_diag <- lapply(seq_len(nrow(comp_rows)), function(i) {
-  cr <- comp_rows[i, ]
-  cl <- comp_loc_of(cr)
-  Xc <- comp_X[[i]]
-  pr <- if (any(is.na(Xc)) || !cl$known) NA else predict_of(mterms, Xc)
-  price <- cr$price_comp * if (is.na(cr$sale_age)) NA else exp(-tm_f(tm, cr$sale_age / month_days))   # comp price at the effective date
-  r <- price - pr
-  at <- match(cr$mls_id, d$mls_id)
-  list(mls_id = cr$mls_id, address = cr$address, price_used = cr$price_comp, price_time_adjusted = round(price), model_estimate = round(pr), residual = round(r),
-       cqa = if (is.na(r)) NA else round(10 * mean(resid < r), 2),
-       in_fit = cr$mls_id %in% d$mls_id, listing_weight = comp_lw[[i]]$w, listing_check = paste(comp_lw[[i]]$why, collapse = "; "),
-       model_weight = if (is.na(at)) NA else wts[at],
-       reading = "Residual = time-adjusted price above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry.")
-})
-
-## ---- Battery on partial residuals (other model effects removed) ----------------------
-battery <- NULL
+## ---- Per-unit rates beside MARS: the multiple regression, and Theil-Sen, median (LAD) and grouped slopes on the
+## multiple regression's partial residuals (its other lines removed; MARS plays no part). Every priced line gets a row.
 # Least absolute deviation slope. With counts (baths, garage spaces) the LAD minimum is often a flat
 # stretch of slopes, so the answer is the middle of that stretch (the browser engine does the same).
 lad_slope <- function(x, yv) {
@@ -1212,42 +1329,65 @@ lad_slope <- function(x, yv) {
   bL <- cc; a <- bm; cc <- hi0; for (it in 1:100) { m <- (a + cc) / 2; if (obj(m) <= thr) a <- m else cc <- m }
   (bL + a) / 2
 }
-if (requireNamespace("MASS", quietly = TRUE)) {
-  theil_sen <- function(x, yv) { set.seed(seeds$theilsen); nn <- length(x)
-    ij <- if (nn * (nn - 1) / 2 > 50000) { a <- sample(nn, 50000, TRUE); b <- sample(nn - 1, 50000, TRUE); b <- b + (b >= a); cbind(a, b) } else t(combn(nn, 2))
-    s <- (yv[ij[, 2]] - yv[ij[, 1]]) / (x[ij[, 2]] - x[ij[, 1]]); median(s[is.finite(s)]) }
-  battery <- do.call(rbind, lapply(features[features %in% eligible], function(f) {
-    x <- as.numeric(d[[f]]); if (length(unique(x)) < 2) return(NULL)
-    gpart <- if (f %in% groups_in_model) sapply(seq_len(n), function(i) g_contrib(X[i, , drop = FALSE], f)) else 0
-    yv <- resid + gpart
-    data.frame(feature = f, in_mars = f %in% groups_in_model, picked_by_mars = f %in% mod$picked,
-      ols = round(coef(lm(yv ~ x))[2], 2), theil_sen = round(theil_sen(x, yv), 2),
-      lad = round(lad_slope(x, yv), 2),
-      lms = round(tryCatch({ set.seed(seeds$lms); coef(MASS::lqs(yv ~ x, method = "lms"))[2] }, error = function(e) NA), 2),
-      grouped_quintiles = round(tryCatch({ qb <- cut(x, unique(quantile(x, 0:5 / 5)), include.lowest = TRUE)
-        gm <- aggregate(cbind(x, yv), list(qb), mean); coef(lm(yv ~ x, gm))[2] }, error = function(e) NA), 2))
-  }))
-  rownames(battery) <- NULL
-}
+theil_sen <- function(x, yv) { set.seed(seeds$theilsen); nn <- length(x)
+  ij <- if (nn * (nn - 1) / 2 > 50000) { a <- sample(nn, 50000, TRUE); b <- sample(nn - 1, 50000, TRUE); b <- b + (b >= a); cbind(a, b) } else t(combn(nn, 2))
+  s <- (yv[ij[, 2]] - yv[ij[, 1]]) / (x[ij[, 2]] - x[ij[, 1]]); median(s[is.finite(s)]) }
+grouped_slope <- function(x, yv) tryCatch({ qb <- cut(x, unique(quantile(x, 0:5 / 5)), include.lowest = TRUE)
+  gm <- aggregate(cbind(x, yv), list(qb), mean); if (nrow(gm) < 2) NA_real_ else unname(coef(lm(yv ~ x, gm))[2]) }, error = function(e) NA_real_)
+battery <- do.call(rbind, lapply(features, function(f) {
+  row <- data.frame(feature = f, priced = f %in% eligible, sales_differing = unname(vary_n[[f]]), pool_sales = n,
+                    in_mars = f %in% groups_in_model, picked_by_mars = f %in% mod$picked,
+                    multiple_regression = NA_real_, mr_se = NA_real_, mr_half_sample_p2.5 = NA_real_, mr_half_sample_p97.5 = NA_real_,
+                    theil_sen = NA_real_, lad = NA_real_, grouped_quintiles = NA_real_, stringsAsFactors = FALSE)
+  if (!row$priced || is.null(mr) || is.null(mr$rates[[f]])) return(row)
+  x <- mr_cols[, f]; b <- mr_full$coef[[f]]; yv <- mr_resid + b * x; r0 <- mr$rates[[f]]
+  row$multiple_regression <- r0$rate; row$mr_se <- r0$se; row$mr_half_sample_p2.5 <- r0$lo; row$mr_half_sample_p97.5 <- r0$hi
+  row$theil_sen <- mr_rate(f, theil_sen(x, yv)); row$lad <- mr_rate(f, lad_slope(x, yv)); row$grouped_quintiles <- mr_rate(f, grouped_slope(x, yv))
+  row
+}))
+rownames(battery) <- NULL
 
-## ---- Local validation (GLA band, same levels) on partial residuals -------------------
-local_val <- list(verdict = "not run")
-if ("gla" %in% features && "gla" %in% eligible) {
-  band <- if (is.na(cfg$gla_band)) max(250, rnd(0.15 * X_subj[1, "gla"] / 10) * 10) else cfg$gla_band   # round half up, as in the browser
-  same_lv <- "levels" %in% eligible && !is.na(subj_df$levels[1])
-  inb <- abs(d$gla - X_subj[1, "gla"]) <= band & (if (same_lv) d$levels == subj_df$levels[1] else TRUE)
-  if (sum(inb) >= 10) {
-    gpart <- sapply(which(inb), function(i) g_contrib(X[i, , drop = FALSE], "gla"))
-    yv <- resid[inb] + gpart; xv <- d$gla[inb]
-    sl <- coef(lm(yv ~ xv))[2]
-    xr <- range(xv); xa <- X_subj; xb <- X_subj; xa[1, "gla"] <- xr[1]; xb[1, "gla"] <- xr[2]
-    mars_avg <- (g_contrib(xb, "gla") - g_contrib(xa, "gla")) / diff(xr)
-    se_sl <- summary(lm(yv ~ xv))$coefficients[2, 2]
-    local_val <- list(gla_band_sf = band, batch_n = sum(inb), batch_gla_range = xr, same_levels = same_lv,
-      batch_slope_per_sf = round(sl, 2), batch_slope_se = round(se_sl, 2), mars_avg_slope_over_band = round(mars_avg, 2),
-      verdict = if (1.96 * se_sl >= abs(sl)) "NOT INFORMATIVE: the local slope is too noisy to confirm or reject the model rate" else
-                if (abs(sl - mars_avg) <= 1.96 * se_sl) "LOCALLY VALIDATED" else "DIVERGES: FLAG FOR APPRAISER JUDGMENT")
-  } else local_val <- list(gla_band_sf = band, batch_n = sum(inb), verdict = "BATCH TOO SMALL")
+## ---- Time support for comps sold more than 12 months before the effective date (percent only) ----
+time_support <- NULL
+comp_close <- if ("sale_date" %in% names(comp_rows)) to_date(comp_rows$sale_date) else as.Date(rep(NA, nrow(comp_rows)))
+ts_rows <- list(); ts_list <- list()
+for (i in seq_len(nrow(comp_rows))) {
+  sa <- comp_rows$sale_age[i]; if (is.na(sa) || !(sa > 365)) next
+  a_m <- sa / month_days; before <- comp_rows$date_used[i] < min(dm$date_used)
+  o <- list(comp = i, mls_id = comp_rows$mls_id[i], address = comp_rows$address[i], date = format(comp_rows$date_used[i]), months = a_m, before_export = before,
+            index = NULL, fhfa = if (!is.null(fhfa_sup[[as.character(i)]])) fhfa_sup[[as.character(i)]] else NULL, medians = NULL)
+  if (!before) {
+    tot <- exp(-tm_f(tm, a_m)) - 1
+    hv <- if (is.null(hs_comp_f)) numeric(0) else exp(-hs_comp_f[, i]) - 1
+    ks <- time_bend_ages(); ks <- ks[ks < a_m]; br <- sort(unique(c(0, ks, a_m)))
+    st <- do.call(rbind, lapply(rev(seq_len(length(br) - 1)), function(j) { lo <- br[j]; hi <- br[j + 1]
+      data.frame(from = format(eff_date - round(hi * month_days)), to = format(eff_date - round(lo * month_days)), months = hi - lo,
+                 pct_per_month = exp((tm_f(tm, lo) - tm_f(tm, hi)) / (hi - lo)) - 1, pct_total = exp(tm_f(tm, lo) - tm_f(tm, hi)) - 1, stringsAsFactors = FALSE) }))
+    o$index <- list(total = tot, lo = q_or_na(hv, 0.025), hi = q_or_na(hv, 0.975), per_month = (1 + tot)^(1 / a_m) - 1, per_month_simple = tot / a_m, stretches = st)
+  }
+  y_c <- as.integer(format(if (!is.na(comp_close[i])) comp_close[i] else comp_rows$date_used[i], "%Y"))
+  sel_c <- pulled & !is.na(pull_year) & pull_year == y_c
+  if (y_c %in% yrs && sum(sel_c) > 0 && y_c < base_year) {
+    tot_m <- med_base / med_of(sel_c) - 1; mo_y <- 12 * (base_year - y_c)
+    if (!is.na(tot_m)) o$medians <- list(from_year = y_c, to_year = base_year, total = tot_m, months = mo_y, per_month = (1 + tot_m)^(1 / mo_y) - 1, per_month_simple = tot_m / mo_y, n_from = sum(sel_c))
+  }
+  ts_list[[length(ts_list) + 1]] <- o
+  ts_rows[[length(ts_rows) + 1]] <- data.frame(comp = i, mls_id = o$mls_id, sale_date = o$date, months_to_effective_date = round(a_m, 2), before_export = before,
+    index_pct = if (is.null(o$index)) NA else round(100 * o$index$total, 2), index_half_sample_p2.5 = if (is.null(o$index)) NA else round(100 * o$index$lo, 2),
+    index_half_sample_p97.5 = if (is.null(o$index)) NA else round(100 * o$index$hi, 2),
+    index_pct_per_month = if (is.null(o$index)) NA else round(100 * o$index$per_month, 4), index_pct_per_month_simple = if (is.null(o$index)) NA else round(100 * o$index$per_month_simple, 4),
+    index_stretches = if (is.null(o$index)) "" else paste(sprintf("%s to %s %s/mo", o$index$stretches$from, o$index$stretches$to, fmt_pct(o$index$stretches$pct_per_month, 2)), collapse = "; "),
+    fhfa_from = if (is.null(o$fhfa) || is.null(o$fhfa$from)) NA else o$fhfa$from, fhfa_to = if (is.null(o$fhfa) || is.null(o$fhfa$from)) NA else o$fhfa$to,
+    fhfa_pct = if (is.null(o$fhfa) || is.null(o$fhfa$from)) NA else round(100 * o$fhfa$total, 2),
+    fhfa_pct_per_month = if (is.null(o$fhfa) || is.null(o$fhfa$from)) NA else round(100 * o$fhfa$per_month, 4),
+    median_from_year = if (is.null(o$medians)) NA else o$medians$from_year, median_to_year = if (is.null(o$medians)) NA else o$medians$to_year,
+    median_pct = if (is.null(o$medians)) NA else round(100 * o$medians$total, 2), median_pct_per_month = if (is.null(o$medians)) NA else round(100 * o$medians$per_month, 4),
+    stringsAsFactors = FALSE)
+}
+if (length(ts_rows)) {
+  time_support <- do.call(rbind, ts_rows)
+  note("Older comps (sold more than 12 months before the effective date): %s.", paste(vapply(ts_list, function(o)
+    paste0("C", o$comp, " ", o$date, if (o$before_export) sprintf(" (before the export's first clean sale, %s)", format(min(dm$date_used))) else ""), ""), collapse = "; "))
 }
 
 ## ---- Bracketing (selected comps vs subject) -------------------------------------------
@@ -1256,23 +1396,24 @@ bracket <- lapply(features, function(f) { cv <- if (f %in% names(comp_rows)) to_
        bracketed = if (length(cv)) sv >= min(cv) && sv <= max(cv) else NA,
        data_min = ranges[[f]][1], data_max = ranges[[f]][2]) })
 
-## ---- Interaction diagnostic (degree 2, earth only) -----------------------------------
-inter <- NULL
-if (isTRUE(cfg$interaction_check)) {
-  m2 <- tryCatch(earth_fit(X, y, rec_full, degree = 2, penalty = 3), error = function(e) NULL)
-  if (!is.null(m2)) {
-    d2 <- m2$dirs[m2$selected.terms, , drop = FALSE]
-    it <- rownames(d2)[rowSums(d2 != 0) >= 2]
-    inter <- list(terms = it, any_retained = length(it) > 0,
-                  reading = "Headline model stays additive. A retained GLA x year_built or GLA x levels term means $/sf differs by cohort.")
-  }
-}
-
 ## ---- Weights for the data trail ---------------------------------------------------------
 lw_tab <- data.frame(mls_id = dm$mls_id, address = dm$address, sale_price = dm$sale_price, date = format(dm$date_used),
                      listing_weight = dm$lw, in_adjustment_pool = in_pool, reasons = dm$lw_why, stringsAsFactors = FALSE)
 lw_tab <- lw_tab[lw_tab$listing_weight < 1, , drop = FALSE]
 lw_tab <- lw_tab[order(lw_tab$listing_weight, seq_len(nrow(lw_tab))), , drop = FALSE]
+# Records to check: comps whose listing looks off, then every sale the weights touched, lowest weight first
+rec_comp <- do.call(rbind, lapply(seq_len(nrow(comp_rows)), function(i) { lw <- comp_lw[[i]]; if (!isTRUE(lw$w < 1)) return(NULL)
+  data.frame(kind = "comp", comp = i, mls_id = comp_rows$mls_id[i], address = comp_rows$address[i], date = format(comp_rows$date_used[i]),
+             sale_price = comp_rows$sale_price[i], in_pool = comp_rows$mls_id[i] %in% d$mls_id, weight = lw$w, reasons = paste(lw$why, collapse = "; "), stringsAsFactors = FALSE) }))
+rec_w <- ifelse(dm$lw < 1, dm$lw, 1); rec_why <- ifelse(dm$lw < 1, dm$lw_why, "")
+pool_dm <- which(in_pool)
+for (ii in which(hub < 1 - 1e-9)) { jm <- pool_dm[ii]
+  txt <- sprintf("time-adjusted price %s from the MARS estimate, price weight %.2f", fmt_pct(resid[ii] / fitted[ii]), hub[ii])
+  rec_why[jm] <- if (rec_why[jm] == "") txt else paste(rec_why[jm], txt, sep = "; "); rec_w[jm] <- rec_w[jm] * hub[ii] }
+rs_i <- which(rec_why != ""); rs_i <- rs_i[order(rec_w[rs_i], rs_i)]
+rec_sale <- if (length(rs_i)) data.frame(kind = "sale", comp = NA_integer_, mls_id = dm$mls_id[rs_i], address = dm$address[rs_i], date = format(dm$date_used[rs_i]),
+  sale_price = dm$sale_price[rs_i], in_pool = in_pool[rs_i], weight = rec_w[rs_i], reasons = rec_why[rs_i], stringsAsFactors = FALSE) else NULL
+records <- rbind(rec_comp, rec_sale)
 
 ## ---- Write outputs (staged, then moved) ---------------------------------------------------
 # Data fingerprint: one line per clean sale in the market pool (mls_id, price used, sale
@@ -1287,31 +1428,41 @@ data_hash <- sha256(paste(apply(canon_m, 1, paste, collapse = ","), collapse = "
 cfg_hash <- sha256(as.character(toJSON(cfg, auto_unbox = TRUE, null = "null")))
 num_round <- function(df) { for (cn in names(df)) if (is.numeric(df[[cn]])) df[[cn]] <- round(df[[cn]], 2); df }
 excl_all <- if (nrow(pool_out)) rbind(excl, pool_out[, names(excl)]) else excl
-write.csv(num_round(grid), file.path(stage_dir, "comp_grid.csv"), row.names = FALSE)
-write.csv(segments, file.path(stage_dir, "segments.csv"), row.names = FALSE)
+write.csv(num_round(grid), file.path(stage_dir, "comp_lines.csv"), row.names = FALSE)   # internal: the leave-comps-out check works on these
+write.csv(num_round(battery), file.path(stage_dir, "per_unit_rates.csv"), row.names = FALSE)
+write.csv(transform(segments, slope_per_unit = round(slope_per_unit, 2)), file.path(stage_dir, "segments.csv"), row.names = FALSE)
+if (!is.null(value_curves)) write.csv(value_curves, file.path(stage_dir, "value_curves.csv"), row.names = FALSE)
+if (!is.null(mr)) write.csv(rbind(data.frame(variable = "(Intercept)", label = "Intercept", transform = "", role = "intercept", coefficient = mr$intercept, se = mr$intercept_se,
+                                             t = mr$intercept / mr$intercept_se, stringsAsFactors = FALSE), mr$coefficients),
+                            file.path(stage_dir, "mr_coefficients.csv"), row.names = FALSE)
 write.csv(time_index, file.path(stage_dir, "time_index.csv"), row.names = FALSE)
 write.csv(time_years, file.path(stage_dir, "time_years.csv"), row.names = FALSE)
+if (!is.null(time_support)) write.csv(time_support, file.path(stage_dir, "time_support.csv"), row.names = FALSE)
 if (!is.null(fhfa_out)) write.csv(fhfa_out$table, file.path(stage_dir, "fhfa_check.csv"), row.names = FALSE)
 if (!is.null(influence)) write.csv(num_round(influence), file.path(stage_dir, "comp_influence.csv"), row.names = FALSE)
+if (!is.null(mr) && !is.null(mr$influence)) write.csv(num_round(mr$influence), file.path(stage_dir, "mr_influence.csv"), row.names = FALSE)
+if (!is.null(records)) write.csv(transform(records, weight = round(weight, 6)), file.path(stage_dir, "records_to_check.csv"), row.names = FALSE)
 write.csv(transform(lw_tab, listing_weight = round(listing_weight, 6)), file.path(stage_dir, "listing_weights.csv"), row.names = FALSE)
 write.csv(excl_all, file.path(stage_dir, "exclusions.csv"), row.names = FALSE)
 if (!is.null(repeat_sales)) write.csv(repeat_sales, file.path(stage_dir, "repeat_sales.csv"), row.names = FALSE)
-if (!is.null(battery)) write.csv(battery, file.path(stage_dir, "battery.csv"), row.names = FALSE)
-write.csv(cbind(d[, c("mls_id", "address", "sale_price", "price_used", "sale_age", model_vars, if (loc_var != "") "loc")],
-                time_factor = round(d$time_factor, 6), price_time_adjusted = round(d$price_ta), model_estimate = round(fitted), residual = round(resid),
-                listing_weight = round(d$lw, 6), price_weight = round(hub, 6), weight = round(wts, 6)),
-          file.path(stage_dir, "model_data.csv"), row.names = FALSE)
+md_out <- cbind(d[, c("mls_id", "address", "sale_price", "price_used", "sale_age", model_vars, if (loc_var != "") "loc")],
+                time_factor = round(d$time_factor, 6), price_time_adjusted = round(d$price_ta))
+if ("lot_sf" %in% eligible) md_out$ln_lot_sf_plus_1 <- round(log1p(d$lot_sf), 8)
+md_out <- cbind(md_out, model_estimate = round(fitted), residual = round(resid), listing_weight = round(d$lw, 6), price_weight = round(hub, 6), weight = round(wts, 6))
+if (!is.null(mr)) { md_out$mr_estimate <- round(mr_full$fit); md_out$mr_residual <- round(mr_resid) }
+write.csv(md_out, file.path(stage_dir, "model_data.csv"), row.names = FALSE)
 
 scope <- paste("Scope and use: statistical analysis supporting the appraiser's adjustment development.",
-  "Per-unit figures and line amounts are model estimates with stated uncertainty, not confirmed market facts.",
-  "The appraiser makes all final adjustment selections, within or outside the supported ranges.",
+  "Per-unit rates and value curves are model estimates with stated uncertainty, not confirmed market facts.",
+  "The appraiser makes all final adjustment selections.",
   "No indicated, reconciled or opinion-of-value figure is produced.",
   "Prepared with reference to USPAP Advisory Opinion 41 (Use of Technology in an Appraisal or Appraisal Review Assignment):",
   "the tool cannot comply with USPAP; the appraiser remains responsible for judging whether this output is accurate and relevant to the assignment.")
 seg_txt <- if (is.null(tm_segments)) "" else paste(sprintf("%s to %s %s/mo", tm_segments$from, tm_segments$to, fmt_pct(tm_segments$pct_per_month, 2)), collapse = "; ")
-time_method <- sprintf("Quality-adjusted log-price index from %d clean sales: log price on %s%s%s, plus a time curve that may bend only on a %d-month calendar grid with at least %d sales on each side%s, bends pruned by GCV (penalty %s). Listings far from typical and prices far from the model count for less (listing and Huber weights). Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.",
+time_method <- sprintf("Quality-adjusted log-price index from %d clean sales: log price on %s%s%s, plus a time curve that may bend only on calendar dates every %d months, with at least %d sales on each side%s, bends pruned by GCV (penalty %s). Listings far from typical and prices far from the model count for less (listing and Huber weights). Prices in the adjustment pool are brought to the effective date with it before either model prices the features.",
   n_market, paste(tolower(vapply(model_vars, label_of, "")), collapse = ", "), if (length(tm_loc)) ", location" else "", if (season_on) ", quarter of the year (reported, not applied)" else "",
   as.integer(cfg$time_knot_months), as.integer(cfg$time_min_side), if (B_boot > 0) sprintf(" (%d in the half-sample refits, which use half the sales)", min_side_h) else "", format(cfg$penalty))
+mx_df <- data.frame(mls_id = mx_ids, reason = mx_reason, found = mx_ids %in% sales$mls_id, stringsAsFactors = FALSE)
 results <- list(
   scope_notice = scope,
   engine = list(name = "MARS / Regression Adjustment Support", version = ENGINE_VERSION, earth_version = as.character(packageVersion("earth")),
@@ -1321,13 +1472,12 @@ results <- list(
   data = list(n_raw = nrow(sales), n_market = n_market, n_modeled = n, n_excluded = nrow(excl), n_outside_pool = sum(!in_pool),
               pool_ranges = pool_used, window = c(format(min(dm$date_used)), format(max(dm$date_used))),
               days_from_most_recent_sale_to_effective_date = round(time_gap), time_gap_days_allowed = cfg$time_gap_days,
-              exclusion_counts = as.list(table(excl$exclude_reason)), notes = notes),
+              exclusion_counts = as.list(table(excl$exclude_reason)), excluded_by_appraiser = mx_df, notes = notes),
   variables = list(priced = features, priced_in_model = features[features %in% eligible], not_enough_data = thin_priced,
                    background_controls = ctrl_used, sales_differing_from_most_common = as.list(vary_n)),
   weights = list(listing_downweighted = nrow(lw_tab), typical_from_nearest = as.integer(norm_k), count_weight_cut = cfg$count_weight_cut,
                  lumped_weight = cfg$lumped_weight, huber_k = cfg$huber_k, model_price_downweighted = m_down, model_effective_n = round(n_eff(wts), 1),
                  time_price_downweighted = tm_down, time_effective_n = round(n_eff(tm$w), 1)),
-  review_flags = grid[grid$review_flag != "", c("comp_mls", "feature", "review_flag")],
   time_index = list(method = time_method, n_sales = n_market, knot_months = as.integer(cfg$time_knot_months), min_side = as.integer(cfg$time_min_side),
                     min_side_half_samples = if (B_boot > 0) min_side_h else NULL,
                     season_control = season_on, season_effects_vs_q1_pct = if (is.null(tm$season)) NULL else as.list(round(100 * tm$season, 2)),
@@ -1338,55 +1488,67 @@ results <- list(
                                   forced = mterms$forced, coefficient = round(mterms$coef, 4)),
                groups = groups_in_model, picked_by_mars = mod$picked, forced_back_in = forced_in,
                rsq = round(rsq_w, 4), grsq = round(grsq_w, 4), cvrsq = round(cvrsq, 4), cvrsq_sd = round(cvrsq_sd, 4), cv_folds = length(cv_rsq),
+               oof_rsq = round(oof_mars, 6), mdape = round(md_mars, 6),
                rmse = round(sqrt(mean(resid^2))), mae = round(mean(abs(resid))), n_terms = k,
                earth_selection = list(rsq = round(mod$earth$rsq, 4), grsq = round(mod$earth$grsq, 4)),
                params = list(degree = cfg$degree, nk = cfg$nk, minspan = cfg$minspan, endspan = cfg$endspan, penalty = cfg$penalty,
                              newvar_penalty = cfg$newvar_penalty, thresh = cfg$thresh, pmethod = "backward",
                              nfold = cfg$nfold, ncross = cfg$ncross, stratify = TRUE),
                picked_in_half_samples = as.list(boot_freq)),
-  location_effects = loc_effects, per_segment_slopes = segments,
-  comp_diagnostics = comp_diag, repeat_sales = repeat_sales,
-  comp_influence = influence, local_validation = local_val, bracketing = bracket, interaction_diagnostic = inter,
+  multiple_regression = if (is.null(mr)) NULL else list(n = mr$n, k = mr$k, rsq = round(mr$r2, 6), rmse = round(mr$rmse), oof_rsq = round(mr$oof_r2, 6), mdape = round(mr$mdape, 6),
+                                                         intercept = mr$intercept, intercept_se = mr$intercept_se, coefficients = mr$coefficients, rates = mr$rates, leave_comps_out = mr$influence),
+  mars_flags = list(pool_under_bar = flag_pool, oof_under_bar = flag_oof, pool_sales = n, pool_bar = cfg$mars_min_pool, oof_rsq = round(oof_mars, 6), oof_bar = cfg$mars_min_oof,
+                    segment_bar = cfg$seg_min_sales, segments = n_seg_m, segments_no_model_rate = n_seg_fl, segments_under_bar = n_seg_thin),
+  location_effects = loc_effects, per_segment_slopes = segments, per_unit_rates = battery,
+  time_support = ts_list, records_to_check = records, repeat_sales = repeat_sales,
+  comp_influence = influence, bracketing = bracket,
   reproducibility = list(master_seed = cfg$master_seed, derived_seeds = seeds, data_sha256 = data_hash, config_sha256 = cfg_hash,
-                         deterministic = c("listing weights", "time index fit (IRLS, GCV pruning of the bends)", "MARS selection (GCV backward pruning) and the weighted refit", "segments", "conditional and HC1 SEs", "leave-comps-out refit"),
-                         seed_dependent = c("CVRSq (fold assignment)", "half-sample ranges (adjustment model and time index)", "Theil-Sen pair sampling", "LMS")))
+                         deterministic = c("listing weights", "time index fit (IRLS, GCV pruning of the bends)", "MARS selection (GCV backward pruning) and the weighted refit", "multiple regression (ordinary least squares)", "segments", "leave-comps-out refits"),
+                         seed_dependent = c("CVRSq and the pooled out-of-fold scores (fold assignment)", "half-sample ranges and curve bands (both models and the time index)", "Theil-Sen pair sampling")))
 write_json(results, file.path(stage_dir, "results.json"), pretty = TRUE, auto_unbox = TRUE, digits = NA, na = "null")
 
-flag_n <- function(pat) sum(grepl(pat, grid$review_flag))
 yr_txt <- paste(sprintf("%d %s", time_years$year[time_years$year != base_year & time_years$sales_as_pulled > 0],
                         fmt_pct(time_years$median_to_base_year_pct[time_years$year != base_year & time_years$sales_as_pulled > 0] / 100)), collapse = ", ")
 wf <- c(sprintf("WORKFILE NOTE: MARS / Regression Adjustment Support v%s", ENGINE_VERSION),
   sprintf("Run date: %s   Effective date: %s   Sale age basis: %s", Sys.Date(), format(eff_date), date_label),
-  sprintf("Data: %d clean sales of %d in the export (%d excluded, reasons in exclusions.csv). Window %s to %s.",
-          n_market, nrow(sales), nrow(excl), format(min(dm$date_used)), format(max(dm$date_used))),
-  sprintf("Priced lines: %s.%s%s", paste(vapply(features[features %in% eligible], label_of, character(1)), collapse = ", "),
-          if (length(ctrl_used)) sprintf(" Background controls (never on the grid): %s.", paste(tolower(vapply(ctrl_used, label_of, character(1))), collapse = ", ")) else "",
-          if (length(thin_priced)) sprintf(" Not enough data to price: %s.", paste(vapply(thin_priced, label_of, character(1)), collapse = ", ")) else ""),
-  sprintf("Weights: %d listing(s) with counts far from typical for their size counted for less (listing_weights.csv); %d of %d pool sales priced far from the model got Huber weights below 1. Nothing was dropped for either.",
+  sprintf("Data: %d clean sales of %d in the export (%d excluded, reasons in exclusions.csv). Window %s to %s.%s",
+          n_market, nrow(sales), nrow(excl), format(min(dm$date_used)), format(max(dm$date_used)),
+          if (length(mx_ids)) sprintf(" Excluded by the appraiser: %s.", paste(sprintf("%s (%s)", mx_ids, ifelse(mx_reason == "", "no reason given", mx_reason)), collapse = "; ")) else ""),
+  sprintf("Lines priced: %s.%s%s", paste(vapply(features[features %in% eligible], label_of, character(1)), collapse = ", "),
+          if (length(ctrl_used)) sprintf(" Background controls (never priced): %s.", paste(tolower(vapply(ctrl_used, label_of, character(1))), collapse = ", ")) else "",
+          if (length(thin_priced)) sprintf(" Not enough data to price: %s.", paste(sprintf("%s (%d of %d sales differ)", vapply(thin_priced, label_of, character(1)), vary_n[thin_priced], n), collapse = ", ")) else ""),
+  sprintf("Weights: %d listing(s) with counts far from typical for their size counted for less; %d of %d pool sales priced far from the MARS model got Huber weights below 1. Nothing was dropped for either; each is listed in records_to_check.csv.",
           nrow(lw_tab), m_down, n),
   sprintf("Time index: %s", time_method),
   sprintf("Time index result: %s. %s R-squared %.3f.%s",
           if (!length(tm$terms)) "no time trend cleared the GCV penalty (flat)" else paste(c(if (any(is.na(tm$terms))) "overall slope kept", if (length(tm_bends)) paste("bends at", paste(format(tm_bends), collapse = ", "))), collapse = "; "),
           if (nchar(seg_txt)) paste0("Segments: ", seg_txt, ".") else "", tm$r2,
           if (!is.null(tm$season)) sprintf(" Season vs Q1 (reported, not applied): Q2 %s, Q3 %s, Q4 %s.", fmt_pct(tm$season[["Q2"]]), fmt_pct(tm$season[["Q3"]]), fmt_pct(tm$season[["Q4"]])) else ""),
-  sprintf("Adjustment pool: %d sales%s; prices time-adjusted to the effective date, then MARS (earth %s, degree %d) with any priced variable it left out put back as a straight line, refit with weights: %d terms. RSq %.3f, GRSq %.3f (weighted), CVRSq %.3f (sd %.3f, %d-fold x %d). RMSE %s, MAE %s.",
+  sprintf("Adjustment pool: %d sales%s; prices time-adjusted to the effective date. MARS (earth %s, degree %d) with any priced variable it left out put back as a straight line, refit with listing and Huber weights: %d terms, RSq %.3f, GRSq %.3f (weighted).",
           n, if (length(pool_desc)) sprintf(" inside the similarity ranges (%s)", paste(pool_desc, collapse = "; ")) else " (no similarity ranges set)",
-          as.character(packageVersion("earth")), cfg$degree, k, rsq_w, grsq_w, cvrsq, cvrsq_sd, cfg$nfold, cfg$ncross,
-          fmt_money(sqrt(mean(resid^2))), fmt_money(mean(abs(resid)))),
+          as.character(packageVersion("earth")), cfg$degree, k, rsq_w, grsq_w),
+  if (!is.null(mr)) sprintf("Multiple regression: least squares on the same pool and prices with the listing weights (no price weights), every priced line and background control a straight line (site as ln(1 + lot sf)): %d coefficients, R-squared %.3f (weighted). Coefficients in mr_coefficients.csv.", mr$k, mr$r2) else
+    "Multiple regression: the least-squares fit is singular on this pool.",
+  sprintf("Held-out test (%d-fold x %d, the same folds for both models): MARS pooled out-of-fold R-squared %s, typical miss %s; multiple regression %s, typical miss %s. MARS CVRSq averaged fold by fold %s (sd %s).",
+          as.integer(cfg$nfold), as.integer(cfg$ncross), f2(oof_mars), f1p(md_mars), f2(oof_mr), f1p(md_mr), f2(cvrsq), f2(cvrsq_sd)),
+  if (n_seg_fl) sprintf("MARS flags: %d of %d MARS segments read no model rate (bars: pool %s sales, pooled out-of-fold R-squared %s, %s sales per segment).", n_seg_fl, n_seg_m,
+                        gfmt(cfg$mars_min_pool), gfmt(cfg$mars_min_oof), gfmt(cfg$seg_min_sales)) else
+    sprintf("MARS flags: none (bars: pool %s sales, pooled out-of-fold R-squared %s, %s sales per segment).", gfmt(cfg$mars_min_pool), gfmt(cfg$mars_min_oof), gfmt(cfg$seg_min_sales)),
   sprintf("Median-to-median as pulled (yearly medians, %d as the base%s): %s.%s", base_year,
           if (base_year != eff_year) sprintf(": no %d sales in the export", eff_year) else " year to date", yr_txt,
           if (mix_shift) " New-construction share moved by 10 points or more between years, so these medians mix different products." else ""),
-  if (!is.null(fhfa_out)) sprintf("FHFA check: %s (%s, %s to %s), compared over the same periods; %d time line(s) flagged.", fhfa_out$label, fhfa_out$frequency,
-          fhfa_out$first_period, fhfa_out$last_period, flag_n("^FHFA CHECK")) else "FHFA check: no FHFA series supplied.",
-  if (!is.null(influence)) sprintf("Leave-comps-out check: %d line(s) moved outside their half-sample range when the comps were left out of the fit.", sum(influence$outside_range)) else
+  if (!is.null(fhfa_out)) sprintf("FHFA check: %s (%s, %s to %s), compared over the same periods.", fhfa_out$label, fhfa_out$frequency,
+          fhfa_out$first_period, fhfa_out$last_period) else "FHFA check: no FHFA series supplied.",
+  if (!is.null(influence)) sprintf("Leave-comps-out check: %d MARS comp line(s) and %d multiple-regression rate(s) moved outside their half-sample range when the comps were left out of the fit.",
+                                   sum(influence$outside_range), if (is.null(mr) || is.null(mr$influence)) 0L else sum(mr$influence$outside_range)) else
     "Leave-comps-out check: not run (no comp in the adjustment pool, or switched off).",
+  if (length(ts_list)) sprintf("Time support: %d comp(s) sold more than 12 months before the effective date (time_support.csv).", length(ts_list)) else
+    "Time support: no comp sold more than 12 months before the effective date.",
   sprintf("Data rules: gross prices; sales after the effective date %s; likely flip purchases %s; sales with no MLS exposure %s.",
           if (isTRUE(cfg$exclude_after_effective)) "excluded" else "kept",
           if (isTRUE(cfg$exclude_flip_purchases)) "excluded" else "kept",
           if (!isTRUE(cfg$exclude_unexposed)) "kept" else if (exposure_checked) "excluded" else "not checked (no MLS entry date in the file)"),
   sprintf("Data SHA-256: %s   Config SHA-256: %s   Master seed: %d", data_hash, cfg_hash, cfg$master_seed),
-  sprintf("Review flags: %d grid line(s) flagged (REVERSED SEGMENT %d, FHFA CHECK %d, COMP INFLUENCE %d, OUTSIDE ITS RANGE %d); see comp_grid.csv, review_flag column.",
-          sum(grid$review_flag != ""), flag_n("REVERSED"), flag_n("FHFA CHECK"), flag_n("COMP INFLUENCE"), flag_n("OUTSIDE ITS RANGE")),
   "", scope, "",
   "I reviewed the MARS/regression statistical output for this assignment. I considered the modeled estimates, standard errors and ranges in the context of the specific comparable sales, market conditions and paired-sales support where available. Final adjustments were determined by my independent professional judgment and reconciliation of all evidence. Where data support was insufficient, adjustments were treated as not supported or developed qualitatively.",
   "[ ] Adopted   [ ] Modified   [ ] Rejected   Notes: ________________________________")
