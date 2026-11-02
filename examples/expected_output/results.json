@@ -1,11 +1,11 @@
 {
-  "scope_notice": "Scope and use: statistical analysis supporting the appraiser's adjustment development. Per-unit figures and line amounts are model estimates with stated uncertainty, not confirmed market facts. The appraiser makes all final adjustment selections, within or outside the supported ranges. No indicated, reconciled or opinion-of-value figure is produced. Prepared with reference to USPAP Advisory Opinion 41 (Use of Technology in an Appraisal or Appraisal Review Assignment): the tool cannot comply with USPAP; the appraiser remains responsible for judging whether this output is accurate and relevant to the assignment.",
+  "scope_notice": "Scope and use: statistical analysis supporting the appraiser's adjustment development. Per-unit rates and value curves are model estimates with stated uncertainty, not confirmed market facts. The appraiser makes all final adjustment selections. No indicated, reconciled or opinion-of-value figure is produced. Prepared with reference to USPAP Advisory Opinion 41 (Use of Technology in an Appraisal or Appraisal Review Assignment): the tool cannot comply with USPAP; the appraiser remains responsible for judging whether this output is accurate and relevant to the assignment.",
   "engine": {
     "name": "MARS / Regression Adjustment Support",
-    "version": "2.3.1",
+    "version": "2.4.0",
     "earth_version": "5.3.3",
     "r_version": "R version 4.3.3 (2024-02-29)",
-    "run_date": "2026-10-29"
+    "run_date": "2026-11-02"
   },
   "assignment": {
     "effective_date": "2026-09-15",
@@ -33,7 +33,8 @@
       "distressed / non-market sale type": 11,
       "price above the time model's estimate by more than 3x (data error or not a market sale)": 2
     },
-    "notes": ["Raw Bright MLS export detected; mapped to standard schema (bedrooms and baths above grade; blank garage, half bath and carport = 0).", "Price screen: 2 sale(s) sold for more than 3x above or below what the time model expects for their features and date; left out of both pools and listed in exclusions: DEMO200019, DEMO200176.", "Cleaning: 320 sales in file, 307 clean, 13 excluded. Effective date 2026-09-15, sale age from closing date, window 2021-05-08 to 2026-08-18.", "Listing weights: 37 of 307 clean sales count for less because a bedroom, bath, garage or carport count sits more than 2 away from what is typical for their size (the median of the nearest 61 sales by GLA), or a finished basement has its lower-level rooms left blank while the main line shows more rooms than typical. Nothing is dropped for this; the list is in listing_weights.csv.", "Time index: 307 clean sales, log-price model with the model features and quarter of the year; bends allowed every 6 months with 20 sales on each side (9 candidate dates). Kept: overall slope. R-squared 0.857 (weighted). 49 sale(s) priced far from the time model got less weight.", "Adjustment pool: 281 of 307 clean sales inside your ranges (lot_sf 5,000 to any; year_built 1968 to any).", "Priced on the grid: Site, Bedrooms, Full baths, Half baths, Gross living area, Garage, Carport, Pool. Background controls in the model, never on the grid: year built, levels, finished basement.", "Adjustment model: MARS left out bedrooms, half baths, carport, levels, finished basement; each went back in as a straight line so every priced line gets a number and a range.", "Weighted fit: 54 of 281 pool sales priced far from the model (beyond 1.345 robust standard deviations) got less weight; with the listing weights the pool counts as 266 full-weight sales.", "Comps not in the modeled data (still adjusted, flagged): MANUAL001 (not in the sales file); MANUAL002 (not in the sales file).", "Comps outside your adjustment-pool ranges (still adjusted; lines that fall outside the modeled sales are flagged): DEMO200033.", "Comp listings that look off by the same test the pool sales get: C3 4066 Briar Gate Pl (finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)); C4 4099 Fox Hollow Dr (6 garage spaces where 2 is typical for its size). Check those records before relying on their count lines.", "FHFA check: FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A), annual, 2010 to 2025 (ends before the effective date, so its changes run to 2025 only). Compared with this index over the same annual periods.", "Leave-comps-out check: refit without the 3 comp(s) in the adjustment pool; 0 line(s) moved outside their half-sample range."]
+    "excluded_by_appraiser": [],
+    "notes": ["Raw Bright MLS export detected; mapped to standard schema (bedrooms and baths above grade; blank garage, half bath and carport = 0).", "Price screen: 2 sale(s) sold for more than 3x above or below what the time model expects for their features and date; left out of both pools and listed in exclusions: DEMO200019, DEMO200176.", "Cleaning: 320 sales in file, 307 clean, 13 excluded. Effective date 2026-09-15, sale age from closing date, window 2021-05-08 to 2026-08-18.", "Listing weights: 37 of 307 clean sales count for less because a bedroom, bath, garage or carport count sits more than 2 away from what is typical for their size (the median of the nearest 61 sales by GLA), or a finished basement has its lower-level rooms left blank while the main line shows more rooms than typical. Nothing is dropped for this; the list is in listing_weights.csv.", "Time index: 307 clean sales, log-price model with the model features and quarter of the year; bends allowed every 6 months with 20 sales on each side (9 candidate dates). Kept: overall slope. R-squared 0.857 (weighted). 49 sale(s) priced far from the time model got less weight.", "Adjustment pool: 281 of 307 clean sales inside your ranges (lot_sf 5,000 to any; year_built 1968 to any).", "Lines priced: Site, Bedrooms, Full baths, Half baths, Gross living area, Garage, Carport, Pool. Background controls in both models, never priced: year built, levels, finished basement.", "Adjustment model: MARS left out bedrooms, half baths, carport, levels, finished basement; each went back in as a straight line so every priced line gets a number and a range.", "Weighted fit: 54 of 281 pool sales priced far from the model (beyond 1.345 robust standard deviations) got less weight; with the listing weights the pool counts as 266 full-weight sales.", "Held-out test (5-fold x 16, the same folds for both models): MARS pooled out-of-fold R-squared 0.77, typical miss 5.4%; multiple regression 0.79, typical miss 5.2%. MARS cross-validated R-squared averaged fold by fold 0.77 (sd 0.05).", "Comps not in the modeled data: MANUAL001 (not in the sales file); MANUAL002 (not in the sales file).", "Comps outside the adjustment-pool ranges: DEMO200033.", "Comp listings that look off by the same test the pool sales get: C3 4066 Briar Gate Pl (finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)); C4 4099 Fox Hollow Dr (6 garage spaces where 2 is typical for its size).", "FHFA check: FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A), annual, 2010 to 2025 (ends before the effective date, so its changes run to 2025 only). Compared with this index over the same annual periods.", "Leave-comps-out check: refit without the 3 comp(s) in the adjustment pool; 0 MARS comp line(s) and 0 multiple-regression rate(s) moved outside their half-sample range.", "Older comps (sold more than 12 months before the effective date): C1 2022-07-31; C2 2022-06-15; C3 2024-12-12; C4 2024-08-23."]
   },
   "variables": {
     "priced": ["lot_sf", "beds_ag", "fb_ag", "hb_ag", "gla", "garage", "carport", "pool"],
@@ -65,30 +66,8 @@
     "time_price_downweighted": 49,
     "time_effective_n": 292.7
   },
-  "review_flags": [
-    {
-      "comp_mls": "DEMO200022",
-      "feature": "time (market index)",
-      "review_flag": "FHFA CHECK: FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A) shows +2.1% from 2024 to 2025; these sales show +3.9% over the same periods (half-sample range +3.0% to +9.1%). Find out why before relying on this time line."
-    },
-    {
-      "comp_mls": "DEMO200033",
-      "feature": "time (market index)",
-      "review_flag": "FHFA CHECK: FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A) shows +2.1% from 2024 to 2025; these sales show +3.9% over the same periods (half-sample range +3.0% to +9.1%). Find out why before relying on this time line."
-    },
-    {
-      "comp_mls": "DEMO200033",
-      "feature": "garage",
-      "review_flag": "REVERSED SEGMENT: 3 to 6 at -$4,253/space (-$12,758). More of this feature normally adds value; check the segment and its value curve before relying on this line."
-    },
-    {
-      "comp_mls": "MANUAL002",
-      "feature": "carport",
-      "review_flag": "REVERSED SEGMENT: 0 to 1 at -$4,764/space (-$4,764). More of this feature normally adds value; check the segment and its value curve before relying on this line."
-    }
-  ],
   "time_index": {
-    "method": "Quality-adjusted log-price index from 307 clean sales: log price on site, bedrooms, full baths, half baths, gross living area, garage, carport, pool, year built, levels, finished basement, quarter of the year (reported, not applied), plus a time curve that may bend only on a 6-month calendar grid with at least 20 sales on each side (10 in the half-sample refits, which use half the sales), bends pruned by GCV (penalty 2). Listings far from typical and prices far from the model count for less (listing and Huber weights). Prices in the adjustment pool are brought to the effective date with it before MARS prices the features.",
+    "method": "Quality-adjusted log-price index from 307 clean sales: log price on site, bedrooms, full baths, half baths, gross living area, garage, carport, pool, year built, levels, finished basement, quarter of the year (reported, not applied), plus a time curve that may bend only on calendar dates every 6 months, with at least 20 sales on each side (10 in the half-sample refits, which use half the sales), bends pruned by GCV (penalty 2). Listings far from typical and prices far from the model count for less (listing and Huber weights). Prices in the adjustment pool are brought to the effective date with it before either model prices the features.",
     "n_sales": 307,
     "knot_months": 6,
     "min_side": 20,
@@ -390,6 +369,8 @@
     "cvrsq": 0.7666,
     "cvrsq_sd": 0.0514,
     "cv_folds": 80,
+    "oof_rsq": 0.772438,
+    "mdape": 0.053768,
     "rmse": 33477,
     "mae": 25445,
     "n_terms": 16,
@@ -425,31 +406,324 @@
       "fin_bsmt": 0.01
     }
   },
+  "multiple_regression": {
+    "n": 281,
+    "k": 12,
+    "rsq": 0.821229,
+    "rmse": 34151,
+    "oof_rsq": 0.792282,
+    "mdape": 0.052241,
+    "intercept": -2248122.59936579,
+    "intercept_se": 317745.785646537,
+    "coefficients": [
+      {
+        "variable": "lot_sf",
+        "label": "Site",
+        "transform": "ln(1 + lot sf)",
+        "role": "priced",
+        "coefficient": 46846.5626265076,
+        "se": 3514.30025180722,
+        "t": 13.3302675553738,
+        "_row": "lot_sf"
+      },
+      {
+        "variable": "beds_ag",
+        "label": "Bedrooms",
+        "transform": "",
+        "role": "priced",
+        "coefficient": 1793.03609448193,
+        "se": 3052.13011588005,
+        "t": 0.587470398182852,
+        "_row": "beds_ag"
+      },
+      {
+        "variable": "fb_ag",
+        "label": "Full baths",
+        "transform": "",
+        "role": "priced",
+        "coefficient": 20097.1291658894,
+        "se": 3301.74558086168,
+        "t": 6.08681943344784,
+        "_row": "fb_ag"
+      },
+      {
+        "variable": "hb_ag",
+        "label": "Half baths",
+        "transform": "",
+        "role": "priced",
+        "coefficient": 6744.81066587633,
+        "se": 3419.47091880239,
+        "t": 1.97247200693801,
+        "_row": "hb_ag"
+      },
+      {
+        "variable": "gla",
+        "label": "Gross living area",
+        "transform": "",
+        "role": "priced",
+        "coefficient": 91.817401088774,
+        "se": 5.8205768370371,
+        "t": 15.7746222856346,
+        "_row": "gla"
+      },
+      {
+        "variable": "garage",
+        "label": "Garage",
+        "transform": "",
+        "role": "priced",
+        "coefficient": 3080.66339804942,
+        "se": 1944.78520714367,
+        "t": 1.58406356996824,
+        "_row": "garage"
+      },
+      {
+        "variable": "carport",
+        "label": "Carport",
+        "transform": "",
+        "role": "priced",
+        "coefficient": -4359.25678860706,
+        "se": 5267.08024748373,
+        "t": -0.827641992105517,
+        "_row": "carport"
+      },
+      {
+        "variable": "pool",
+        "label": "Pool",
+        "transform": "",
+        "role": "priced",
+        "coefficient": 17988.5610423799,
+        "se": 6349.00040004209,
+        "t": 2.83329026759246,
+        "_row": "pool"
+      },
+      {
+        "variable": "year_built",
+        "label": "Year built",
+        "transform": "",
+        "role": "control",
+        "coefficient": 987.397688057553,
+        "se": 159.290033451305,
+        "t": 6.19874116831925,
+        "_row": "year_built"
+      },
+      {
+        "variable": "levels",
+        "label": "Levels",
+        "transform": "",
+        "role": "control",
+        "coefficient": -7151.92245187823,
+        "se": 4343.07858781751,
+        "t": -1.64674028048666,
+        "_row": "levels"
+      },
+      {
+        "variable": "fin_bsmt",
+        "label": "Finished basement",
+        "transform": "",
+        "role": "control",
+        "coefficient": 1238.99210757309,
+        "se": 4126.84486936419,
+        "t": 0.300227449006091,
+        "_row": "fin_bsmt"
+      }
+    ],
+    "rates": {
+      "lot_sf": {
+        "rate": 3.12289598203504,
+        "se": 0.234271065382789,
+        "lo": 2.67741045651097,
+        "hi": 3.55520478039594,
+        "n_refits": 200
+      },
+      "beds_ag": {
+        "rate": 1793.03609448193,
+        "se": 3052.13011588005,
+        "lo": -4140.08014240228,
+        "hi": 7768.87244753222,
+        "n_refits": 200
+      },
+      "fb_ag": {
+        "rate": 20097.1291658894,
+        "se": 3301.74558086168,
+        "lo": 13781.773498112,
+        "hi": 27516.1573962178,
+        "n_refits": 200
+      },
+      "hb_ag": {
+        "rate": 6744.81066587633,
+        "se": 3419.47091880239,
+        "lo": 458.117090154432,
+        "hi": 15081.7420003829,
+        "n_refits": 200
+      },
+      "gla": {
+        "rate": 91.817401088774,
+        "se": 5.8205768370371,
+        "lo": 81.0590176646459,
+        "hi": 102.97241372146,
+        "n_refits": 200
+      },
+      "garage": {
+        "rate": 3080.66339804942,
+        "se": 1944.78520714367,
+        "lo": -1132.20548299583,
+        "hi": 7770.94902100739,
+        "n_refits": 200
+      },
+      "carport": {
+        "rate": -4359.25678860706,
+        "se": 5267.08024748373,
+        "lo": -13646.2987975354,
+        "hi": 10097.3845758348,
+        "n_refits": 200
+      },
+      "pool": {
+        "rate": 17988.5610423799,
+        "se": 6349.00040004209,
+        "lo": 5183.04828876691,
+        "hi": 28934.662790056,
+        "n_refits": 200
+      },
+      "year_built": {
+        "rate": 987.397688057553,
+        "se": 159.290033451305,
+        "lo": 642.827103008824,
+        "hi": 1315.86763419496,
+        "n_refits": 200
+      },
+      "levels": {
+        "rate": -7151.92245187823,
+        "se": 4343.07858781751,
+        "lo": -15322.2682850283,
+        "hi": 1463.43553920361,
+        "n_refits": 200
+      },
+      "fin_bsmt": {
+        "rate": 1238.99210757309,
+        "se": 4126.84486936419,
+        "lo": -8126.07647931086,
+        "hi": 10493.1383724443,
+        "n_refits": 200
+      }
+    },
+    "leave_comps_out": [
+      {
+        "feature": "lot_sf",
+        "with_comps": 3.12289598203504,
+        "without_comps": 3.11812687003731,
+        "change": -0.00476911199773244,
+        "half_sample_p2.5": 2.67741045651097,
+        "half_sample_p97.5": 3.55520478039594,
+        "outside_range": false
+      },
+      {
+        "feature": "beds_ag",
+        "with_comps": 1793.03609448193,
+        "without_comps": 1485.41596377521,
+        "change": -307.620130706726,
+        "half_sample_p2.5": -4140.08014240228,
+        "half_sample_p97.5": 7768.87244753222,
+        "outside_range": false
+      },
+      {
+        "feature": "fb_ag",
+        "with_comps": 20097.1291658894,
+        "without_comps": 19733.0843963165,
+        "change": -364.044769572909,
+        "half_sample_p2.5": 13781.773498112,
+        "half_sample_p97.5": 27516.1573962178,
+        "outside_range": false
+      },
+      {
+        "feature": "hb_ag",
+        "with_comps": 6744.81066587633,
+        "without_comps": 7345.69488817832,
+        "change": 600.884222301991,
+        "half_sample_p2.5": 458.117090154432,
+        "half_sample_p97.5": 15081.7420003829,
+        "outside_range": false
+      },
+      {
+        "feature": "gla",
+        "with_comps": 91.817401088774,
+        "without_comps": 92.5201068577731,
+        "change": 0.702705768999095,
+        "half_sample_p2.5": 81.0590176646459,
+        "half_sample_p97.5": 102.97241372146,
+        "outside_range": false
+      },
+      {
+        "feature": "garage",
+        "with_comps": 3080.66339804942,
+        "without_comps": 2960.85824004306,
+        "change": -119.80515800636,
+        "half_sample_p2.5": -1132.20548299583,
+        "half_sample_p97.5": 7770.94902100739,
+        "outside_range": false
+      },
+      {
+        "feature": "carport",
+        "with_comps": -4359.25678860706,
+        "without_comps": -4309.15509047493,
+        "change": 50.1016981321291,
+        "half_sample_p2.5": -13646.2987975354,
+        "half_sample_p97.5": 10097.3845758348,
+        "outside_range": false
+      },
+      {
+        "feature": "pool",
+        "with_comps": 17988.5610423799,
+        "without_comps": 18189.1489969698,
+        "change": 200.587954589944,
+        "half_sample_p2.5": 5183.04828876691,
+        "half_sample_p97.5": 28934.662790056,
+        "outside_range": false
+      }
+    ]
+  },
+  "mars_flags": {
+    "pool_under_bar": false,
+    "oof_under_bar": false,
+    "pool_sales": 281,
+    "pool_bar": 150,
+    "oof_rsq": 0.772438,
+    "oof_bar": 0,
+    "segment_bar": 20,
+    "segments": 12,
+    "segments_no_model_rate": 0,
+    "segments_under_bar": 0
+  },
   "location_effects": {},
   "per_segment_slopes": [
     {
       "feature": "lot_sf",
       "from": 5104,
       "to": 20941,
-      "slope_per_unit": 4.01,
+      "slope_per_unit": 4.00548525093244,
       "in_model": true,
-      "_row": "lot_sf.1"
+      "n_sales": 186,
+      "no_model_rate": false,
+      "flags": ""
     },
     {
       "feature": "lot_sf",
       "from": 20941,
       "to": 94002,
-      "slope_per_unit": 0.97,
+      "slope_per_unit": 0.969088737721045,
       "in_model": true,
-      "_row": "lot_sf.2"
+      "n_sales": 96,
+      "no_model_rate": false,
+      "flags": ""
     },
     {
       "feature": "beds_ag",
       "from": 2,
       "to": 6,
-      "slope_per_unit": 2395.63,
+      "slope_per_unit": 2395.633362525,
       "in_model": true,
-      "_row": "beds_ag"
+      "n_sales": 281,
+      "no_model_rate": false,
+      "flags": ""
     },
     {
       "feature": "fb_ag",
@@ -457,157 +731,1322 @@
       "to": 2,
       "slope_per_unit": 0,
       "in_model": true,
-      "_row": "fb_ag.1"
+      "n_sales": 156,
+      "no_model_rate": false,
+      "flags": ""
     },
     {
       "feature": "fb_ag",
       "from": 2,
       "to": 4,
-      "slope_per_unit": 20766.14,
+      "slope_per_unit": 20766.1387042897,
       "in_model": true,
-      "_row": "fb_ag.2"
+      "n_sales": 247,
+      "no_model_rate": false,
+      "flags": ""
     },
     {
       "feature": "hb_ag",
       "from": 0,
       "to": 2,
-      "slope_per_unit": 5324.59,
+      "slope_per_unit": 5324.59490296938,
       "in_model": true,
-      "_row": "hb_ag"
+      "n_sales": 281,
+      "no_model_rate": false,
+      "flags": ""
     },
     {
       "feature": "gla",
       "from": 1200,
       "to": 1890,
-      "slope_per_unit": 115,
+      "slope_per_unit": 114.998909577604,
       "in_model": true,
-      "_row": "gla.1"
+      "n_sales": 97,
+      "no_model_rate": false,
+      "flags": ""
     },
     {
       "feature": "gla",
       "from": 1890,
       "to": 3190,
-      "slope_per_unit": 87.25,
+      "slope_per_unit": 87.254947344614,
       "in_model": true,
-      "_row": "gla.2"
+      "n_sales": 186,
+      "no_model_rate": false,
+      "flags": ""
     },
     {
       "feature": "garage",
       "from": 0,
       "to": 3,
-      "slope_per_unit": 7708.64,
+      "slope_per_unit": 7708.64171067536,
       "in_model": true,
-      "_row": "garage.1"
+      "n_sales": 273,
+      "no_model_rate": false,
+      "flags": ""
     },
     {
       "feature": "garage",
       "from": 3,
       "to": 10,
-      "slope_per_unit": -4252.61,
+      "slope_per_unit": -4252.61123689559,
       "in_model": true,
-      "_row": "garage.2"
+      "n_sales": 34,
+      "no_model_rate": false,
+      "flags": ""
     },
     {
       "feature": "carport",
       "from": 0,
       "to": 2,
-      "slope_per_unit": -4764.24,
+      "slope_per_unit": -4764.24337663128,
       "in_model": true,
-      "_row": "carport"
+      "n_sales": 281,
+      "no_model_rate": false,
+      "flags": ""
     },
     {
       "feature": "pool",
       "from": 0,
       "to": 1,
-      "slope_per_unit": 19564.77,
+      "slope_per_unit": 19564.7726483899,
       "in_model": true,
-      "_row": "pool"
+      "n_sales": 281,
+      "no_model_rate": false,
+      "flags": ""
     }
   ],
-  "comp_diagnostics": [
+  "per_unit_rates": [
     {
+      "feature": "lot_sf",
+      "priced": true,
+      "sales_differing": 279,
+      "pool_sales": 281,
+      "in_mars": true,
+      "picked_by_mars": true,
+      "multiple_regression": 3.12289598203504,
+      "mr_se": 0.234271065382789,
+      "mr_half_sample_p2.5": 2.67741045651097,
+      "mr_half_sample_p97.5": 3.55520478039594,
+      "theil_sen": 3.03014385075539,
+      "lad": 3.01824722700487,
+      "grouped_quintiles": 3.05280332665633
+    },
+    {
+      "feature": "beds_ag",
+      "priced": true,
+      "sales_differing": 172,
+      "pool_sales": 281,
+      "in_mars": true,
+      "picked_by_mars": false,
+      "multiple_regression": 1793.03609448193,
+      "mr_se": 3052.13011588005,
+      "mr_half_sample_p2.5": -4140.08014240228,
+      "mr_half_sample_p97.5": 7768.87244753222,
+      "theil_sen": 1602.38573921791,
+      "lad": 868.446806979382,
+      "grouped_quintiles": 1186.54789497366
+    },
+    {
+      "feature": "fb_ag",
+      "priced": true,
+      "sales_differing": 159,
+      "pool_sales": 281,
+      "in_mars": true,
+      "picked_by_mars": true,
+      "multiple_regression": 20097.1291658894,
+      "mr_se": 3301.74558086168,
+      "mr_half_sample_p2.5": 13781.773498112,
+      "mr_half_sample_p97.5": 27516.1573962178,
+      "theil_sen": 19336.0350260709,
+      "lad": 18585.6210268213,
+      "grouped_quintiles": 21449.6922214452
+    },
+    {
+      "feature": "hb_ag",
+      "priced": true,
+      "sales_differing": 119,
+      "pool_sales": 281,
+      "in_mars": true,
+      "picked_by_mars": false,
+      "multiple_regression": 6744.81066587633,
+      "mr_se": 3419.47091880239,
+      "mr_half_sample_p2.5": 458.117090154432,
+      "mr_half_sample_p97.5": 15081.7420003829,
+      "theil_sen": 4384.7813685533,
+      "lad": 2673.82203083321,
+      "grouped_quintiles": 4970.85957396305
+    },
+    {
+      "feature": "gla",
+      "priced": true,
+      "sales_differing": 275,
+      "pool_sales": 281,
+      "in_mars": true,
+      "picked_by_mars": true,
+      "multiple_regression": 91.817401088774,
+      "mr_se": 5.8205768370371,
+      "mr_half_sample_p2.5": 81.0590176646459,
+      "mr_half_sample_p97.5": 102.97241372146,
+      "theil_sen": 92.5645032098553,
+      "lad": 91.0536875693411,
+      "grouped_quintiles": 90.6426866938601
+    },
+    {
+      "feature": "garage",
+      "priced": true,
+      "sales_differing": 147,
+      "pool_sales": 281,
+      "in_mars": true,
+      "picked_by_mars": true,
+      "multiple_regression": 3080.66339804942,
+      "mr_se": 1944.78520714367,
+      "mr_half_sample_p2.5": -1132.20548299583,
+      "mr_half_sample_p97.5": 7770.94902100739,
+      "theil_sen": 6057.132154522,
+      "lad": 5970.42662137081,
+      "grouped_quintiles": 2180.77203120587
+    },
+    {
+      "feature": "carport",
+      "priced": true,
+      "sales_differing": 18,
+      "pool_sales": 281,
+      "in_mars": true,
+      "picked_by_mars": false,
+      "multiple_regression": -4359.25678860706,
+      "mr_se": 5267.08024748373,
+      "mr_half_sample_p2.5": -13646.2987975354,
+      "mr_half_sample_p97.5": 10097.3845758348,
+      "theil_sen": -4950.0766156187,
+      "lad": -3332.46455200577,
+      "grouped_quintiles": null
+    },
+    {
+      "feature": "pool",
+      "priced": true,
+      "sales_differing": 32,
+      "pool_sales": 281,
+      "in_mars": true,
+      "picked_by_mars": true,
+      "multiple_regression": 17988.5610423799,
+      "mr_se": 6349.00040004209,
+      "mr_half_sample_p2.5": 5183.04828876691,
+      "mr_half_sample_p97.5": 28934.662790056,
+      "theil_sen": 20769.7868108265,
+      "lad": 23274.212767843,
+      "grouped_quintiles": null
+    }
+  ],
+  "time_support": [
+    {
+      "comp": 1,
       "mls_id": "DEMO200008",
       "address": "4024 Winter Park Rd",
-      "price_used": 464300,
-      "price_time_adjusted": 543603,
-      "model_estimate": 505199,
-      "residual": 38404,
-      "cqa": 8.97,
-      "in_fit": true,
-      "listing_weight": 1,
-      "listing_check": "",
-      "model_weight": 1,
-      "reading": "Residual = time-adjusted price above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+      "date": "2022-07-31",
+      "months": 49.5112936344969,
+      "before_export": false,
+      "index": {
+        "total": 0.170801399949186,
+        "lo": 0.10544487187957,
+        "hi": 0.216076060274701,
+        "per_month": 0.0031899762194032,
+        "per_month_simple": 0.00344974625809778,
+        "stretches": [
+          {
+            "from": "2022-07-31",
+            "to": "2026-09-15",
+            "months": 49.5112936344969,
+            "pct_per_month": 0.0031899762194032,
+            "pct_total": 0.170801399949186
+          }
+        ]
+      },
+      "fhfa": {
+        "label": "FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A)",
+        "from": "2022",
+        "to": "2025",
+        "months": 36.0082135523614,
+        "total": 0.147348022679968,
+        "per_month": 0.00382456892190808,
+        "per_month_simple": 0.00409206700759264,
+        "ends_early": true
+      },
+      "medians": {
+        "from_year": 2022,
+        "to_year": 2026,
+        "total": 0.131789245564134,
+        "months": 48,
+        "per_month": 0.0025824910587231,
+        "per_month_simple": 0.00274560928258612,
+        "n_from": 76
+      }
     },
     {
+      "comp": 2,
       "mls_id": "DEMO200092",
       "address": "4276 Bakersville Rd",
-      "price_used": 357400,
-      "price_time_adjusted": 420463,
-      "model_estimate": 388126,
-      "residual": 32337,
-      "cqa": 8.58,
-      "in_fit": true,
-      "listing_weight": 1,
-      "listing_check": "",
-      "model_weight": 1,
-      "reading": "Residual = time-adjusted price above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+      "date": "2022-06-15",
+      "months": 51.0225872689938,
+      "before_export": false,
+      "index": {
+        "total": 0.176450423352378,
+        "lo": 0.104679855327418,
+        "hi": 0.219715058290114,
+        "per_month": 0.0031899762194032,
+        "per_month_simple": 0.0034582805929092,
+        "stretches": [
+          {
+            "from": "2022-06-15",
+            "to": "2026-09-15",
+            "months": 51.0225872689938,
+            "pct_per_month": 0.0031899762194032,
+            "pct_total": 0.176450423352378
+          }
+        ]
+      },
+      "fhfa": {
+        "label": "FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A)",
+        "from": "2022",
+        "to": "2025",
+        "months": 36.0082135523614,
+        "total": 0.147348022679968,
+        "per_month": 0.00382456892190808,
+        "per_month_simple": 0.00409206700759264,
+        "ends_early": true
+      },
+      "medians": {
+        "from_year": 2022,
+        "to_year": 2026,
+        "total": 0.131789245564134,
+        "months": 48,
+        "per_month": 0.0025824910587231,
+        "per_month_simple": 0.00274560928258612,
+        "n_from": 76
+      }
     },
     {
+      "comp": 3,
       "mls_id": "DEMO200022",
       "address": "4066 Briar Gate Pl",
-      "price_used": 466300,
-      "price_time_adjusted": 498701,
-      "model_estimate": 497024,
-      "residual": 1677,
-      "cqa": 5.59,
-      "in_fit": true,
-      "listing_weight": 0.5,
-      "listing_check": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)",
-      "model_weight": 0.5,
-      "reading": "Residual = time-adjusted price above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+      "date": "2024-12-12",
+      "months": 21.0924024640657,
+      "before_export": false,
+      "index": {
+        "total": 0.0694849445558137,
+        "lo": 0,
+        "hi": 0.128247994977207,
+        "per_month": 0.0031899762194032,
+        "per_month_simple": 0.00329431152635137,
+        "stretches": [
+          {
+            "from": "2024-12-12",
+            "to": "2026-09-15",
+            "months": 21.0924024640657,
+            "pct_per_month": 0.0031899762194032,
+            "pct_total": 0.0694849445558137
+          }
+        ]
+      },
+      "fhfa": {
+        "label": "FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A)",
+        "from": "2024",
+        "to": "2025",
+        "months": 12.0246406570842,
+        "total": 0.021045572126593,
+        "per_month": 0.00173354204550002,
+        "per_month_simple": 0.00175020382951687,
+        "ends_early": true
+      },
+      "medians": {
+        "from_year": 2024,
+        "to_year": 2026,
+        "total": 0.0598680872653476,
+        "months": 24,
+        "per_month": 0.0024256226743089,
+        "per_month_simple": 0.00249450363605615,
+        "n_from": 57
+      }
     },
     {
+      "comp": 4,
       "mls_id": "DEMO200033",
       "address": "4099 Fox Hollow Dr",
-      "price_used": 309300,
-      "price_time_adjusted": 334656,
-      "model_estimate": 332335,
-      "residual": 2321,
-      "cqa": 5.73,
-      "in_fit": false,
-      "listing_weight": 0.5,
-      "listing_check": "6 garage spaces where 2 is typical for its size",
-      "model_weight": null,
-      "reading": "Residual = time-adjusted price above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+      "date": "2024-08-23",
+      "months": 24.7392197125257,
+      "before_export": false,
+      "index": {
+        "total": 0.0819791572919526,
+        "lo": 0,
+        "hi": 0.152033824608334,
+        "per_month": 0.0031899762194032,
+        "per_month_simple": 0.0033137325366186,
+        "stretches": [
+          {
+            "from": "2024-08-23",
+            "to": "2026-09-15",
+            "months": 24.7392197125257,
+            "pct_per_month": 0.0031899762194032,
+            "pct_total": 0.0819791572919526
+          }
+        ]
+      },
+      "fhfa": {
+        "label": "FHFA all-transactions HPI, Fairfax County, VA (FRED ATNHPIUS51059A)",
+        "from": "2024",
+        "to": "2025",
+        "months": 12.0246406570842,
+        "total": 0.021045572126593,
+        "per_month": 0.00173354204550002,
+        "per_month_simple": 0.00175020382951687,
+        "ends_early": true
+      },
+      "medians": {
+        "from_year": 2024,
+        "to_year": 2026,
+        "total": 0.0598680872653476,
+        "months": 24,
+        "per_month": 0.0024256226743089,
+        "per_month_simple": 0.00249450363605615,
+        "n_from": 57
+      }
+    }
+  ],
+  "records_to_check": [
+    {
+      "kind": "comp",
+      "comp": 3,
+      "mls_id": "DEMO200022",
+      "address": "4066 Briar Gate Pl",
+      "date": "2024-12-12",
+      "sale_price": 466300,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
     },
     {
-      "mls_id": "MANUAL001",
-      "address": "77 Hand Entered Ct",
-      "price_used": 498000,
-      "price_time_adjusted": 502554,
-      "model_estimate": null,
-      "residual": null,
-      "cqa": null,
-      "in_fit": false,
-      "listing_weight": null,
-      "listing_check": "",
-      "model_weight": null,
-      "reading": "Residual = time-adjusted price above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+      "kind": "comp",
+      "comp": 4,
+      "mls_id": "DEMO200033",
+      "address": "4099 Fox Hollow Dr",
+      "date": "2024-08-23",
+      "sale_price": 309300,
+      "in_pool": false,
+      "weight": 0.5,
+      "reasons": "6 garage spaces where 2 is typical for its size"
     },
     {
-      "mls_id": "MANUAL002",
-      "address": "81 Hand Entered Ct",
-      "price_used": 455000,
-      "price_time_adjusted": 470296,
-      "model_estimate": null,
-      "residual": null,
-      "cqa": null,
-      "in_fit": false,
-      "listing_weight": 1,
-      "listing_check": "",
-      "model_weight": null,
-      "reading": "Residual = time-adjusted price above (+) or below (-) the model; CQA 0-10 ranks it among all modeled sales (5 = median). Large residuals point to condition, quality, view or location the data does not carry."
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200122",
+      "address": "4366 Cedar Run Rd",
+      "date": "2022-11-13",
+      "sale_price": 390800,
+      "in_pool": true,
+      "weight": 0.143253645200287,
+      "reasons": "10 garage spaces where 2 is typical for its size; time-adjusted price +18.2% from the MARS estimate, price weight 0.57"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200024",
+      "address": "4072 Indian Hill Dr",
+      "date": "2023-02-21",
+      "sale_price": 264800,
+      "in_pool": true,
+      "weight": 0.149153478124613,
+      "reasons": "6 garage spaces where 2 is typical for its size; time-adjusted price -30.6% from the MARS estimate, price weight 0.30"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200158",
+      "address": "4474 Natick Rd",
+      "date": "2024-12-28",
+      "sale_price": 425700,
+      "in_pool": true,
+      "weight": 0.155857400075179,
+      "reasons": "9 garage spaces where 2 is typical for its size; time-adjusted price -13.9% from the MARS estimate, price weight 0.55"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200062",
+      "address": "4186 Meadow Bend Ct",
+      "date": "2021-07-23",
+      "sale_price": 254400,
+      "in_pool": true,
+      "weight": 0.285714285714286,
+      "reasons": "8 garage spaces where 1 is typical for its size"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200283",
+      "address": "4849 Hartley Ct",
+      "date": "2026-01-01",
+      "sale_price": 343600,
+      "in_pool": true,
+      "weight": 0.28971498942087,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line); time-adjusted price -16.3% from the MARS estimate, price weight 0.58"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200290",
+      "address": "4870 Winter Park Pl",
+      "date": "2021-07-21",
+      "sale_price": 276300,
+      "in_pool": true,
+      "weight": 0.333333333333333,
+      "reasons": "7 garage spaces where 1 is typical for its size"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200292",
+      "address": "4876 Natick Ct",
+      "date": "2024-12-09",
+      "sale_price": 443200,
+      "in_pool": true,
+      "weight": 0.35554859864642,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line); time-adjusted price -10.6% from the MARS estimate, price weight 0.71"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200174",
+      "address": "4522 Briar Gate Dr",
+      "date": "2022-07-18",
+      "sale_price": 513400,
+      "in_pool": true,
+      "weight": 0.362926129829011,
+      "reasons": "time-adjusted price +22.3% from the MARS estimate, price weight 0.36"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200088",
+      "address": "4264 Strattondale Ct",
+      "date": "2021-10-06",
+      "sale_price": 314200,
+      "in_pool": true,
+      "weight": 0.377196608830746,
+      "reasons": "time-adjusted price -21.8% from the MARS estimate, price weight 0.38"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200142",
+      "address": "4426 Hartley Dr",
+      "date": "2021-12-16",
+      "sale_price": 410700,
+      "in_pool": true,
+      "weight": 0.421060237712862,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line); time-adjusted price +10.6% from the MARS estimate, price weight 0.84"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200205",
+      "address": "4615 Meadow Bend Pl",
+      "date": "2022-07-08",
+      "sale_price": 325000,
+      "in_pool": true,
+      "weight": 0.446880401655292,
+      "reasons": "time-adjusted price +30.6% from the MARS estimate, price weight 0.45"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200077",
+      "address": "4231 Strattondale Ln",
+      "date": "2023-06-19",
+      "sale_price": 312000,
+      "in_pool": true,
+      "weight": 0.463652188601508,
+      "reasons": "time-adjusted price -19.6% from the MARS estimate, price weight 0.46"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200084",
+      "address": "4252 Indian Hill Ct",
+      "date": "2025-04-17",
+      "sale_price": 405000,
+      "in_pool": true,
+      "weight": 0.469911241255498,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line); time-adjusted price -9.0% from the MARS estimate, price weight 0.94"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200096",
+      "address": "4288 Hartley Pl",
+      "date": "2023-04-30",
+      "sale_price": 327100,
+      "in_pool": true,
+      "weight": 0.47388950674902,
+      "reasons": "time-adjusted price -18.4% from the MARS estimate, price weight 0.47"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200104",
+      "address": "4312 Old Mill Ct",
+      "date": "2026-04-26",
+      "sale_price": 377400,
+      "in_pool": true,
+      "weight": 0.490850706068599,
+      "reasons": "time-adjusted price -17.5% from the MARS estimate, price weight 0.49"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200186",
+      "address": "4558 Indian Hill Dr",
+      "date": "2021-10-23",
+      "sale_price": 315000,
+      "in_pool": true,
+      "weight": 0.492039642463596,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line); time-adjusted price -9.6% from the MARS estimate, price weight 0.98"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200004",
+      "address": "4012 Old Mill Ct",
+      "date": "2025-10-02",
+      "sale_price": 366300,
+      "in_pool": false,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200015",
+      "address": "4045 Strattondale Ln",
+      "date": "2023-01-20",
+      "sale_price": 422000,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "6 garage spaces where 2 is typical for its size"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200016",
+      "address": "4048 Laurel Fork Dr",
+      "date": "2021-05-09",
+      "sale_price": 357800,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200022",
+      "address": "4066 Briar Gate Pl",
+      "date": "2024-12-12",
+      "sale_price": 466300,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200033",
+      "address": "4099 Fox Hollow Dr",
+      "date": "2024-08-23",
+      "sale_price": 309300,
+      "in_pool": false,
+      "weight": 0.5,
+      "reasons": "6 garage spaces where 2 is typical for its size"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200037",
+      "address": "4111 Stony Brook Ct",
+      "date": "2026-08-17",
+      "sale_price": 265600,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200064",
+      "address": "4192 Fox Hollow Ct",
+      "date": "2023-10-07",
+      "sale_price": 342300,
+      "in_pool": false,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200086",
+      "address": "4258 Indian Hill Ct",
+      "date": "2021-05-21",
+      "sale_price": 381200,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200095",
+      "address": "4285 Strattondale Ln",
+      "date": "2025-12-09",
+      "sale_price": 459400,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200101",
+      "address": "4303 Brook Ford Rd",
+      "date": "2023-02-14",
+      "sale_price": 228800,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200107",
+      "address": "4321 Briar Gate Ct",
+      "date": "2025-04-12",
+      "sale_price": 318400,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200110",
+      "address": "4330 Old Mill Dr",
+      "date": "2024-09-19",
+      "sale_price": 495000,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200115",
+      "address": "4345 Briar Gate Ln",
+      "date": "2026-01-14",
+      "sale_price": 352900,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200132",
+      "address": "4396 Quail Hill Way",
+      "date": "2024-11-28",
+      "sale_price": 497900,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200148",
+      "address": "4444 Old Mill Dr",
+      "date": "2025-01-11",
+      "sale_price": 428000,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200163",
+      "address": "4489 Winter Park Ln",
+      "date": "2023-05-27",
+      "sale_price": 368500,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200184",
+      "address": "4552 Oak Ridge Way",
+      "date": "2024-12-28",
+      "sale_price": 398800,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200188",
+      "address": "4564 Quail Hill Ln",
+      "date": "2025-12-27",
+      "sale_price": 315400,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "5 garage spaces where 1 is typical for its size"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200194",
+      "address": "4582 Indian Hill Rd",
+      "date": "2025-04-16",
+      "sale_price": 431500,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200227",
+      "address": "4681 Fox Hollow Rd",
+      "date": "2021-09-06",
+      "sale_price": 376700,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200251",
+      "address": "4753 Fox Hollow Ct",
+      "date": "2026-05-13",
+      "sale_price": 368700,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200258",
+      "address": "4774 Brook Ford Dr",
+      "date": "2024-04-20",
+      "sale_price": 413900,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "6 garage spaces where 2 is typical for its size"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200268",
+      "address": "4804 Garretson Pl",
+      "date": "2025-02-20",
+      "sale_price": 554800,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200273",
+      "address": "4819 Battalion Pl",
+      "date": "2021-09-28",
+      "sale_price": 384700,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200307",
+      "address": "4921 Fox Hollow Dr",
+      "date": "2023-03-29",
+      "sale_price": 393900,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200315",
+      "address": "4945 Winter Park Way",
+      "date": "2023-11-10",
+      "sale_price": 276800,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200316",
+      "address": "4948 Winter Park Pl",
+      "date": "2026-05-16",
+      "sale_price": 508300,
+      "in_pool": true,
+      "weight": 0.5,
+      "reasons": "finished basement with the lower-level rooms left blank and more above-grade rooms than typical (basement rooms probably listed on the main line)"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200136",
+      "address": "4408 Hartley Rd",
+      "date": "2021-10-02",
+      "sale_price": 305900,
+      "in_pool": true,
+      "weight": 0.523253216919719,
+      "reasons": "time-adjusted price -17.1% from the MARS estimate, price weight 0.52"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200055",
+      "address": "4165 Oak Ridge Rd",
+      "date": "2025-03-17",
+      "sale_price": 596800,
+      "in_pool": true,
+      "weight": 0.534719439725471,
+      "reasons": "time-adjusted price +13.4% from the MARS estimate, price weight 0.53"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200070",
+      "address": "4210 Sycamore Dr",
+      "date": "2025-08-09",
+      "sale_price": 544900,
+      "in_pool": true,
+      "weight": 0.535733501149761,
+      "reasons": "time-adjusted price +15.1% from the MARS estimate, price weight 0.54"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200217",
+      "address": "4651 Fox Hollow Rd",
+      "date": "2024-06-12",
+      "sale_price": 404500,
+      "in_pool": true,
+      "weight": 0.539009226527142,
+      "reasons": "time-adjusted price -14.4% from the MARS estimate, price weight 0.54"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200261",
+      "address": "4783 Natick Ln",
+      "date": "2022-03-06",
+      "sale_price": 281400,
+      "in_pool": true,
+      "weight": 0.539493329086852,
+      "reasons": "time-adjusted price -18.1% from the MARS estimate, price weight 0.54"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200063",
+      "address": "4189 Meadow Bend Dr",
+      "date": "2025-03-05",
+      "sale_price": 463100,
+      "in_pool": true,
+      "weight": 0.548802675741446,
+      "reasons": "time-adjusted price +17.4% from the MARS estimate, price weight 0.55"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200266",
+      "address": "4798 Briar Gate Rd",
+      "date": "2025-02-23",
+      "sale_price": 407900,
+      "in_pool": true,
+      "weight": 0.584463581091411,
+      "reasons": "time-adjusted price +18.7% from the MARS estimate, price weight 0.58"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200152",
+      "address": "4456 Quail Hill Dr",
+      "date": "2022-12-02",
+      "sale_price": 300900,
+      "in_pool": true,
+      "weight": 0.584813809891612,
+      "reasons": "time-adjusted price -16.4% from the MARS estimate, price weight 0.58"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200051",
+      "address": "4153 Cedar Run Ct",
+      "date": "2026-02-23",
+      "sale_price": 615300,
+      "in_pool": true,
+      "weight": 0.605311799578874,
+      "reasons": "time-adjusted price +11.7% from the MARS estimate, price weight 0.61"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200252",
+      "address": "4756 Winter Park Way",
+      "date": "2023-03-20",
+      "sale_price": 258100,
+      "in_pool": true,
+      "weight": 0.616635336155776,
+      "reasons": "time-adjusted price -18.0% from the MARS estimate, price weight 0.62"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200089",
+      "address": "4267 Cedar Run Pl",
+      "date": "2025-03-04",
+      "sale_price": 451600,
+      "in_pool": true,
+      "weight": 0.627996287650332,
+      "reasons": "time-adjusted price +15.3% from the MARS estimate, price weight 0.63"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200170",
+      "address": "4510 Laurel Fork Pl",
+      "date": "2026-07-25",
+      "sale_price": 415600,
+      "in_pool": true,
+      "weight": 0.657719308006759,
+      "reasons": "time-adjusted price -12.7% from the MARS estimate, price weight 0.66"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200303",
+      "address": "4909 Laurel Fork Ln",
+      "date": "2025-07-27",
+      "sale_price": 457600,
+      "in_pool": true,
+      "weight": 0.673831777532347,
+      "reasons": "time-adjusted price +14.1% from the MARS estimate, price weight 0.67"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200155",
+      "address": "4465 Garretson Pl",
+      "date": "2022-09-12",
+      "sale_price": 327700,
+      "in_pool": true,
+      "weight": 0.677096046885574,
+      "reasons": "time-adjusted price +18.2% from the MARS estimate, price weight 0.68"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200226",
+      "address": "4678 Old Mill Pl",
+      "date": "2022-07-20",
+      "sale_price": 353400,
+      "in_pool": true,
+      "weight": 0.682329607096645,
+      "reasons": "time-adjusted price -12.4% from the MARS estimate, price weight 0.68"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200090",
+      "address": "4270 Garretson Way",
+      "date": "2023-03-23",
+      "sale_price": 265300,
+      "in_pool": true,
+      "weight": 0.685991997184419,
+      "reasons": "time-adjusted price -16.1% from the MARS estimate, price weight 0.69"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200005",
+      "address": "4015 Sycamore Pl",
+      "date": "2025-07-28",
+      "sale_price": 524900,
+      "in_pool": true,
+      "weight": 0.690074357337045,
+      "reasons": "time-adjusted price +11.8% from the MARS estimate, price weight 0.69"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200313",
+      "address": "4939 Ridge Ford Rd",
+      "date": "2025-06-21",
+      "sale_price": 491400,
+      "in_pool": true,
+      "weight": 0.699649024486616,
+      "reasons": "time-adjusted price +12.4% from the MARS estimate, price weight 0.70"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200247",
+      "address": "4741 Oak Ridge Ct",
+      "date": "2022-12-26",
+      "sale_price": 425600,
+      "in_pool": true,
+      "weight": 0.702040915037827,
+      "reasons": "time-adjusted price +13.1% from the MARS estimate, price weight 0.70"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200259",
+      "address": "4777 Battalion Rd",
+      "date": "2024-06-08",
+      "sale_price": 341600,
+      "in_pool": true,
+      "weight": 0.702791876600955,
+      "reasons": "time-adjusted price -13.2% from the MARS estimate, price weight 0.70"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200199",
+      "address": "4597 Garretson Pl",
+      "date": "2022-01-17",
+      "sale_price": 493900,
+      "in_pool": true,
+      "weight": 0.708108162830501,
+      "reasons": "time-adjusted price +10.6% from the MARS estimate, price weight 0.71"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200127",
+      "address": "4381 Cedar Run Ln",
+      "date": "2023-02-21",
+      "sale_price": 474300,
+      "in_pool": true,
+      "weight": 0.767864236557298,
+      "reasons": "time-adjusted price +10.6% from the MARS estimate, price weight 0.77"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200282",
+      "address": "4846 Fox Hollow Dr",
+      "date": "2021-11-28",
+      "sale_price": 386300,
+      "in_pool": true,
+      "weight": 0.798114168371025,
+      "reasons": "time-adjusted price +12.1% from the MARS estimate, price weight 0.80"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200260",
+      "address": "4780 Meadow Bend Pl",
+      "date": "2024-07-22",
+      "sale_price": 264500,
+      "in_pool": true,
+      "weight": 0.79975845622929,
+      "reasons": "time-adjusted price -14.8% from the MARS estimate, price weight 0.80"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200178",
+      "address": "4534 Fox Hollow Ln",
+      "date": "2023-01-31",
+      "sale_price": 244300,
+      "in_pool": true,
+      "weight": 0.820711053263178,
+      "reasons": "time-adjusted price -14.8% from the MARS estimate, price weight 0.82"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200147",
+      "address": "4441 Briar Gate Ct",
+      "date": "2024-09-18",
+      "sale_price": 429600,
+      "in_pool": true,
+      "weight": 0.840116622893083,
+      "reasons": "time-adjusted price +11.4% from the MARS estimate, price weight 0.84"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200264",
+      "address": "4792 Stony Brook Dr",
+      "date": "2025-08-29",
+      "sale_price": 294600,
+      "in_pool": true,
+      "weight": 0.843999552831154,
+      "reasons": "time-adjusted price -13.4% from the MARS estimate, price weight 0.84"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200318",
+      "address": "4954 Indian Hill Pl",
+      "date": "2025-04-07",
+      "sale_price": 278500,
+      "in_pool": true,
+      "weight": 0.847935155563208,
+      "reasons": "time-adjusted price -13.8% from the MARS estimate, price weight 0.85"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200023",
+      "address": "4069 Laurel Fork Rd",
+      "date": "2022-03-13",
+      "sale_price": 375300,
+      "in_pool": true,
+      "weight": 0.854829215422178,
+      "reasons": "time-adjusted price +11.7% from the MARS estimate, price weight 0.85"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200246",
+      "address": "4738 Quail Hill Way",
+      "date": "2022-03-02",
+      "sale_price": 340900,
+      "in_pool": true,
+      "weight": 0.863648124083849,
+      "reasons": "time-adjusted price +12.9% from the MARS estimate, price weight 0.86"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200248",
+      "address": "4744 Hartley Way",
+      "date": "2024-04-01",
+      "sale_price": 385900,
+      "in_pool": true,
+      "weight": 0.899248822384405,
+      "reasons": "time-adjusted price -9.5% from the MARS estimate, price weight 0.90"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200066",
+      "address": "4198 Sycamore Way",
+      "date": "2022-08-11",
+      "sale_price": 414100,
+      "in_pool": true,
+      "weight": 0.903204397649094,
+      "reasons": "time-adjusted price +10.0% from the MARS estimate, price weight 0.90"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200229",
+      "address": "4687 Indian Hill Dr",
+      "date": "2021-11-25",
+      "sale_price": 341300,
+      "in_pool": true,
+      "weight": 0.919629547775256,
+      "reasons": "time-adjusted price -9.6% from the MARS estimate, price weight 0.92"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200079",
+      "address": "4237 Quail Hill Ln",
+      "date": "2022-06-30",
+      "sale_price": 382800,
+      "in_pool": true,
+      "weight": 0.937906691930453,
+      "reasons": "time-adjusted price -8.6% from the MARS estimate, price weight 0.94"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200274",
+      "address": "4822 Hartley Ln",
+      "date": "2024-06-26",
+      "sale_price": 434300,
+      "in_pool": true,
+      "weight": 0.96113232494716,
+      "reasons": "time-adjusted price +9.6% from the MARS estimate, price weight 0.96"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200010",
+      "address": "4030 Battalion Ln",
+      "date": "2022-12-07",
+      "sale_price": 288500,
+      "in_pool": true,
+      "weight": 0.974467551765913,
+      "reasons": "time-adjusted price -10.9% from the MARS estimate, price weight 0.97"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200310",
+      "address": "4930 Natick Ct",
+      "date": "2023-07-16",
+      "sale_price": 353500,
+      "in_pool": true,
+      "weight": 0.976267231868407,
+      "reasons": "time-adjusted price -9.3% from the MARS estimate, price weight 0.98"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200058",
+      "address": "4174 Battalion Ct",
+      "date": "2025-11-12",
+      "sale_price": 430400,
+      "in_pool": true,
+      "weight": 0.981989763340523,
+      "reasons": "time-adjusted price +10.1% from the MARS estimate, price weight 0.98"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200119",
+      "address": "4357 Ridge Ford Dr",
+      "date": "2024-06-28",
+      "sale_price": 499500,
+      "in_pool": true,
+      "weight": 0.983922140739449,
+      "reasons": "time-adjusted price +8.1% from the MARS estimate, price weight 0.98"
+    },
+    {
+      "kind": "sale",
+      "comp": null,
+      "mls_id": "DEMO200028",
+      "address": "4084 Old Mill Dr",
+      "date": "2025-05-11",
+      "sale_price": 401700,
+      "in_pool": true,
+      "weight": 0.989297363014361,
+      "reasons": "time-adjusted price -8.7% from the MARS estimate, price weight 0.99"
     }
   ],
   "repeat_sales": {},
@@ -1083,16 +2522,6 @@
       "outside_range": false
     }
   ],
-  "local_validation": {
-    "gla_band_sf": 320,
-    "batch_n": 60,
-    "batch_gla_range": [1780, 2420],
-    "same_levels": true,
-    "batch_slope_per_sf": 90.61,
-    "batch_slope_se": 22.27,
-    "mars_avg_slope_over_band": 92.02,
-    "verdict": "LOCALLY VALIDATED"
-  },
   "bracketing": [
     {
       "feature": "lot_sf",
@@ -1167,23 +2596,17 @@
       "data_max": 1
     }
   ],
-  "interaction_diagnostic": {
-    "terms": ["h(16306-lot_sf)*h(fb_ag-2)", "h(fb_ag-2)*h(2-garage)", "h(lot_sf-20941)*levels", "h(gla-1890)*h(garage-2)"],
-    "any_retained": true,
-    "reading": "Headline model stays additive. A retained GLA x year_built or GLA x levels term means $/sf differs by cohort."
-  },
   "reproducibility": {
     "master_seed": 20260606,
     "derived_seeds": {
       "cv": 20260607,
       "boot": 20270606,
       "time": 20280606,
-      "theilsen": 20290606,
-      "lms": 20300606
+      "theilsen": 20290606
     },
     "data_sha256": "d00a66ead9636246832d37af7419e63ee473315915ed5a754126ee1bbfda0353",
-    "config_sha256": "7578d1c32e1e0538d0107097d72971fcc767f286684704e789e41717720b2906",
-    "deterministic": ["listing weights", "time index fit (IRLS, GCV pruning of the bends)", "MARS selection (GCV backward pruning) and the weighted refit", "segments", "conditional and HC1 SEs", "leave-comps-out refit"],
-    "seed_dependent": ["CVRSq (fold assignment)", "half-sample ranges (adjustment model and time index)", "Theil-Sen pair sampling", "LMS"]
+    "config_sha256": "74be671bd7ba1da1263141238190d773f3cadf24cf029e7b7eb99eac11f69f01",
+    "deterministic": ["listing weights", "time index fit (IRLS, GCV pruning of the bends)", "MARS selection (GCV backward pruning) and the weighted refit", "multiple regression (ordinary least squares)", "segments", "leave-comps-out refits"],
+    "seed_dependent": ["CVRSq and the pooled out-of-fold scores (fold assignment)", "half-sample ranges and curve bands (both models and the time index)", "Theil-Sen pair sampling"]
   }
 }
