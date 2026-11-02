@@ -13,6 +13,30 @@ The output is adjustment **support** only: per-unit rates, value curves and time
 
 ---
 
+## Time Adjustment Support (browser only)
+
+`docs/time.html` is a second page, for market-conditions support on a comp of any age, including a comp from 14 years back. Load one broad MLS export (every closed sale of the property type in the market, back to the oldest comp, up to Spark's 5,000-row cap), the effective date and the comps. Each comp gets its change to the effective date from four methods, in percent:
+
+| Method | What it is |
+|---|---|
+| **Quality-adjusted index** | The main tool's time index, same code and settings: log price on the features, location and quarter of the year, plus a time curve that may bend only on set calendar dates, with listing and Huber weights and 200 half-sample refits for the range. Here location (zip code) is on by default, because a long export usually spans more ground. |
+| **Repeat sales** | The export's own same-property pairs (Tax ID, else address) in different years, with no GLA change over 5% and no change in bedroom or bath count: log of the later price over the earlier one on yearly periods, least squares with no intercept (Bailey, Muth and Nourse), 200 bootstrap draws of the pairs for the range. |
+| **Yearly medians** | Median closed price by closing year, every closed sale as pulled. |
+| **FHFA** | FHFA's change over its own periods (the main tool's presets, or a pasted FRED series). |
+
+**Price tier.** Optional, with no default. The tier keeps the clean sales between two percentiles of their own year's prices, recut every year, so it follows the market instead of a fixed dollar floor. Every method then also runs on the tier alone, and a comp that sold in the tier for its year is read against the tier index. The page shows each comp's price percentile in its year before you pick the cut.
+
+**Same span, side by side.** The index runs from the comp's sale date. Repeat sales and yearly medians run from the comp's year to the base year, and FHFA over its own periods, so each one is set beside the index over that same span and marked inside or outside the index's range.
+
+**Checks.**
+- With location off, the all-sales index equals the main tool's time index month by month, half-sample ranges included, on 10 test exports (`node tests/time/equality.js` reruns the three synthetic ones in this repo).
+- Known answers (`tests/time/known_answer.js`, results in `tests/time/results/`): 10 synthetic 14-year exports where upper-end homes follow their own price path, with realtor-style listing errors, flips, REO sales and renovations the MLS never records. The tier index (85th to 100th percentile) held the upper tier's true change inside its half-sample range at 143 of 150 comp dates (95%), median miss 3.1 points; the all-sales index held it at 71 (47%). In 10 one-path exports where bigger homes sold more often in the 2020 to 2022 run-up, the all-sales index held the truth at 144 of 150 dates (96%), median miss 1.2 points, and yearly medians missed by 4.6 points at the median and up to 23. The unrecorded renovations push every method high: the tier index ran 3.8 points high on average at the comp dates, repeat sales 2 to 3 points high.
+- A 5,000-row export with the tier set runs in about a minute in Chrome.
+
+**Browser only.** There is no R script for this page yet. Its all-sales index is the main tool's time index, which `R/mars_adjustment_support.R` reproduces. The code is `web/time_analysis.js` (it loads `web/mars_engine.js` and `web/mars_analysis.js`) and `web/time_demo.js` (the synthetic demo and test exports). Like the main tool, it reports support only: no time adjustment is applied to a comp and no value is produced.
+
+---
+
 ## What changed in v2.4: support, not a grid
 
 | # | v2.4 behavior | Why it matters |
